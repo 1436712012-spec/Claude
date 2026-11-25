@@ -28,6 +28,11 @@
 - HUD：梦中时钟、地平线经验条、道具槽及等级点、跟随角色的血条、弹簧动效提示条。
 - 自适应分辨率：平均帧时间超过 21ms 时自动降低像素比。
 
+## 试玩
+
+- 单文件试玩版（私有 Artifact）：https://claude.ai/artifact/C8FJMNsed3UFQbzR8oiLhv
+- 重新生成：`cd game && npm run single`，产物为 `game/dist/noclip-bloom.html`。
+
 ## 真实验证结果
 
 均在无头 Chromium + SwiftShader 软件渲染下完成。

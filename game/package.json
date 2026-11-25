@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview --port 4173 --host 127.0.0.1",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "single": "npm run build && node scripts/single.mjs"
   },
   "keywords": [],
   "author": "",
