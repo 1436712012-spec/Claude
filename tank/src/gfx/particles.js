@@ -85,14 +85,16 @@ export class Particles {
     }
     this.n = 0;
   }
-  step(dt, wind, time, heightTex, terrInfo) {
+  step(dt, wind, time, heightTex, terrInfo, attr, nAttr) {
     const gl = this.gl;
     this._flush();
     gl.bindBuffer(gl.ARRAY_BUFFER, null); // a TF target must not stay bound to another target
     const from = this.cur, to = 1 - from;
     this.update.use()
       .f1('uDt', dt).f1('uTime', time).f1('uWind', wind)
-      .f3('uTerr', terrInfo[0], terrInfo[1], terrInfo[2]).i1('uH', 3);
+      .f3('uTerr', terrInfo[0], terrInfo[1], terrInfo[2]).i1('uH', 3)
+      .i1('uNA', nAttr || 0);
+    if (nAttr) this.update.v4('uAttr', attr);
     gl.activeTexture(gl.TEXTURE3);
     gl.bindTexture(gl.TEXTURE_2D, heightTex);
     gl.bindVertexArray(this.vaoU[from]);

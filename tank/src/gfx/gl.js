@@ -4,8 +4,9 @@ export function initGL(canvas) {
     powerPreference: 'high-performance', preserveDrawingBuffer: false,
   });
   if (!gl) throw new Error('需要支持 WebGL2 的浏览器');
-  const hdr = !!gl.getExtension('EXT_color_buffer_float');
-  gl.getExtension('EXT_color_buffer_half_float');
+  const f32 = gl.getExtension('EXT_color_buffer_float');
+  const f16 = gl.getExtension('EXT_color_buffer_half_float'); // many phones expose only this one
+  const hdr = !!(f32 || f16);
   gl.getExtension('OES_texture_float_linear');
   return { gl, hdr };
 }

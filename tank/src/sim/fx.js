@@ -16,7 +16,7 @@ export class Fx {
     this.set = settings;
     this.trauma = 0; this.hitstop = 0;
     this.slowT = 0; this.slowScale = 1; this.slowCur = 1;
-    this.lights = []; this.shocks = []; this.glows = []; this.rings = []; this.texts = [];
+    this.lights = []; this.shocks = []; this.lenses = new Map(); this.glows = []; this.rings = []; this.texts = [];
     this.flash = 0; this.exposure = 0; this.ca = 0; this.zoomPunch = 0; this.t = 0;
     this.hurt = 0; this.auto = 1;
   }
@@ -37,9 +37,11 @@ export class Fx {
     this.lights.push({ x, y, z, r: radius, col, i: intensity, life, max: life, pow });
   }
   shock(x, y, maxR, strength, dur = 0.5) {
-    if (this.shocks.length >= 8) this.shocks.shift();
+    if (this.shocks.length >= 12) this.shocks.shift();
     this.shocks.push({ x, y, maxR, s: strength * (this.set.reduceFlash ? 0.6 : 1), t: 0, dur });
   }
+  /** persistent screen-space lens (negative strength pulls light inward); call every step while alive */
+  lens(id, x, y, r, s) { this.lenses.set(id, { x, y, r, s, ttl: 0.1 }); }
   glow(x, y, r, life, col, intensity, shape = SH.ELL, rot = 0, hh = null) {
     this.glows.push({ x, y, r, hh: hh === null ? r : hh, rot, life, max: life, col, i: intensity, shape });
   }
@@ -63,6 +65,7 @@ export class Fx {
     this.lights = this.lights.filter((L) => L.life > 0);
     for (const s of this.shocks) s.t += dt;
     this.shocks = this.shocks.filter((s) => s.t < s.dur);
+    for (const [k, l] of this.lenses) { l.ttl -= dt; if (l.ttl <= 0) this.lenses.delete(k); }
     for (const g of this.glows) g.life -= dt;
     this.glows = this.glows.filter((g) => g.life > 0);
     for (const g of this.rings) g.life -= dt;
@@ -104,6 +107,12 @@ export class Fx {
       const r = s.maxR * (1 - Math.pow(1 - t, 2.2));
       const ux = (s.x - cam.x) / (cam.halfW * 2) + 0.5, uy = (s.y - cam.y) / (cam.halfH * 2) + 0.5;
       arr[n * 4] = ux; arr[n * 4 + 1] = uy; arr[n * 4 + 2] = r / (cam.halfH * 2); arr[n * 4 + 3] = s.s * (1 - t) * (1 - t);
+      n++;
+    }
+    for (const l of this.lenses.values()) {
+      if (n >= 16) break;
+      arr[n * 4] = (l.x - cam.x) / (cam.halfW * 2) + 0.5; arr[n * 4 + 1] = (l.y - cam.y) / (cam.halfH * 2) + 0.5;
+      arr[n * 4 + 2] = l.r / (cam.halfH * 2); arr[n * 4 + 3] = l.s;
       n++;
     }
     return n;

@@ -440,6 +440,8 @@ layout(location=2) in vec4 aC;
 uniform float uDt, uTime, uWind;
 uniform sampler2D uH;
 uniform vec3 uTerr; // x0, invStep, count
+uniform vec4 uAttr[4]; // gravity wells: x, y, strength, radius
+uniform int uNA;
 out vec4 oA;
 out vec4 oB;
 out vec4 oC;
@@ -472,6 +474,17 @@ void main(){
       vec2 q = p*0.011 + vec2(0.0, uTime*0.55);
       float sd = fract(C.w)*40.0;
       acc += vec2(sin(q.y*3.1 + q.x*1.7 + sd), cos(q.x*2.7 - q.y*1.3 + sd*0.7)) * turb;
+    }
+    for(int i=0;i<4;i++){
+      if(i >= uNA) break;
+      vec2 dd = uAttr[i].xy - p;
+      float L = length(dd) + 1.0;
+      float rr = uAttr[i].w;
+      if(L < rr){
+        float f = 1.0 - L/rr;
+        acc += dd/L * uAttr[i].z * f * f;
+        if(L < 12.0) B.x = 0.0;
+      }
     }
     v += acc*uDt;
     v *= max(0.0, 1.0 - drag*uDt);
@@ -655,7 +668,7 @@ uniform sampler2D uScene, uBloom, uBloom1;
 uniform vec2 uRes;
 uniform float uTime, uExposure, uBloomAmt, uCA, uVig, uGrain, uHurt, uOD, uRay, uFlash;
 uniform vec2 uSun;
-uniform vec4 uShock[8];
+uniform vec4 uShock[16];
 uniform int uNS;
 uniform vec3 uGradeLift, uGradeGain;
 
@@ -664,7 +677,7 @@ float hash21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7)))*43758.5453); 
 vec2 distortUV(vec2 uv){
   float asp = uRes.x/uRes.y;
   vec2 off = vec2(0.0);
-  for(int i=0;i<8;i++){
+  for(int i=0;i<16;i++){
     if(i >= uNS) break;
     vec2 c = uShock[i].xy;
     float r = uShock[i].z;

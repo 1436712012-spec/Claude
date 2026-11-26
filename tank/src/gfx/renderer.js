@@ -122,9 +122,9 @@ export class Renderer {
   }
 
   /** advance the GPU particle simulation (also callable without drawing, e.g. headless tests) */
-  simParticles(dt, wind, time) {
+  simParticles(dt, wind, time, attr, nAttr) {
     this._uploadHeights();
-    this.particles.step(dt, wind, time, this.heightTex, this.terrInfo);
+    this.particles.step(dt, wind, time, this.heightTex, this.terrInfo, attr, nAttr);
   }
 
   render(f) {
@@ -132,7 +132,7 @@ export class Renderer {
     const px = (f.cam.halfH * 2) / this.h;
 
     // GPU particle simulation step (uses frame fx dt, frozen during hit-stop)
-    this.simParticles(f.fxDt, f.wind, f.time);
+    this.simParticles(f.fxDt, f.wind, f.time, f.attr, f.attrCount);
 
     // ---------------- scene pass ----------------
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.scene.fbo);

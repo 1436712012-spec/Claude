@@ -56,13 +56,15 @@ export function updateEnemies(w, dt) {
     e.flash = Math.max(0, e.flash - dt * 7);
     e.inCloud = Math.max(0, e.inCloud - dt);
     if (e.state === 'dying') { if (updateDying(w, e, dt)) w.enemies.splice(i, 1); continue; }
+    let edt = dt;
+    if (e.stun > 0) { e.stun -= dt; edt = dt * 0.3; if (Math.random() < 0.5) fx.sparks(e.x + (Math.random() - 0.5) * e.r * 1.4, e.y + (Math.random() - 0.5) * e.r, 0, 1, 1, 220, [0.5, 0.85, 1], 3); }
 
     // ---- behaviours ----
     if (e.kind === 'bomber') {
-      e.x += e.vx * dt;
+      e.x += e.vx * edt;
       e.y = e.y0 + Math.sin(e.t * 0.9 + e.phase) * 9;
-      e.rot = damp(e.rot, Math.cos(e.t * 0.9 + e.phase) * 0.03 * e.dir, 4, dt);
-      e.bombCd -= dt;
+      e.rot = damp(e.rot, Math.cos(e.t * 0.9 + e.phase) * 0.03 * e.dir, 4, edt);
+      e.bombCd -= edt;
       if (e.bombs > 0 && e.bombCd <= 0) {
         const gh = T.heightAt(e.x), fall = Math.sqrt(2 * Math.max(40, e.y - gh - 30) / BOMB_G);
         const ix = e.x + e.vx * 0.9 * fall;
@@ -72,9 +74,9 @@ export function updateEnemies(w, dt) {
       }
       if ((e.dir > 0 && e.x > T.W + 500) || (e.dir < 0 && e.x < -500)) { w.enemies.splice(i, 1); w.escaped++; continue; }
     } else if (e.kind === 'scout') {
-      updateScout(w, e, dt);
+      updateScout(w, e, edt);
     } else {
-      updateDiver(w, e, dt);
+      updateDiver(w, e, edt);
       if (e.gone) { w.enemies.splice(i, 1); w.escaped++; continue; }
     }
     // damage-state smoke / fire

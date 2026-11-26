@@ -5,6 +5,7 @@ import { Bot } from './sim/bot.js';
 import { Hud } from './ui/hud.js';
 import { AudioEngine } from './audio/audio.js';
 import { loadSettings, saveSettings, buildPanel } from './ui/settings.js';
+import { DEFS, ORDER } from './sim/arsenal.js';
 import { clamp } from './core/math.js';
 
 const params = new URLSearchParams(location.search);
@@ -16,17 +17,20 @@ const settings = loadSettings();
 if (params.has('fx')) settings.fx = +params.get('fx');
 const renderer = new Renderer(glCanvas);
 const input = new Input(window);
+const isTouch = input.touch.enabled;
+if (settings.autoFire === null || settings.autoFire === undefined) settings.autoFire = isTouch;
+if (params.has('auto')) settings.autoFire = params.get('auto') !== '0';
 const audio = new AudioEngine(settings);
 const game = new Game(renderer, audio, settings, input);
 const hud = new Hud(hudCanvas);
 hud.showFps = params.has('fps');
 
 // quality / adaptive resolution ---------------------------------------------------------------
-let renderScale = 1, adaptEma = 16.7, adaptCount = 0;
+let renderScale = isTouch ? 0.75 : 1, adaptEma = 16.7, adaptCount = 0;
 const QUALITY = { low: 0.6, med: 0.8, high: 1 };
 function applySize() {
   const cssW = innerWidth, cssH = innerHeight;
-  const dprCap = params.has('dpr') ? +params.get('dpr') : 2;
+  const dprCap = params.has('dpr') ? +params.get('dpr') : (isTouch ? 1.5 : 2);
   const dpr = Math.min(window.devicePixelRatio || 1, dprCap);
   const q = settings.quality === 'auto' ? renderScale : QUALITY[settings.quality] || 1;
   renderer.resize(cssW * dpr * q, cssH * dpr * q);
@@ -42,7 +46,7 @@ const panel = buildPanel(settings, (key) => {
   saveSettings(settings);
   if (key === 'volume' || key === 'music') audio.applyVolume();
   if (key === 'quality') applySize();
-});
+}, () => setPaused(false));
 panel.style.display = 'none';
 document.body.append(panel);
 
@@ -52,14 +56,25 @@ function startBot() {
 }
 function stopBot() { bot = null; game.bot = null; input.virtual = null; }
 
-if (params.has('bot') || params.has('autostart') || true) startBot(); // attract mode behind the title
-if (params.has('autostart')) { game.startGame(params.get('seed') || 'shot'); if (!params.has('bot')) { /* keep bot for hands-free runs */ } }
+startBot(); // attract mode behind the title
+function parseLoadout() {
+  const a = params.get('arms');
+  if (!a) return null;
+  const lv = Math.max(1, Math.min(5, +(params.get('lv') || 1)));
+  const ids = a === 'all' ? ORDER.filter((id) => !DEFS[id].passive) : a.split(',').filter((id) => DEFS[id]);
+  return ids.map((id) => [id, lv]);
+}
+if (params.has('autostart')) game.startGame(params.get('seed') || 'shot', parseLoadout() || [['tesla', 1]]);
 
 function begin() {
   audio.init();
   stopBot();
-  game.startGame();
+  game.startGame(null, parseLoadout());
   document.body.classList.add('playing');
+  if (isTouch) {
+    try { const el = document.documentElement; (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el); } catch (e) { /* not allowed */ }
+    try { screen.orientation?.lock?.('landscape').catch(() => {}); } catch (e) { /* unsupported */ }
+  }
 }
 function setPaused(p) {
   if (p && game.state === 'play') { game.state = 'paused'; panel.style.display = 'block'; document.body.classList.remove('playing'); }
@@ -67,16 +82,25 @@ function setPaused(p) {
 }
 addEventListener('keydown', (e) => {
   audio.init();
+  if (game.state === 'pick') {
+    const k = { Digit1: 0, Digit2: 1, Digit3: 2, Numpad1: 0, Numpad2: 1, Numpad3: 2 }[e.code];
+    if (k !== undefined) game.choose(k);
+    return;
+  }
+  if (e.code === 'KeyT' && !e.repeat && game.state !== 'title') { settings.autoFire = !settings.autoFire; saveSettings(settings); game.fx.text(game.tank.x, game.tank.y + 150, settings.autoFire ? '全自动开火' : '手动开火', '#7af0ff', 22, 1.2); return; }
   if (e.code === 'Escape' || e.code === 'KeyP') { setPaused(game.state === 'play'); return; }
   if (game.state === 'title' && !e.repeat && e.code !== 'F12') begin();
   else if ((game.state === 'over' && game.overT > 1.5) || game.state === 'win') { if (e.code === 'Enter' || e.code === 'Space') begin(); }
 });
-addEventListener('mousedown', (e) => {
+input.onPointer = (e) => {
   audio.init();
   if (panel.contains(e.target)) return;
   if (game.state === 'title') begin();
+  else if (game.state === 'pick') { const i = hud.hitCard(e.clientX, e.clientY); if (i >= 0) game.choose(i); }
   else if ((game.state === 'over' && game.overT > 1.5) || game.state === 'win') begin();
-});
+};
+input.onPause = () => setPaused(game.state === 'play');
+document.addEventListener('visibilitychange', () => { if (document.hidden) setPaused(true); });
 addEventListener('blur', () => setPaused(true));
 
 // loop ------------------------------------------------------------------------------------------
@@ -87,12 +111,14 @@ function frame(now) {
   dt = Math.min(dt, 0.1);
   acc += dt;
   let n = 0;
+  if (window.__freeze) acc = 0; // test hook: hold the simulation still for a screenshot
   while (acc >= STEP && n < 5) {
     game.step(STEP); input.endFrame();
     acc -= STEP; n++;
     if (game.state === 'paused') { acc = 0; break; }
   }
   if (n === 5) acc = 0;
+  if (window.__noRender) return; // test hook: skip drawing while stepping headless
   audio.update(game, dt);
   game.draw(dt);
   hud.draw(game, input);
@@ -135,5 +161,6 @@ window.__game = {
     const mk = (kind, dx, y, dir) => { const e = game.spawnDirect(kind, c.x + dx, y, dir); return e; };
     mk('bomber', -230, 330, 1); mk('scout', 330, 250, -1); mk('diver', 60, 400, 1);
   },
+  give(id, lv = 1) { for (let i = 0; i < lv; i++) game.arms.add(id); },
   begin, startBot, stopBot,
 };

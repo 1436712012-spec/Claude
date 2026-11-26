@@ -2,11 +2,16 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#05030c">
 <title>NIGHTWATCH FLAK · 守夜炮</title>
 <style>
   html,body{margin:0;height:100%;background:#05030c;overflow:hidden;font-family:'Orbitron','Rajdhani','Segoe UI','Microsoft YaHei',sans-serif}
-  canvas{position:fixed;left:0;top:0;display:block}
+  canvas{position:fixed;left:0;top:0;display:block;touch-action:none;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
+  html,body{touch-action:none;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
   #gl{image-rendering:auto}
   #hud{pointer-events:none}
   body.playing,body.playing canvas{cursor:none}
@@ -19,12 +24,18 @@
   #panel input[type=range]{flex:1;accent-color:#ff2fb4}
   #panel b{flex:0 0 38px;text-align:right;font-weight:600;color:#ffb347;font-size:12px}
   #panel select{flex:1;background:#0b0820;color:#d8e8ff;border:1px solid #3a4a8a;padding:3px}
+  #panel button{display:block;margin:14px auto 0;padding:10px 28px;font:inherit;font-size:15px;letter-spacing:3px;color:#05030c;background:linear-gradient(90deg,#19f0ff,#ff2fb4);border:0;border-radius:4px;cursor:pointer}
   #panel .hint{margin:14px 0 0;font-size:12px;color:#7f8fb8;text-align:center}
+  #rotate{display:none;position:fixed;inset:0;z-index:9;background:rgba(5,3,12,.96);color:#d8e8ff;align-items:center;justify-content:center;flex-direction:column;gap:18px;font-size:18px;letter-spacing:3px;text-shadow:0 0 14px #19f0ff}
+  #rotate i{display:block;width:64px;height:40px;border:3px solid #19f0ff;border-radius:7px;animation:rot 2.2s ease-in-out infinite;box-shadow:0 0 18px #19f0ff}
+  @keyframes rot{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+  @media (orientation:portrait) and (pointer:coarse){#rotate{display:flex}}
 </style>
 </head>
 <body>
 <canvas id="gl"></canvas>
 <canvas id="hud"></canvas>
+<div id="rotate"><i></i><div>请横屏使用</div></div>
 <!--BUNDLE-->
 <script type="module" src="./src/main.js"></script>
 <!--/BUNDLE-->

@@ -182,6 +182,51 @@ export class AudioEngine {
         this.noise(t, 0.8, { type: 'lowpass', f0: 1200, f1: 100, gain: 0.4, pan, rev: 0.5 });
         break;
       case 'overheat': this.tone(t, 0.22, { f0: 900, f1: 380, type: 'square', gain: 0.07, pan }); break;
+      case 'zap': {
+        const n = a.n || 2;
+        this.tone(t, 0.16, { f0: 3200, f1: 700, type: 'triangle', gain: 0.1, pan });
+        this.tone(t, 0.2, { f0: 240, f1: 60, type: 'sawtooth', gain: 0.16, pan, rev: 0.15 });
+        for (let i = 0; i < 3 + n; i++) this.noise(t + Math.random() * 0.22, 0.04, { type: 'highpass', f0: rr(2500, 7000), gain: 0.16, pan });
+        break;
+      }
+      case 'railCharge':
+        this.tone(t, 0.8, { f0: 70, f1: 1400, type: 'sawtooth', gain: 0.1, rev: 0.3 });
+        this.noise(t, 0.8, { type: 'bandpass', f0: 300, f1: 5000, q: 2, gain: 0.12 });
+        break;
+      case 'rail':
+        this.tone(t, 0.7, { f0: 170, f1: 26, gain: 0.85, pan, rev: 0.4 });
+        this.noise(t, 0.55, { type: 'lowpass', f0: 7000, f1: 160, gain: 0.8, pan, rev: 0.5 });
+        this.tone(t, 0.45, { f0: 2600, f1: 180, type: 'sawtooth', gain: 0.12, pan });
+        this.noise(t, 0.08, { type: 'highpass', f0: 3000, gain: 0.5, pan });
+        break;
+      case 'gravityLaunch': this.tone(t, 0.4, { f0: 260, f1: 90, gain: 0.16, pan }); this.noise(t, 0.35, { type: 'lowpass', f0: 1800, f1: 200, gain: 0.2, pan }); break;
+      case 'gravityOpen':
+        this.tone(t, 1.0, { f0: 64, f1: 28, gain: 0.5, pan, rev: 0.5 });
+        this.noise(t, 0.8, { type: 'bandpass', f0: 4500, f1: 160, q: 1.5, gain: 0.3, pan, rev: 0.4 });
+        break;
+      case 'gravityHum': if (this._gate('gh', 160)) this.tone(t, 0.25, { f0: 48, f1: 40, gain: 0.1, pan }); break;
+      case 'laserOn': this.tone(t, 0.35, { f0: 400, f1: 1900, type: 'sawtooth', gain: 0.07, pan, rev: 0.2 }); this.tone(t + 0.05, 0.3, { f0: 800, f1: 3000, type: 'sine', gain: 0.05, pan }); break;
+      case 'laserHit': if (this._gate('lh', 90)) this.noise(t, 0.05, { type: 'highpass', f0: rr(3000, 7000), gain: 0.1, pan }); break;
+      case 'fwLaunch': this.tone(t, 0.7, { f0: 420, f1: 2000, gain: 0.05, pan }); this.noise(t, 0.12, { type: 'lowpass', f0: 1500, f1: 300, gain: 0.2, pan }); break;
+      case 'fwPop':
+        this.noise(t, 0.18, { type: 'bandpass', f0: 1600, q: 0.8, gain: 0.45, pan, rev: 0.4 });
+        this.tone(t, 0.22, { f0: 110, f1: 45, gain: 0.45, pan, rev: 0.3 });
+        for (let i = 0; i < 10; i++) this.noise(t + 0.05 + Math.random() * 0.6, 0.04, { type: 'highpass', f0: rr(3000, 8000), gain: 0.1, pan });
+        break;
+      case 'drone': if (this._gate('dr', 120)) { this.tone(t, 0.18, { f0: 640, f1: 980, type: 'square', gain: 0.035, pan }); this.noise(t, 0.15, { type: 'bandpass', f0: 2400, q: 2, gain: 0.05, pan }); } break;
+      case 'pulse':
+        this.tone(t, 0.9, { f0: 100, f1: 22, gain: 0.85, pan, rev: 0.5 });
+        this.noise(t, 0.6, { type: 'lowpass', f0: 900, f1: 60, gain: 0.6, pan, rev: 0.5 });
+        this.tone(t, 0.3, { f0: 700, f1: 120, type: 'triangle', gain: 0.12, pan });
+        break;
+      case 'ionMark': for (let i = 0; i < 4; i++) this.tone(t + i * (0.34 - i * 0.05), 0.07, { f0: 1100 + i * 140, type: 'square', gain: 0.045, pan }); break;
+      case 'ion':
+        this.tone(t, 1.5, { f0: 76, f1: 18, gain: 0.95, pan, rev: 0.6 });
+        this.noise(t, 1.2, { type: 'lowpass', f0: 5200, f1: 90, gain: 0.85, pan, rev: 0.7 });
+        this.tone(t, 0.9, { f0: 2200, f1: 90, type: 'sawtooth', gain: 0.12, pan });
+        break;
+      case 'cardOpen': [523, 659, 784].forEach((f, i) => this.tone(t + i * 0.07, 0.25, { f0: f, type: 'triangle', gain: 0.09, pan: 0, rev: 0.3 })); break;
+      case 'cardPick': [523, 659, 784, 1047].forEach((f, i) => this.tone(t + i * 0.05, 0.5, { f0: f, type: 'triangle', gain: 0.11, pan: 0, rev: 0.4 })); this.noise(t, 0.3, { type: 'highpass', f0: 4000, f1: 9000, gain: 0.08 }); break;
       default: break;
     }
   }

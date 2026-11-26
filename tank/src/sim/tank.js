@@ -1,7 +1,7 @@
 import { clamp, damp, wrapPi, approach } from '../core/math.js';
 import { C } from '../data/palette.js';
 import { SH } from '../gfx/shapes.js';
-import { GRAV, TIER, solveBallistic, fireShell, fireMissiles } from './weapons.js';
+import { GRAV, TIER, solveBallistic, fireShell } from './weapons.js';
 
 export const SC = 1.25;
 export const THRESH = [0.22, 0.7, 1.3];
@@ -54,13 +54,13 @@ export class Tank {
     if (w.time - this.lastHurt > 6 && this.hp < this.hpMax) this.hp = Math.min(this.hpMax, this.hp + 3 * dt);
 
     // ---- driving ----
-    const dir = (inp.right ? 1 : 0) - (inp.left ? 1 : 0);
+    const dir = inp.axis;
     const od = w.combo.odT > 0;
     let maxV = 200 * (this.charging && this.charge > 0.2 ? 0.7 : 1);
     const sl = T.slopeAt(this.x);
     this.slopeCur = damp(this.slopeCur, sl, 8, dt);
-    if (dir) maxV *= 1 - 0.3 * clamp(this.slopeCur * dir, 0, 1);
-    if (dir) this.vx += dir * 950 * dt; else this.vx = approach(this.vx, 0, 820 * dt);
+    if (dir) maxV *= (1 - 0.3 * clamp(this.slopeCur * dir, 0, 1)) * Math.min(1, 0.35 + Math.abs(dir));
+    if (Math.abs(dir) > 0.05) this.vx += dir * 950 * dt; else this.vx = approach(this.vx, 0, 820 * dt);
     this.vx = clamp(this.vx, -maxV, maxV);
     this.x = clamp(this.x + this.vx * dt, 170, T.W - 170);
     this.odo += this.vx * dt * (this.f > 0 ? 1 : -1);
@@ -159,7 +159,7 @@ export class Tank {
         const T = TIER[tier];
         this.recoil = 12 * T.power; this.recoilV = 0;
         this.vx -= this.f * (70 + tier * 55);
-        this.cd = 0.28 + tier * 0.06;
+        this.cd = (0.28 + tier * 0.06) / (1 + 0.08 * (w.arms.lv('cannon') - 1));
         this.charge = 0;
       }
     }
@@ -171,13 +171,13 @@ export class Tank {
       const g = this.mgPos();
       const a = Math.atan2(aim.y - g.y, aim.x - g.x) + (Math.random() - 0.5) * 0.06;
       const od2 = w.combo.odT > 0;
-      w.tracers.push({ x: g.x + Math.cos(a) * 20, y: g.y + Math.sin(a) * 20, vx: Math.cos(a) * 1500, vy: Math.sin(a) * 1500, life: 0.7, dmg: 4.2, od: od2 });
+      w.tracers.push({ x: g.x + Math.cos(a) * 20, y: g.y + Math.sin(a) * 20, vx: Math.cos(a) * 1500, vy: Math.sin(a) * 1500, life: 0.7, dmg: 4.2 * (1 + 0.22 * (w.arms.lv('mg') - 1)), od: od2 });
       fx.sparks(g.x + Math.cos(a) * 22, g.y + Math.sin(a) * 22, Math.cos(a), Math.sin(a), 3, 600, [1, 0.8, 0.4], 0.35);
       fx.glow(g.x + Math.cos(a) * 18, g.y + Math.sin(a) * 18, 14, 0.05, [1, 0.85, 0.5], 4);
       fx.light(g.x, g.y, 40, 110, [1, 0.8, 0.5], 2.6, 0.05);
       fx.casing(g.x, g.y, -this.f * (60 + Math.random() * 80), 150 + Math.random() * 120);
       fx.addTrauma(0.012);
-      this.heat += od2 ? 0.01 : 0.032;
+      this.heat += od2 ? 0.01 : 0.032 * (1 - 0.08 * (w.arms.lv('mg') - 1));
       this.mgShots++;
       if (this.mgShots % 2 === 0) w.sfx('mg', this.x, {});
       if (this.heat >= 1) { this.overheat = true; w.sfx('overheat', this.x, {}); }
@@ -187,7 +187,7 @@ export class Tank {
       fx.smoke(g.x, g.y + 4, this.f * 10, 50, 5, 0.9, false, [0.5, 0.5, 0.55]);
     }
     // ---- missiles / overdrive ----
-    if (inp.missile && this.missileCd <= 0 && w.enemies.length) { this.missileCd = 7; fireMissiles(w, this); }
+    if (inp.missile && w.arms.by.missiles && w.enemies.length && this.missileCd <= 0) { this.missileCd = 3; w.arms.by.missiles.cd = 0; }
     if (inp.overdrive && w.combo.meter >= 100 && w.combo.odT <= 0) w.startOverdrive();
 
     // ---- exhaust ----

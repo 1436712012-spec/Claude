@@ -7,13 +7,14 @@ import { Town, Props } from './town.js';
 import { computeSky } from './sky.js';
 import { spawnEnemy, updateEnemies, updateEnemyShots, drawEnemies } from './enemies.js';
 import { updateShells, updateClouds, updateTracers, updateMissiles, drawShots } from './weapons.js';
+import { Arsenal, DEFS } from './arsenal.js';
+import { Gunner } from './gunner.js';
 import { PT } from '../gfx/particles.js';
 import { C } from '../data/palette.js';
 import { SH } from '../gfx/shapes.js';
 
-export const WORLD_W = 7000;
-export const TOWN_X = 3500;
-export const WAVES = 8;
+import { WORLD_W, TOWN_X, WAVES } from '../data/consts.js';
+export { WORLD_W, TOWN_X, WAVES };
 const B = [1, 2, 3, 3, 4, 5, 5, 6], S = [2, 3, 3, 4, 4, 6, 6, 8], D = [0, 0, 2, 2, 3, 4, 5, 6];
 const NAMES = ['黄昏', '暮色', '入夜', '深夜', '午夜', '夜半', '拂晓前', '黎明'];
 
@@ -31,12 +32,15 @@ export class Game {
         return { x: ((wx - this.x) / this.halfW * 0.5 + 0.5) * this.cssW, y: (1 - ((wy - this.y) / this.halfH * 0.5 + 0.5)) * this.cssH };
       },
     };
-    this.lp = new Float32Array(64); this.lc = new Float32Array(64); this.shocks = new Float32Array(32);
+    this.lp = new Float32Array(64); this.lc = new Float32Array(64); this.shocks = new Float32Array(64); this.attr = new Float32Array(16); this.attrCount = 0;
     this.state = 'title';
     this.skyPhase = 0.04;
     this.fxDt = 0;
     this.bot = null;
-    this.reset('ironclad');
+    this.gunner = new Gunner();
+    this.autoOn = false;
+    this.offer = null; this.pickT = 0;
+    this.startDemo();
   }
 
   reset(seed) {
@@ -53,6 +57,7 @@ export class Game {
     this.time = 0; this.uid = 0; this.overT = 0;
     this.fx.lights.length = 0; this.fx.glows.length = 0; this.fx.rings.length = 0; this.fx.shocks.length = 0; this.fx.texts.length = 0;
     this.fx.trauma = 0; this.fx.hitstop = 0; this.fx.slowT = 0; this.fx.slowScale = 1; this.fx.slowCur = 1;
+    this.arms = new Arsenal(this);
     this.tank = new Tank(this);
     this.camera.x = this.tank.x; this.camera.y = this.tank.y + 120;
     this.wave = { n: 0, state: 'idle', t: 0, events: [], idx: 0, prog: 0 };
@@ -60,10 +65,41 @@ export class Game {
     this.banner = null;
   }
 
-  startGame(seed) {
+  startGame(seed, loadout) {
     this.reset(seed || ('run' + Math.floor(Math.random() * 1e6)));
-    this.state = 'play';
+    if (loadout) { for (const [id, lv] of loadout) for (let i = 0; i < lv; i++) this.arms.add(id); this.state = 'play'; this.startWave(1); }
+    else { this.state = 'pick'; this.pickStart = true; this.openPick(); }
+  }
+
+  /** attract mode: a random showy loadout fights the first waves behind the title */
+  startDemo() {
+    this.reset('demo' + Math.floor(Math.random() * 999));
+    const ids = ['tesla', 'rail', 'gravity', 'prism', 'firework', 'drones', 'pulse', 'ion', 'barrage', 'missiles'].sort(() => Math.random() - 0.5).slice(0, 4);
+    for (const id of ids) { this.arms.add(id); this.arms.add(id); }
+    this.state = 'title';
     this.startWave(1);
+  }
+
+  // ---- weapon picks --------------------------------------------------------------------------
+  openPick() {
+    let offer = this.arms.offer(this.rng, 3);
+    if (this.pickStart) offer = offer.filter((o) => !DEFS[o.id].passive);
+    while (this.pickStart && offer.length < 3) { const extra = this.arms.offer(this.rng, 6).find((o) => !DEFS[o.id].passive && !offer.some((x) => x.id === o.id)); if (!extra) break; offer.push(extra); }
+    if (!offer.length) { this.pickStart = false; this.state = 'play'; return; }
+    this.offer = offer; this.pickT = 0; this.state = 'pick';
+    this.sfx('cardOpen', this.camera.x, {});
+  }
+  choose(i) {
+    if (this.state !== 'pick' || !this.offer || !this.offer[i]) return;
+    const id = this.offer[i].id;
+    const s = this.arms.add(id);
+    const d = DEFS[id];
+    this.fx.text(this.tank.x, this.tank.y + 170, (s.lv === 1 ? '获得 ' : '升级 ') + d.name + ' Lv' + s.lv, '#fff', 28, 1.8);
+    this.fx.ring(this.tank.x, this.tank.y + 50, 10, 200, 5, 0.6, d.col, 3);
+    this.fx.light(this.tank.x, this.tank.y + 60, 80, 400, d.col, 5, 0.5);
+    this.sfx('cardPick', this.tank.x, {});
+    this.offer = null; this.state = 'play';
+    if (this.pickStart) { this.pickStart = false; this.startWave(1); } else this.wave.t = Math.max(this.wave.t, 1.5);
   }
 
   // ---- hooks used by entities --------------------------------------------------------------
@@ -138,6 +174,15 @@ export class Game {
     t.hp = Math.min(t.hpMax, t.hp + 30);
     this.banner = { text: '第 ' + W.n + ' 波 · 肃清', sub: '灯火 ' + this.town.litCount + ' / ' + this.town.houses.length, t: 0, life: 3.4 };
     this.score += this.town.litCount * 100;
+    if (W.n < WAVES) {
+      if (this.bot) this._botPick(); // attract mode / hands-free runs: choose silently, never leave the title state
+      else { this.pickStart = false; this.openPick(); }
+    }
+  }
+  _botPick() {
+    const offer = this.arms.offer(this.rng, 3);
+    const o = offer.find((x) => !DEFS[x.id].passive) || offer[0];
+    if (o) this.arms.add(o.id);
   }
   _win() {
     this.wave.state = 'idle';
@@ -151,6 +196,11 @@ export class Game {
     const fx = this.fx, inp = this.input, cam = this.camera;
     fx.tickReal(dt);
     if (this.state === 'paused') return;
+    if (this.state === 'pick') {
+      this.pickT += dt;
+      if (this.bot && this.pickT > 0.7 && this.offer) this.choose(Math.floor(Math.random() * this.offer.length));
+      this.camera.x += 0; return;
+    }
     const dtW = dt * fx.slowCur;
     const frozen = fx.hitstop > 0;
     const od = this.combo.odT > 0;
@@ -158,6 +208,16 @@ export class Game {
     const dtE = frozen ? 0 : dtW * (od ? 0.55 : 1);
 
     if (this.bot) this.bot.update(this, dt);
+    // full-auto: cannon + MG are driven by the gunner; a finger / recent mouse move overrides the aim point
+    this.autoOn = !this.bot && this.set.autoFire;
+    if (this.autoOn && this.state === 'play') {
+      let manual = null;
+      const ta = inp.touch && inp.touch.aim;
+      if (ta && ta.active) manual = cam.screenToWorld(ta.x, ta.y - ta.off);
+      else if (!inp.touch?.enabled && performance.now() - inp.mouseT < 1800) manual = cam.screenToWorld(inp.mx, inp.my);
+      this.gunner.update(this, dt, manual);
+      inp.auto = this.gunner.out;
+    } else inp.auto = null;
 
     // wind
     const wi = this.wind;
@@ -170,6 +230,7 @@ export class Game {
       this.time += dtW;
       const tinp = this.state === 'over' ? NO_INPUT : inp;
       this.tank.update(this, dtW, tinp);
+      if (this.state !== 'over') this.arms.update(dtS);
       updateShells(this, dtS); updateTracers(this, dtS); updateMissiles(this, dtS); updateClouds(this, dtS);
       updateEnemies(this, dtE); updateEnemyShots(this, dtE);
       this.town.update(this, dtS);
@@ -193,7 +254,7 @@ export class Game {
       if (this.state === 'over') this.overT += dt;
       if (this.state === 'title' && (this.tank.dead || this.town.litCount === 0)) {
         this.overT += dt;
-        if (this.overT > 3) { this.reset('demo' + Math.floor(Math.random() * 999)); this.startWave(1); }
+        if (this.overT > 3) this.startDemo();
       }
     }
     if (this.banner) { this.banner.t += dt; if (this.banner.t > this.banner.life) this.banner = null; }
@@ -216,7 +277,7 @@ export class Game {
 
   /** step GPU particles for the sim time accumulated since the last draw (used when stepping headless) */
   flushParticles() {
-    if (this.fxDt > 0) { this.r.simParticles(this.fxDt, this.wind.v, this.time); this.fxDt = 0; }
+    if (this.fxDt > 0) { this.r.simParticles(this.fxDt, this.wind.v, this.time, this.attr, this.attrCount); this.fxDt = 0; }
   }
 
   resizeCamera(cssW, cssH) {
@@ -242,6 +303,7 @@ export class Game {
     this.tank.draw(this, L0, LA);
     drawEnemies(this, L0, LA);
     drawShots(this, L0, L1, LA);
+    this.arms.draw(L0, L1, LA);
     fx.drawAdd(LA);
 
     // overdrive aura
@@ -262,7 +324,7 @@ export class Game {
     const lowHp = this.tank.hp < 30 && !this.tank.dead ? (0.5 + 0.5 * Math.sin(this.time * 6)) * 0.25 : 0;
     const frame = {
       cam: { x: cam.x, y: cam.y, halfW: cam.halfW, halfH: cam.halfH },
-      shake, time: this.time + fx.t * 0, wind: this.wind.v, fxDt: this.fxDt,
+      shake, time: this.time + fx.t * 0, wind: this.wind.v, fxDt: this.fxDt, attr: this.attr, attrCount: this.attrCount,
       sky, lightCount, lightPos: this.lp, lightCol: this.lc, shockCount, shocks: this.shocks,
       post: {
         exposure: 1.0 + fx.exposure, bloom: 0.42 * set.bloom, threshold: 1.15, ca: 0.0009 + fx.ca + this.combo.odBlend * 0.0016, vig: 1.0,
@@ -276,4 +338,4 @@ export class Game {
   }
 }
 
-const NO_INPUT = { left: false, right: false, fire: false, mg: false, jump: false, missile: false, overdrive: false, aimX: 640, aimY: 300 };
+const NO_INPUT = { axis: 0, left: false, right: false, fire: false, mg: false, jump: false, missile: false, overdrive: false, aimX: 640, aimY: 300 };

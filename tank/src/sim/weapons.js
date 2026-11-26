@@ -27,7 +27,7 @@ export function fireShell(w, tank, tier, tof) {
   const T = TIER[tier];
   const m = tank.muzzle(), a = tank.barrelAng;
   const od = w.combo.odT > 0;
-  w.shells.push({ x: m.x, y: m.y, vx: Math.cos(a) * T.speed, vy: Math.sin(a) * T.speed, tier, t: 0, fuse: tier > 0 ? tof : 99, od, tr: 0 });
+  w.shells.push({ x: m.x, y: m.y, vx: Math.cos(a) * T.speed, vy: Math.sin(a) * T.speed, tier, t: 0, fuse: tier > 0 ? tof : 99, od, tr: 0, mult: 1 + 0.18 * (w.arms.lv('cannon') - 1) });
   w.fx.muzzle(m.x, m.y, a, T.power);
   w.fx.addTrauma(0.12 + tier * 0.1);
   w.fx.stop(tier >= 2 ? 3 : 1);
@@ -46,26 +46,26 @@ function groundImpact(w, s, y) {
   fx.explosion(s.x, y, size, { plasma: s.od });
   fx.dust(s.x, y, 40, 40 * size, 260);
   w.terrain.crater(s.x, 30 * size * od, 15 * size * od);
-  splash(w, s.x, y, T.splashR || T.R * 0.55, (T.splashD || T.dmg * 0.4) * od, {});
+  splash(w, s.x, y, T.splashR || T.R * 0.55, (T.splashD || T.dmg * 0.4) * od * (s.mult || 1), {});
   w.sfx('explosion', s.x, { size });
 }
 
 function burst(w, s, hitEnemy) {
   const fx = w.fx, T = TIER[s.tier];
-  const od = s.od ? 1.25 : 1;
+  const od = s.od ? 1.25 : 1, mult = s.mult || 1;
   if (s.tier === 0) {
     fx.explosion(s.x, s.y, T.size, { plasma: s.od });
-    if (hitEnemy) damageEnemy(w, hitEnemy, T.dmg, s.x, s.y, { stop: 3 });
-    splash(w, s.x, s.y, T.splashR * od, T.splashD * od, { target: hitEnemy });
+    if (hitEnemy) damageEnemy(w, hitEnemy, T.dmg * mult, s.x, s.y, { stop: 3 });
+    splash(w, s.x, s.y, T.splashR * od, T.splashD * od * mult, { target: hitEnemy });
     w.sfx('explosion', s.x, { size: 0.6 });
     return;
   }
   const R = T.R * od;
   fx.flakBurst(s.x, s.y, R, s.tier, s.od);
   fx.stop(s.tier >= 2 ? 3 : 2);
-  splash(w, s.x, s.y, R, T.dmg, { target: hitEnemy, color: s.od ? C.plasma : undefined });
+  splash(w, s.x, s.y, R, T.dmg * mult, { target: hitEnemy, color: s.od ? C.plasma : undefined });
   const puffs = 9 + s.tier * 2;
-  const cl = { x: s.x, y: s.y, R, age: 0, life: T.cloudLife * (s.od ? 1.2 : 1), dps: T.cloudDps * (s.od ? 1.6 : 1), tick: 0.2, puffs: [], plasma: s.od, tier: s.tier };
+  const cl = { x: s.x, y: s.y, R, age: 0, life: T.cloudLife * (s.od ? 1.2 : 1), dps: T.cloudDps * (s.od ? 1.6 : 1) * mult, tick: 0.2, puffs: [], plasma: s.od, tier: s.tier };
   for (let i = 0; i < puffs; i++) {
     const a = Math.random() * 6.283, r = Math.sqrt(Math.random()) * R * 0.78;
     cl.puffs.push({ ox: Math.cos(a) * r, oy: Math.sin(a) * r * 0.85, r: R * (0.34 + Math.random() * 0.26), rot: Math.random() * 6.283, seed: Math.random() * 7, spin: (Math.random() - 0.5) * 0.3 });
@@ -160,15 +160,13 @@ export function updateTracers(w, dt) {
   }
 }
 
-export function fireMissiles(w, tank) {
-  const aim = { x: tank.aimX, y: tank.aimY };
-  const cands = w.enemies.filter((e) => e.state !== 'dying').map((e) => ({ e, d: Math.hypot(e.x - aim.x, e.y - aim.y) })).sort((a, b) => a.d - b.d);
-  const n = 3;
-  const m = tank.muzzle();
+export function fireMissiles(w, tank, n = 3, dmg = 80, sr = 66) {
+  const rank = { bomber: 0, diver: 1, scout: 2 };
+  const cands = w.enemies.filter((e) => e.state !== 'dying').sort((a, b) => (rank[a.kind] - rank[b.kind]) * 400 + (Math.hypot(a.x - tank.x, a.y - tank.y) - Math.hypot(b.x - tank.x, b.y - tank.y)));
   for (let i = 0; i < n; i++) {
-    const target = cands.length ? cands[i % cands.length].e : null;
-    const a = Math.PI / 2 + (i - 1) * 0.35 + (tank.f > 0 ? -0.15 : 0.15);
-    w.missiles.push({ x: tank.x + tank.f * (-10 + i * 8), y: tank.y + 80, vx: Math.cos(a) * 280, vy: Math.sin(a) * 280, t: -i * 0.09, target, rot: a, speed: 300, smokeT: 0 });
+    const target = cands.length ? cands[i % cands.length] : null;
+    const a = Math.PI / 2 + (i - (n - 1) / 2) * 0.28 + (tank.f > 0 ? -0.15 : 0.15);
+    w.missiles.push({ x: tank.x + tank.f * (-10 + i * 6), y: tank.y + 80, vx: Math.cos(a) * 280, vy: Math.sin(a) * 280, t: -i * 0.07, target, rot: a, speed: 300, smokeT: 0, dmg, sr });
   }
   w.fx.addTrauma(0.2); w.fx.zoomPunch = Math.max(w.fx.zoomPunch, 0.25);
   w.sfx('missile', tank.x, {});
@@ -206,7 +204,7 @@ export function updateMissiles(w, dt) {
     if (m.y < T.heightAt(m.x) + 3) boom = true;
     if (boom) {
       fx.explosion(m.x, m.y, 1.05);
-      splash(w, m.x, m.y, 66, 80, { stop: 3 });
+      splash(w, m.x, m.y, m.sr || 66, m.dmg || 80, { stop: 3 });
       if (m.y < T.heightAt(m.x) + 40) T.crater(m.x, 26, 12);
       w.sfx('explosion', m.x, { size: 0.9 });
       w.missiles.splice(i, 1);

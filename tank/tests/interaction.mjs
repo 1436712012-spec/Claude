@@ -14,9 +14,13 @@ const results = [];
 const check = (name, ok, extra = '') => { results.push(ok); console.log((ok ? 'PASS ' : 'FAIL ') + name + (extra ? '  ' + extra : '')); };
 
 check('title state first', (await G(() => window.__game.game.state)) === 'title');
-await pg.mouse.click(480, 270);               // start the game
+await pg.mouse.click(480, 270);               // start the run -> weapon pick screen
 await pg.waitForTimeout(300);
-check('click starts the game', (await G(() => window.__game.game.state)) === 'play');
+check('click opens the weapon pick', (await G(() => window.__game.game.state)) === 'pick');
+check('pick offers 3 new weapons', (await G(() => window.__game.game.offer.length)) === 3);
+await pg.keyboard.press('Digit2');
+await pg.waitForTimeout(300);
+check('pressing 2 picks a weapon and starts', (await G(() => window.__game.game.state)) === 'play' && (await G(() => window.__game.game.arms.list.length)) === 3);
 await G(() => { window.__game.game.wave.state = 'idle'; window.__game.game.banner = null; window.__game.game.enemies.length = 0; });
 
 // driving
@@ -58,9 +62,9 @@ await pg.keyboard.press('Space'); await pg.waitForTimeout(200);
 check('Space jumps (jets)', await G(() => window.__game.game.tank.air));
 
 // missiles need a target
-await G(() => { window.__game.game.spawnDirect('scout', window.__game.game.camera.x + 200, 260, -1); window.__game.game.tank.missileCd = 0; });
+await G(() => { window.__game.give('missiles', 1); window.__game.game.spawnDirect('scout', window.__game.game.camera.x + 200, 260, -1); window.__game.game.tank.missileCd = 0; });
 await pg.keyboard.press('KeyQ'); await pg.waitForTimeout(120);
-check('Q launches 3 missiles', (await G(() => window.__game.game.missiles.length)) === 3);
+check('Q launches the missile salvo', (await G(() => window.__game.game.missiles.length)) >= 3);
 
 // pause
 await pg.keyboard.press('Escape'); await pg.waitForTimeout(150);
@@ -76,7 +80,11 @@ await G(() => window.__game.advance(3));
 check('game over is reached', (await G(() => window.__game.game.state)) === 'over');
 await G(() => { window.__game.game.overT = 2; });
 await pg.keyboard.press('Enter'); await pg.waitForTimeout(300);
-check('Enter restarts', (await G(() => window.__game.game.state)) === 'play');
+check('Enter restarts (weapon pick again)', (await G(() => window.__game.game.state)) === 'pick');
+await pg.keyboard.press('Digit1'); await pg.waitForTimeout(200);
+// auto-fire toggle
+await pg.keyboard.press('KeyT'); await pg.waitForTimeout(100);
+check('T toggles full-auto fire', (await G(() => window.__game.settings.autoFire)) === true);
 
 check('no console/page errors', errs.length === 0, errs.slice(0, 3).join(' | '));
 console.log(results.every(Boolean) ? '\nALL PASSED' : '\nSOME FAILED');
