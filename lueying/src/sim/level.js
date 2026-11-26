@@ -261,3 +261,10 @@ export const GATES = [
   { id: 'south', inner: [-100, -207], outer: [-100, -193] },
   { id: 'north', inner: [0, -493], outer: [0, -508] },
 ];
+
+// 地图标注（俯视图用）
+export const MAP_TEXT = [
+  ['淹水林', -260, 780], ['回收点', EXTRACT.x + 18, EXTRACT.z + 4], ['雨林带', -300, 200], ['清障带', -140, -168],
+  ['涵洞', MAP.culvert.x + 8, -150], ['机库', HANGAR.x - 14, HANGAR.z - 18], ['实验楼', 40, -392], ['发电机房', -54, -470],
+  ['通信塔', COMM_TOWER.x - 20, COMM_TOWER.z - 10], ['城市边缘', -40, -620], ['加油站', 110, -592],
+];
