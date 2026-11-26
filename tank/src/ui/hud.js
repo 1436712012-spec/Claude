@@ -144,7 +144,7 @@ export class Hud {
   drawHUD(g) {
     const ctx = this.ctx, W = this.w, H = this.h, t = g.tank, c = g.combo;
     // top-left wave & score
-    const n = Math.max(1, g.wave.n);
+    const n = Math.min(WAVES, Math.max(1, g.wave.n));
     this.glowText('第 ' + n + ' 波 · ' + NAMES[n - 1], 28, 34, 17, CY, 'left', 700, 10, 2);
     this.glowText(String(g.score).padStart(7, '0'), 28, 66, 34, '#fff', 'left', 800, 14, 3);
     // wave progress pips
