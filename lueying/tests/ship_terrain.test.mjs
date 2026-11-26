@@ -149,3 +149,17 @@ test('line of sight is blocked by trunks and terrain', () => {
   const r2 = T.los(0, -100, 0, 0, 100, 0);
   assert.ok(r2.blocked && r2.by === 'terrain');
 });
+
+test('the ship can fly through the culvert under the south fence', () => {
+  const s = new ShipSim(T, { x: 40, z: -120 });
+  const lo = emptyCommand(); lo.setAlt = 'low';
+  s.step(DT, lo);
+  run(s, 1);
+  for (let i = 0; i < 60 * 14 && s.pos.z > -232; i++) {
+    const c = emptyCommand();
+    c.mz = -0.5; c.mx = (40 - s.pos.x) * 0.2;
+    s.step(DT, c);
+  }
+  assert.ok(s.pos.z < -230, `made it into the compound drain (z=${s.pos.z.toFixed(1)})`);
+  assert.ok(s.pos.y < 3.2, 'stayed under the culvert ceiling');
+});

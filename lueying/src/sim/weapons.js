@@ -1,10 +1,10 @@
 // 玩家武器：两件潜行武器 + 两件战斗武器（出发前挂载），场脉冲为标配。
 // 潜行：静滞束、幻影投射、重力锚、记忆雾；战斗：湮灭束、蜂群针、重力锤、雷暴阵列。
 import { WEAPONS, SHIP, WINGMEN } from './config.js';
-import { clamp, mulberry32 } from './noise.js';
+import { clamp, mulberry32, rand } from './noise.js';
 import { wakeFromStasis } from './enemies.js';
 
-const rnd = mulberry32(31337);
+const rnd = () => rand();
 
 export class PlayerWeapons {
   constructor(world, loadout) {

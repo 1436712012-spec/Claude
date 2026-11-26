@@ -1,11 +1,11 @@
 // Combat：可破坏的研究所、伤害与材质反馈、敌方火力与投射物、场共振连击、逐波升级（步兵 → 无人机群 → 装甲车 → 直升机）。
 import { COMBAT, MAP } from './config.js';
-import { clamp, mulberry32 } from './noise.js';
+import { clamp, mulberry32, rand } from './noise.js';
 import { BUILDINGS, CONTAINERS, SEARCH_TOWERS, COMM_TOWER, HANGAR } from './level.js';
 import { makeObserver, setAware } from './detection.js';
 import { spawnCar, spawnHeli, walkHeight } from './enemies.js';
 
-const rnd = mulberry32(9001);
+const rnd = () => rand();
 
 export class Combat {
   constructor(world) {

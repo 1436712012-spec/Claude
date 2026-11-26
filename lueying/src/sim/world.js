@@ -1,6 +1,6 @@
 // World：固定 60 Hz 步长的模拟总装。只产出状态与事件，不依赖渲染。
 import { SEED, DETECT, CLOCK, WINGMEN, DEFAULT_LOADOUT, SHIP, WEAPONS } from './config.js';
-import { clamp, smoothstep, mulberry32 } from './noise.js';
+import { clamp, smoothstep, mulberry32, srand } from './noise.js';
 import { Terrain } from './terrain.js';
 import { START, EXTRACT, inCompound } from './level.js';
 import { ShipSim } from './ship.js';
@@ -22,6 +22,7 @@ export function getTerrain() {
 export class World {
   constructor(opts = {}) {
     this.opts = opts;
+    srand(opts.seed || 20261126);
     this.time = opts.startTime || 0;
     this.frame = 0;
     this.terrain = opts.terrain || getTerrain();

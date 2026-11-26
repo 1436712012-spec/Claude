@@ -376,6 +376,7 @@ export class ShipSim {
       if (f.broken) continue;
       const fg = MAP.plateauH;
       if (bottom > fg + f.h) continue;
+      if (p.y + 0.8 < fg) continue; // 在涵洞里从围栏脚下穿过
       const abx = f.bx - f.ax, abz = f.bz - f.az;
       const L2 = abx * abx + abz * abz;
       let t = ((p.x - f.ax) * abx + (p.z - f.az) * abz) / L2;

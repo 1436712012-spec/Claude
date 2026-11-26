@@ -283,3 +283,15 @@ test('pulse disables cameras, lamps and drones within 35 m and alerts the camp',
   idle(w, 2);
   assert.ok(w.guards.some((g) => g.aware !== 'quiet'), 'camp noticed the anomaly');
 });
+
+test('the simulation is deterministic for the same seed and inputs', () => {
+  const runOnce = () => {
+    const w = new World({ seed: 7 });
+    for (let i = 0; i < 60 * 25; i++) {
+      const c = emptyCommand(); c.mz = -0.7; c.mx = Math.sin(i * 0.01) * 0.5;
+      w.step(DT, { ship: c });
+    }
+    return JSON.stringify([w.player.pos, w.wingmen.map((m) => m.ship.pos), w.guards.map((g) => [g.pos, g.sus]), w.traces.list.length]);
+  };
+  assert.equal(runOnce(), runOnce());
+});

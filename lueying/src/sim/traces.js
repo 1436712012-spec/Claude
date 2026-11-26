@@ -1,7 +1,7 @@
 // 痕迹系统：飞碟在世界上留下的可见/可闻线索。玩家看得见，敌人也读得懂。
 // 每条痕迹都有类型、位置、持续时间、被发现距离和来源。
 import { TRACE, CLOCK } from './config.js';
-import { clamp, mulberry32 } from './noise.js';
+import { clamp, mulberry32, rand } from './noise.js';
 
 export const TRACE_LABEL = {
   mist: '落叶与水雾',
@@ -33,7 +33,7 @@ export class TraceSystem {
     this.world = world;
     this.list = [];
     this.nextId = 1;
-    this.rand = mulberry32(777);
+    this.rand = rand;
     this.birdRoosts = new Map(); // cellKey → flushedUntil
     this.emitT = new Map(); // `${ship}:${type}` → 下次可发射时间
     this.flocks = []; // 渲染用：正在飞起的鸟群

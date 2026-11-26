@@ -1,7 +1,7 @@
 // Detection：视锥、雷达（含多普勒门限）、电磁监测站、摄像头与手机、卫星过境、热成像、怀疑度与警戒状态机。
 // 规则：玩家必须随时看得懂自己为什么被发现。每次状态跃迁都记录“谁、因为什么、在哪里”。
 import { DETECT, RAIN, CLOCK, TRACE, SHIP } from './config.js';
-import { clamp, lerp, smoothstep, wrapAngle } from './noise.js';
+import { clamp, lerp, smoothstep, wrapAngle, rand } from './noise.js';
 import { TRACE_SENSE, TRACE_LABEL } from './traces.js';
 
 export const CAUSE_LABEL = {
@@ -23,7 +23,7 @@ export function makeObserver(o) {
     alive: true, down: false, disabled: 0, stunned: 0, anchored: 0,
     sus: 0, pending: 0, gainRate: 0, visNow: 0, focus: null, lastKnown: null, cause: '', lastStim: -99,
     aware: 'quiet', searchT: 0, clarity: 0, clipCd: 0, phoneOut: false, noticed: new Set(),
-    thinkT: Math.random() * 0.07, visCache: new Map(), yaw: 0, pitch: 0, eye: { x: 0, y: 0, z: 0 },
+    thinkT: rand() * 0.07, visCache: new Map(), yaw: 0, pitch: 0, eye: { x: 0, y: 0, z: 0 },
     memory: [], // 最近 30 s 的见闻（记忆雾会清掉）
   }, o);
 }
@@ -161,7 +161,7 @@ export function updateAwareness(w, o, dt) {
   } else if (w.time - o.lastStim > 1.5) {
     o.sus = Math.max(0, o.sus - DETECT.decay * dt);
   }
-  if (w.camp.state === 'alarm') {
+  if (w.camp.state === 'alarm' && o.kind !== 'civ') {
     if (o.aware !== 'alarm') setAware(w, o, 'alarm', 'alarm');
     return;
   }
@@ -277,7 +277,7 @@ export function noticeTraces(w, o) {
     o.noticed.add(t.id);
     const falloff = 1 - 0.5 * (d / range);
     const jitter = t.type === 'birds' ? 18 : t.type === 'scrape' ? 8 : 4;
-    stimulate(w, o, t.value * falloff, 'trace:' + t.type, { x: t.x + (Math.random() - 0.5) * jitter, y: t.y, z: t.z + (Math.random() - 0.5) * jitter }, t.source);
+    stimulate(w, o, t.value * falloff, 'trace:' + t.type, { x: t.x + (rand() - 0.5) * jitter, y: t.y, z: t.z + (rand() - 0.5) * jitter }, t.source);
     w.emitEvent({ type: 'noticeTrace', id: o.id, trace: t.type, source: t.source });
   }
   // 连续量：嗡鸣与电磁干扰（无线电杂音）
@@ -292,7 +292,7 @@ export function noticeTraces(w, o) {
     }
     if (d < TRACE.emi.range && o.hasRadio) {
       o.pending += TRACE.emi.value * (1 - d / TRACE.emi.range) * (1 / 15);
-      o.cause = 'emi'; o.lastKnown = { x: s.pos.x + (Math.random() - 0.5) * 10, y: s.pos.y, z: s.pos.z + (Math.random() - 0.5) * 10 }; o.lastStim = w.time; o.focus = s.id;
+      o.cause = 'emi'; o.lastKnown = { x: s.pos.x + (rand() - 0.5) * 10, y: s.pos.y, z: s.pos.z + (rand() - 0.5) * 10 }; o.lastStim = w.time; o.focus = s.id;
       if (o.aware === 'quiet' && o.pending > 8) setAware(w, o, 'suspicious', 'emi');
     }
   }
@@ -324,7 +324,7 @@ export function updateRadar(w, R, dt) {
     R.lastCheck = { id: tg.id, ...res, t: w.time };
     if (!res.seen) continue;
     R.contacts.push({ x: tg.pos.x, z: tg.pos.z, t: w.time, id: tg.id });
-    stimulate(w, R, C.perSweep, 'radar', { x: tg.pos.x + (Math.random() - 0.5) * 20, y: tg.pos.y, z: tg.pos.z + (Math.random() - 0.5) * 20 }, tg.id);
+    stimulate(w, R, C.perSweep, 'radar', { x: tg.pos.x + (rand() - 0.5) * 20, y: tg.pos.y, z: tg.pos.z + (rand() - 0.5) * 20 }, tg.id);
     if (tg.isShip) w.noteSeen(tg.id, R, 'radar', 0.6);
     w.emitEvent({ type: 'radarPing', id: tg.id, x: tg.pos.x, z: tg.pos.z });
   }
@@ -377,7 +377,7 @@ export function updateEM(w, S, dt) {
   if (best && S.gainRate > 0.5) {
     S.focus = best.id;
     S.cause = 'em';
-    S.lastKnown = { x: best.pos.x + (Math.random() - 0.5) * 16, y: best.pos.y, z: best.pos.z + (Math.random() - 0.5) * 16 };
+    S.lastKnown = { x: best.pos.x + (rand() - 0.5) * 16, y: best.pos.y, z: best.pos.z + (rand() - 0.5) * 16 };
     if (best.id === 'player' || best.isWingman) w.noteSeen(best.id, S, 'em', bestSig);
   }
   updateAwareness(w, S, dt);

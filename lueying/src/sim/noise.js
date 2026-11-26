@@ -11,6 +11,11 @@ export function mulberry32(seed) {
   };
 }
 
+// 模拟层共享的可播种随机数：每局由 World 用固定种子重置，保证可复现
+let simRng = mulberry32(1);
+export function srand(seed) { simRng = mulberry32(seed >>> 0); }
+export function rand() { return simRng(); }
+
 export function hash2(x, z, seed = 0) {
   let h = Math.imul((x | 0) ^ 0x27d4eb2d, 0x165667b1) ^ Math.imul((z | 0) ^ seed, 0x9e3779b1);
   h = Math.imul(h ^ (h >>> 15), 0x85ebca6b);

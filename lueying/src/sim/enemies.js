@@ -1,7 +1,7 @@
 // EnemyAI：铁砧联合体的守卫、岗楼与探照灯、监控摄像头、巡逻无人机「蜂鸟」、周界雷达、电磁监测站、
 // 卫星通信终端、城市路人；警报后逐波出动的无人机群、装甲巡逻车和武装直升机。
 import { DETECT, MAP, WEAPONS } from './config.js';
-import { clamp, wrapAngle, smoothstep, mulberry32 } from './noise.js';
+import { clamp, wrapAngle, smoothstep, mulberry32, rand } from './noise.js';
 import {
   GUARDS, TOWER_GUARDS, SEARCH_TOWERS, CAMERAS, EM_STATIONS, DRONE_ROUTES, DRONE_PAD, COMM_TOWER, TERMINAL,
   CITY, LAMP_POSTS, GATES, inCompound, PERIMETER_ROAD, MOTORPOOL_EXIT, developedMask,
@@ -10,7 +10,7 @@ import {
   makeObserver, senseTargets, updateAwareness, updateEvidence, noticeTraces, stimulate, setAware, updateRadar, updateEM,
 } from './detection.js';
 
-const rnd = mulberry32(4242);
+const rnd = () => rand();
 
 export function walkHeight(w, x, z) {
   const h = w.terrain.height(x, z);

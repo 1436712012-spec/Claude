@@ -2,7 +2,7 @@
 // 潜行指令：跟随航迹 / 原地待命 / 惊扰诱敌 / 扫描标记；战斗指令：集火 / 包抄 / 掩护 / 归队；磐石专属：干扰场。
 import { WINGMEN, SHIP, WEAPONS } from './config.js';
 import { ShipSim, emptyCommand } from './ship.js';
-import { clamp, wrapAngle } from './noise.js';
+import { clamp, wrapAngle, rand } from './noise.js';
 import { WING, COMBAT_ORDERS } from './lines.js';
 import { WINGMAN_START } from './level.js';
 import { visibility, emImpulse } from './detection.js';
@@ -34,7 +34,7 @@ export class Wingman {
     this.riskT = 0;
     this.blockedT = 0;
     this.lineCd = new Map();
-    this.fireT = 1 + Math.random();
+    this.fireT = 1 + rand();
     this.spottedBy = null;
     this.evadeT = 0;
     this.out = false; // 撤离战场
@@ -383,7 +383,7 @@ export class Wingman {
       if (d < 160) {
         const los = w.terrain.los(s.pos.x, s.pos.y + 0.6, s.pos.z, target.pos.x, (target.pos.y || 0) + 1, target.pos.z);
         if (!los.blocked || los.by === 'canopy') {
-          this.fireT = 1.0 + Math.random() * 0.6;
+          this.fireT = 1.0 + rand() * 0.6;
           w.combat.wingmanAttack(this, target);
         } else this.fireT = 0.4;
       }
