@@ -19,7 +19,8 @@ const path = require('path');
   await page.evaluate(() => {
     LMN.Store.settings.fast = true; LMN.Menus.applySettings();
     const deck = Array(30).fill('N01').map((c, i) => (i % 3 === 0 ? 'S01' : i % 3 === 1 ? 'N01' : 'N04'));
-    LMN.UI.start({ agent: 'agent_shen', deck, boss: 'boss_manager' });
+    LMN.Store.progress.briefed = true;
+    LMN.UI.start({ agent: 'agent_shen', deck, boss: 'boss_manager', seed: 4242, first: 0 });
   });
   await page.waitForSelector('#mull.on', { timeout: 15000 });
   if (await page.$('#briefOk')) { await page.click('#briefOk'); await page.waitForSelector('#mullOk'); }
@@ -107,6 +108,7 @@ const path = require('path');
   }
   // 7) inspect via long press on a minion
   await page.evaluate(() => document.querySelectorAll('.ov.on').forEach((o) => o.classList.remove('on')));
+  await page.evaluate(() => { const G = LMN.UI.debug.G; if (!G.players[0].board.length) { LMN.E.summon(G, 0, 'N04'); G.events.length = 0; } LMN.UI._forceRender(); });
   const mm = await box('#boardP .minion');
   await page.mouse.move(mm.x, mm.y);
   await page.mouse.down();

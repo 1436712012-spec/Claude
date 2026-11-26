@@ -406,7 +406,7 @@
     const p = $('settingsPanel');
     const s = S.settings;
     const deep = L.Layers.current === 2 && cur === 'game';
-    const row = (key, label, sub) => `<div class="set-row"><span>${label}${sub ? `<small>${sub}</small>` : ''}</span><button class="toggle ${s[key] ? 'on' : ''}" data-k="${key}" aria-label="${label}"></button></div>`;
+    const row = (key, label, sub) => `<div class="set-row"><span>${label}${sub ? `<small>${sub}</small>` : ''}</span><button class="toggle ${s[key] ? 'on' : ''}" data-k="${key}" aria-label="${label.replace(/<[^>]+>/g, '')}"></button></div>`;
     p.innerHTML = `<div class="hdr"><h2>设置</h2><button class="back" id="setClose" aria-label="关闭">×</button></div>
       ${row('mute', `<span id="muteLbl">静音</span>`)}
       <div class="set-row"><span>音量</span><div class="seg3" id="volSeg">${[0.3, 0.55, 0.8, 1].map((v) => `<button class="${Math.abs(s.vol - v) < 0.01 ? 'on' : ''}" data-v="${v}">${Math.round(v * 100)}</button>`).join('')}</div></div>

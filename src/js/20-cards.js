@@ -234,11 +234,11 @@
   });
   card({
     id: 'B06', name: '切出', faction: 'level', type: 'spell', rarity: 'common', cost: 2,
-    text: '将一个敌方随从移回其拥有者的手牌，其法力值消耗增加 1 点。',
+    text: '将一个敌方随从移回其拥有者的手牌，其法力值消耗增加 2 点。',
     lore: { k: '档', t: '「切出」现象：以特定角度贴墙行走时，人会滑入墙的另一侧。另一侧也是走廊。另一侧也有一个你，正在贴墙行走。' },
     art: ['hall', 'faceless x.45 s.85 half1', 'pixtear x.5 n8'],
     tgt: 'enemyMinion',
-    spell: (G, c) => E.bounce(G, T(G, c), 1),
+    spell: (G, c) => E.bounce(G, T(G, c), 2),
   });
   card({
     id: 'B07', name: '熄灯', faction: 'level', type: 'spell', rarity: 'common', cost: 1,
@@ -257,7 +257,7 @@
     spell: (G, c) => { E.limbo(G, T(G, c)); E.draw(G, c.p, 1); },
   });
   card({
-    id: 'B09', name: '无限办公室', faction: 'level', type: 'field', rarity: 'rare', cost: 2,
+    id: 'B09', name: '无限办公室', faction: 'level', type: 'field', rarity: 'rare', cost: 1,
     text: '场地：在你的回合结束时，随机使一个没有潜行的友方随从获得潜行。',
     lore: { k: '档', t: '走廊长度测量：第一次 41 米，第二次 41 米，第三次 2,113 米。测量员坚称自己没有走动。' },
     art: ['office', 'cubicles n9', 'tubes n6'],
@@ -271,13 +271,13 @@
   });
   card({
     id: 'B10', name: '排风管道', faction: 'level', type: 'field', rarity: 'common', cost: 1,
-    text: '场地：你的潜行随从获得 +1 攻击。',
+    text: '场地：你的潜行随从获得 +2 攻击。',
     lore: { k: '讯', t: '[00:14:02] 回声-4 呼叫站点。地毯是湿的。重复，地毯是湿的。……水是从通风口滴下来的，温的。' },
     art: ['hall', 'vent x.5 y.3 s1.2', 'drips n7', 'eyes n2 x.5 y.3 r.15'],
-    auraAtk: (G, f, m) => (m.owner === f.owner && m.kw.stealth ? 1 : 0),
+    auraAtk: (G, f, m) => (m.owner === f.owner && m.kw.stealth ? 2 : 0),
   });
   card({
-    id: 'B11', name: '熄灯的停车场', faction: 'level', type: 'field', rarity: 'epic', cost: 3, san: 1,
+    id: 'B11', name: '熄灯的停车场', faction: 'level', type: 'field', rarity: 'epic', cost: 2, san: 1,
     text: '场地：在每个回合结束时，对所有没有潜行的随从造成 1 点伤害。',
     lore: { k: '记', t: '第 9 天。停车场里停满了车，每一辆的车灯都对着我们，每一辆都没有发动机。我们在车与车之间睡了一晚。' },
     art: ['park', { dark: 0.35 }, 'cars n4'],
