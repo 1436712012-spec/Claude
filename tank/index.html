@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NIGHTWATCH FLAK · 守夜炮</title>
+<style>
+  html,body{margin:0;height:100%;background:#05030c;overflow:hidden;font-family:'Orbitron','Rajdhani','Segoe UI','Microsoft YaHei',sans-serif}
+  canvas{position:fixed;left:0;top:0;display:block}
+  #gl{image-rendering:auto}
+  #hud{pointer-events:none}
+  body.playing,body.playing canvas{cursor:none}
+  #panel{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,88vw);padding:22px 26px 16px;
+    background:linear-gradient(160deg,rgba(18,10,44,.94),rgba(8,6,24,.96));border:1px solid rgba(25,240,255,.45);
+    box-shadow:0 0 40px rgba(25,240,255,.25),inset 0 0 30px rgba(255,47,180,.08);color:#d8e8ff;border-radius:6px;z-index:5}
+  #panel h2{margin:0 0 14px;font-size:16px;letter-spacing:4px;color:#19f0ff;text-shadow:0 0 12px #19f0ff}
+  #panel label{display:flex;align-items:center;gap:10px;margin:9px 0;font-size:14px}
+  #panel label span{flex:0 0 120px;color:#b9c8ee}
+  #panel input[type=range]{flex:1;accent-color:#ff2fb4}
+  #panel b{flex:0 0 38px;text-align:right;font-weight:600;color:#ffb347;font-size:12px}
+  #panel select{flex:1;background:#0b0820;color:#d8e8ff;border:1px solid #3a4a8a;padding:3px}
+  #panel .hint{margin:14px 0 0;font-size:12px;color:#7f8fb8;text-align:center}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<canvas id="hud"></canvas>
+<!--BUNDLE-->
+<script type="module" src="./src/main.js"></script>
+<!--/BUNDLE-->
+</body>
+</html>

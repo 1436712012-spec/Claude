@@ -1,0 +1,23 @@
+import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path'; import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url); const { chromium } = require('playwright');
+const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const out = process.argv[2] || '/tmp/title';
+const server = http.createServer((req, res) => { let p = decodeURIComponent(req.url.split('?')[0]); if (p === '/') p = '/index.html'; const f = path.join(root, p); if (!fs.existsSync(f)) { res.writeHead(404); res.end(); return; } res.writeHead(200, { 'Content-Type': p.endsWith('.js') ? 'text/javascript' : 'text/html' }); fs.createReadStream(f).pipe(res); });
+await new Promise((r) => server.listen(0, r)); const port = server.address().port;
+const b = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const pg = await b.newPage({ viewport: { width: 1280, height: 720 } });
+const errs = []; pg.on('pageerror', (e) => errs.push(e.message)); pg.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
+await pg.goto(`http://127.0.0.1:${port}/?noadapt=1&dpr=1`);
+await pg.waitForFunction(() => window.__game);
+await pg.evaluate(() => { window.__game.game.startWave(1); window.__game.advance(9); });
+await pg.waitForTimeout(400);
+await pg.screenshot({ path: out + '-title.png' });
+// pause panel
+await pg.mouse.click(600, 300);
+await pg.waitForTimeout(300);
+await pg.evaluate(() => window.__game.advance(2));
+await pg.keyboard.press('Escape');
+await pg.waitForTimeout(400);
+await pg.screenshot({ path: out + '-pause.png' });
+console.log(errs.length ? errs.join('\n') : 'ok', await pg.evaluate(() => window.__game.game.state));
+await b.close(); server.close();
