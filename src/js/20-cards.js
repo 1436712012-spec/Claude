@@ -180,6 +180,7 @@
   card({
     id: 'S18', num: 19, name: 'LMN-019 冰封档案库', faction: 'site', type: 'minion', rarity: 'legendary', cost: 6, san: 3, atk: 4, hp: 9, kw: ['taunt'],
     text: '嘲讽。在你的回合结束时，冻结攻击力最高的敌方随从。',
+    whisper: '（霜上的第十三行，写的是你的名字。）',
     lore: { k: '档', t: 'LMN-019 是一座无法打开的档案库。我们知道里面保存着回声-4 的全部记录，因为每天早上，柜门上的霜都会多出一行字。' },
     art: ['void', 'vault x.5 s1.1', 'snow n40', 'textlines n7'],
     on: {
@@ -290,6 +291,7 @@
   card({
     id: 'B12', name: '电梯间', faction: 'level', type: 'field', rarity: 'rare', cost: 3,
     text: '场地：在你的回合结束时，召唤一个 1/1 并具有潜行的「游荡的影子」。',
+    whisper: '（电梯里一共站着五个人。）',
     lore: { k: '讯', t: '[14:00:41] 电梯到了，门开了。里面站着我们四个人。他们在等我们进去。' },
     art: ['hall', 'elevator x.5 s1', 'faceless x.42 y.66 s.35 c#111', 'faceless x.58 y.66 s.35 c#111'],
     on: { turnEnd: (G, c) => { if (c.ev.pid === c.p) E.summon(G, c.p, 'T_SHADOW', null, { how: 'field' }); } },
@@ -528,6 +530,7 @@
   card({
     id: 'N03', name: '失眠者', faction: 'neutral', type: 'minion', rarity: 'common', cost: 3, san: 1, atk: 4, hp: 4,
     text: '',
+    whisper: '（现在几点了？你也该睡了。）',
     lore: { k: '档', t: '警告：长时间处于理智低值状态的人员，会在手中看见「不存在的卡片」。请勿使用它们。若已使用，请勿告诉任何人。' },
     art: ['room', { dark: 0.5 }, 'faceless x.5 s.9 c#cfc4d8 eyes1', 'clock x.78 y.24 s.45'],
   });

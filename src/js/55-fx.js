@@ -13,6 +13,8 @@
   let shakeAmp = 0, shakeX = 0, shakeY = 0, shakeEl = null;
   let reduced = false;
   let dirtyFront = false;
+  let coarse = false;
+  let backScale = 1;
   FX.speed = 1;
 
   const COLORS = {
@@ -30,6 +32,7 @@
     dark: ['#1a1612', '#2b2310', '#000000'],
   };
   FX.COLORS = COLORS;
+  const RAINBOW = ['#ff8fb5', '#ffc38f', '#fff38f', '#a8f0a8', '#8fd8ff', '#c8a8ff'];
 
   // pre-rendered glow sprites
   const sprites = {};
@@ -55,8 +58,8 @@
     fctx = front.getContext('2d');
     bctx = back.getContext('2d');
     reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-    if (coarse) { maxBudget = 420; budget = 360; }
+    coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    if (coarse) { maxBudget = 420; budget = 360; backScale = 0.5; }
     FX.resize();
     window.addEventListener('resize', FX.resize);
     requestAnimationFrame(loop);
@@ -68,11 +71,12 @@
   FX.resize = function () {
     VW = window.innerWidth;
     VH = window.innerHeight;
-    dpr = Math.min(2, window.devicePixelRatio || 1);
+    dpr = Math.min(coarse ? 1.5 : 2, window.devicePixelRatio || 1);
     front.width = Math.round(VW * dpr);
     front.height = Math.round(VH * dpr);
-    back.width = Math.round(VW);
-    back.height = Math.round(VH);
+    // ambience is soft by nature: render it at reduced resolution on phones and let CSS stretch it
+    back.width = Math.round(VW * backScale);
+    back.height = Math.round(VH * backScale);
     ambient.motes = [];
     caustic = null;
   };
@@ -225,6 +229,57 @@
       g.restore();
     });
   };
+  // 后室: eyes opening in the darkness around a rect
+  FX.eyes = function (rect, n) {
+    const eyes = [];
+    n = reduced ? 2 : n || 5;
+    for (let i = 0; i < n; i++) eyes.push({ x: rect.left + rect.width / 2 + rnd(-rect.width * 1.1, rect.width * 1.1), y: rect.top + rect.height / 2 + rnd(-rect.height * 0.6, rect.height * 0.6), w: rnd(7, 13), d: rnd(0, 0.35) });
+    return effect(1.3, (g, k) => {
+      g.save();
+      for (const e of eyes) {
+        const kk = Math.max(0, Math.min(1, (k - e.d) / 0.65));
+        const open = kk < 0.3 ? kk / 0.3 : kk > 0.75 ? Math.max(0, (1 - kk) / 0.25) : 1;
+        if (open <= 0) continue;
+        const x = e.x * dpr, y = e.y * dpr, w = e.w * dpr, h = w * 0.55 * open;
+        g.globalAlpha = 0.95;
+        g.fillStyle = 'rgba(0,0,0,.55)';
+        g.beginPath();
+        g.ellipse(x, y, w * 1.6, w, 0, 0, 6.283);
+        g.fill();
+        g.fillStyle = '#fff4c8';
+        g.shadowColor = '#f2d64b';
+        g.shadowBlur = 10 * dpr;
+        g.beginPath();
+        g.moveTo(x - w, y);
+        g.quadraticCurveTo(x, y - h, x + w, y);
+        g.quadraticCurveTo(x, y + h, x - w, y);
+        g.fill();
+        g.shadowBlur = 0;
+        g.fillStyle = '#1a0f00';
+        g.beginPath();
+        g.arc(x, y, Math.min(h, w * 0.32), 0, 6.283);
+        g.fill();
+      }
+      g.restore();
+    });
+  };
+  // 梦核: a soft halo that is gentle, and slightly wrong
+  FX.halo = function (x, y, r) {
+    return effect(1.1, (g, k) => {
+      const rr = (r || 80) * (0.6 + k * 0.7) * dpr;
+      const hue = 300 + Math.sin(k * 9) * 40;
+      const gr = g.createRadialGradient(x * dpr, y * dpr, rr * 0.2, x * dpr, y * dpr, rr);
+      gr.addColorStop(0, `hsla(${hue},100%,92%,0)`);
+      gr.addColorStop(0.6, `hsla(${hue},100%,85%,${0.35 * (1 - k)})`);
+      gr.addColorStop(0.8, `hsla(${(hue + 120) % 360},90%,80%,${0.18 * (1 - k)})`);
+      gr.addColorStop(1, `hsla(${hue},100%,90%,0)`);
+      g.globalCompositeOperation = 'lighter';
+      g.fillStyle = gr;
+      g.fillRect(x * dpr - rr, y * dpr - rr, rr * 2, rr * 2);
+      g.globalCompositeOperation = 'source-over';
+    });
+  };
+
   // red alarm sweep (breach)
   FX.alarm = function () {
     return effect(1.2, (g, k) => {
@@ -280,7 +335,8 @@
           const y = (1 - e) * (1 - e) * y0 + 2 * (1 - e) * e * my + e * e * y1;
           for (let i = 0; i < (reduced ? 1 : 3); i++) {
             const p = P();
-            Object.assign(p, { x: x + rnd(-3, 3), y: y + rnd(-3, 3), vx: rnd(-30, 30), vy: rnd(-30, 30), ax: 0, ay: style === 'dream' ? -30 : 40, drag: 3, life: rnd(0.25, 0.5), size: rnd(3, 7), col: pick(cols), type: style === 'level' ? 'px' : style === 'dream' && Math.random() < 0.4 ? 'bubble' : 'glow', rot: 0, vr: 0 });
+            const col = style === 'dream' ? RAINBOW[Math.floor((e * 14 + i) % RAINBOW.length)] : pick(cols);
+            Object.assign(p, { x: x + rnd(-3, 3), y: y + rnd(-3, 3), vx: rnd(-30, 30), vy: rnd(-30, 30), ax: 0, ay: style === 'dream' ? -30 : 40, drag: 3, life: rnd(0.25, 0.5) * (style === 'dream' ? 1.8 : 1), size: rnd(3, 7), col, type: style === 'level' ? 'px' : style === 'dream' && Math.random() < 0.3 ? 'bubble' : 'glow', rot: 0, vr: 0 });
             if (p.type === 'glow') p.size *= 2.4;
             add(p);
           }

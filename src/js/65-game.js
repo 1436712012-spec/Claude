@@ -72,7 +72,8 @@
     const boss = L.HEROES[c.boss];
     const deck = c.deck.slice();
     G = E.newGame({
-      seed: (Math.random() * 2 ** 31) | 0,
+      seed: c.seed != null ? c.seed : (Math.random() * 2 ** 31) | 0,
+      first: c.first,
       depth: boss.startDepth,
       rec: true,
       players: [
@@ -95,6 +96,7 @@
     $('codeE').textContent = boss.code;
     els.heroP.querySelector('.pt').style.backgroundImage = `url("${L.Art.portrait(c.agent)}")`;
     els.heroE.querySelector('.pt').style.backgroundImage = `url("${L.Art.portrait(boss.id)}")`;
+    els.heroE.dataset.boss = boss.bossKey;
     els.hpP.querySelector('.ic').innerHTML = CV.HP_ICON[c.agent];
     els.hpE.querySelector('.ic').innerHTML = CV.HP_ICON[boss.id];
     L.Layers.set(G.layer, true);
@@ -116,12 +118,39 @@
         await sleep(1500);
       }
       E.mulligan(G, AI_PID, L.AI.mulligan(G, AI_PID));
+      if (!L.Store.progress.briefed) await briefing();
       await mulligan();
       E.begin(G);
       await drain();
+      // the gatekeeper may have won the coin flip
+      if (!G.over && G.active === AI_PID) await aiTurn();
       afterAction();
     })();
   };
+
+  // ------------------------------------------------------------------ first-time briefing
+  function briefing() {
+    return new Promise((res) => {
+      const ov = $('mull');
+      ov.classList.remove('four');
+      ov.innerHTML = `<div class="ttl">外勤须知</div><div class="sub">LMN-000 · 第一次进入</div>
+        <div class="kwl" style="width:calc(var(--u)*86)">
+          <div><b>出牌</b>轻触手牌选中，再轻触战场或目标；也可以直接把牌拖上去。按住手牌左右滑动可以放大阅读。</div>
+          <div><b>攻击</b>轻触一个发光的随从，再轻触敌人；或者从随从拖向目标。长按任何东西查看详情。</div>
+          <div><b>${CV.SYM}理智</b>带 ${CV.SYM} 的牌更强，但要额外支付理智。理智太低，你的手里会出现不存在的牌。</div>
+          <div><b>梦深</b>消耗的理智和时间会让梦往下沉。沉到下一层时，规则会对双方同时改变，而且回不去。</div>
+          <div><b>收容</b>被收容的敌人会进入你的牌库。及时打出它，它就是你的；拖得太久，它会突破回去。</div>
+        </div><button class="btn" id="briefOk">明白了</button>`;
+      ov.classList.add('on');
+      $('briefOk').onclick = () => {
+        A.play('click');
+        L.Store.progress.briefed = true;
+        L.Store.saveProgress();
+        ov.classList.remove('on');
+        res();
+      };
+    });
+  }
 
   // ------------------------------------------------------------------ mulligan
   function mulligan() {
@@ -460,6 +489,11 @@
         if (src) aim(center(src), { x: e.clientX, y: e.clientY });
       }
     });
+    els.hand.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse' || press) return;
+      const uid = cardIndexAt(e.clientX);
+      if (uid != null && uid !== els.hand._hover) { els.hand._hover = uid; showSidePreview(uid); }
+    });
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible' && G && !G.over && L.Menus.current() === 'game') setTimeout(() => toast('你离开的时候，走廊变长了。'), 400);
     });
@@ -555,13 +589,15 @@
     if (p.kind === 'hand') {
       if (p.drag) {
         p.el.classList.remove('dragging');
+        UI._suppress = performance.now(); // the synthetic click after a drag must not cancel targeting
         dropCard(p.uid, e.clientX, e.clientY);
         return;
       }
-      if (p.previewed) return;
-      // a tap
+      // the hand is a scrubber: press, slide to the card you want, release to pick it up
+      if (p.previewed && !(UI.isMyTurn() && !busy && E.canPlay(G, ME, p.uid))) return;
+      // a tap (or a scrub release)
       if (!UI.isMyTurn() || busy) { UI.inspectHand(p.uid); return; }
-      if (sel && sel.uid === p.uid && sel.kind === 'card') { setSel(null); return; }
+      if (!p.previewed && sel && sel.uid === p.uid && sel.kind === 'card') { setSel(null); return; }
       if (!E.canPlay(G, ME, p.uid)) { toast(whyCantPlay(p.uid)); A.play('error'); setSel(null); return; }
       A.play('hover');
       const ci = G.players[ME].hand.find((c) => c.uid === p.uid);
@@ -745,7 +781,8 @@
     const boss = L.HEROES[cfg.boss];
     await sleep(450);
     for (let i = 0; i < 40 && !G.over && G.active === AI_PID; i++) {
-      const a = L.AI.decide(G, AI_PID, boss.persona, aiMemo);
+      const a = await L.AIW.decide(G, AI_PID, boss.persona, aiMemo);
+      if (!G || G.over) break;
       if (a.t === 'end') break;
       if (a.t === 'atk') {
         const el = minEls.get(a.a);
@@ -980,6 +1017,9 @@
     FX.ring(c.x, c.y + r.height * 0.2, FX.COLORS[d.faction][0], 110, 0.5, 7);
     FX.burst(c.x, c.y + r.height * 0.25, d.faction, 22, { dir: -Math.PI / 2, spread: 1.4, speed: 0.8 });
     if (ev.how === 'tamed') { FX.lattice(r, '#9ff3ff'); FX.word(c.x, r.top - 6, '收容物 · 为你作战', 'cold'); }
+    const sm = E.char(G, ev.uid);
+    if (d.faction === 'level' && sm && sm.kw && sm.kw.stealth) FX.eyes(r, 4);
+    if (d.faction === 'dream') FX.halo(c.x, c.y, r.width * 1.2);
     if (ev.how === 'exit') FX.burst(c.x, c.y, 'heal', 16);
     FX.shake(3);
     await sleep(140);
@@ -1042,7 +1082,7 @@
   };
   H.ambush = async (ev) => {
     const r = rectOf(ev.uid);
-    if (r) FX.word(center(r).x, r.top - 4, '暗袭', 'bad');
+    if (r) { FX.word(center(r).x, r.top - 4, '暗袭', 'bad'); FX.eyes(r, 6); }
   };
   H.damage = async (ev) => {
     const el = elOf(ev.target);
@@ -1560,6 +1600,9 @@
   };
   UI.relayout = function () {
     if (snap) layoutHand();
+  };
+  UI._forceRender = function () {
+    if (G) render(E.snapshot(G));
   };
 
   // test / debug hooks

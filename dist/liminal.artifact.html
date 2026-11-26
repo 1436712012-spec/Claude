@@ -37,6 +37,7 @@
   --sp: 1; /* animation speed multiplier (1 = normal, .5 = 2x) */
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
 html, body { margin: 0; height: 100%; background: #070607; color: var(--paper); overflow: hidden; overscroll-behavior: none; }
 body { font-family: var(--f-sans); -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: manipulation; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
@@ -54,7 +55,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 #overlays { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
 #overlays > * { pointer-events: auto; }
 #crt { z-index: 60; display: none; }
-#app.crt #crt { display: block; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 58%, rgba(0, 0, 0, 0.55) 100%); mix-blend-mode: multiply; animation: crtflick 4s steps(60) infinite; }
+#app.crt #crt { display: block; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 58%, rgba(0, 0, 0, 0.5) 100%); will-change: opacity; animation: crtflick 4s steps(8) infinite; }
 #app.crt #crt::after { content: ''; position: absolute; inset: 0; border-radius: 4vmin; box-shadow: inset 0 0 6vmin rgba(0, 0, 0, 0.75), inset 0 0 0 1px rgba(255, 255, 255, 0.04); }
 #app.crt.barrel #stage { filter: url(#barrel); }
 @keyframes crtflick { 0%, 100% { opacity: 0.92; } 50% { opacity: 1; } 51% { opacity: 0.88; } }
@@ -106,9 +107,9 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 .card.r-rare .cf { box-shadow: inset 0 0 0 0.32em #9fc4e6, inset 0 0 0 0.5em #e8f4ff, inset 0 0 0 0.7em rgba(0, 0, 0, 0.2), 0 0.5em 1.4em rgba(0, 0, 0, 0.55); }
 .card.r-epic .cf { box-shadow: inset 0 0 0 0.36em #b97bff, inset 0 0 0 0.56em #f0dcff, inset 0 0 0 0.74em rgba(40, 0, 70, 0.25), 0 0.5em 1.4em rgba(0, 0, 0, 0.55), 0 0 1em rgba(185, 123, 255, 0.35); }
 .card.r-legendary .cf { box-shadow: inset 0 0 0 0.38em #d9a93a, inset 0 0 0 0.6em #fff1c0, inset 0 0 0 0.8em rgba(90, 60, 0, 0.28), 0 0.5em 1.4em rgba(0, 0, 0, 0.6), 0 0 1.4em rgba(243, 207, 106, 0.45); }
-.card.r-epic .cf::after, .card.r-legendary .cf::after { content: ''; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: overlay; background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.55) 45%, rgba(255, 220, 255, 0.4) 50%, transparent 62%) -100% 0/250% 100% no-repeat; animation: sheen 4.5s ease-in-out infinite; }
-.card.r-legendary .cf::after { background: linear-gradient(115deg, transparent 30%, rgba(255, 240, 180, 0.85) 45%, rgba(255, 255, 255, 0.7) 50%, transparent 62%) -100% 0/250% 100% no-repeat; animation-duration: 3.2s; }
-@keyframes sheen { 0%, 55% { background-position: 160% 0; } 100% { background-position: -100% 0; } }
+.card.r-epic .cf::after, .card.r-legendary .cf::after { content: ''; position: absolute; top: -10%; bottom: -10%; left: 0; width: 60%; pointer-events: none; background: linear-gradient(105deg, transparent 20%, rgba(255, 235, 255, 0.28) 45%, rgba(255, 255, 255, 0.36) 50%, transparent 75%); transform: translateX(-120%); will-change: transform; animation: sheen 4.5s ease-in-out infinite; }
+.card.r-legendary .cf::after { background: linear-gradient(105deg, transparent 20%, rgba(255, 236, 170, 0.45) 45%, rgba(255, 255, 255, 0.5) 50%, transparent 75%); animation-duration: 3.2s; }
+@keyframes sheen { 0%, 55% { transform: translateX(-120%); } 100% { transform: translateX(220%); } }
 .card .art { position: absolute; left: 1.3em; right: 1.3em; top: 1.5em; height: 12.4em; background: #222 center/cover no-repeat; border-radius: 0.7em; box-shadow: 0 0 0 0.22em rgba(0, 0, 0, 0.45), inset 0 0 1.2em rgba(0, 0, 0, 0.35); }
 .card.t-spell .art { left: 2.4em; right: 2.4em; border-radius: 50% / 48%; }
 .card.t-field .art { clip-path: polygon(0 0, 100% 0, 88% 100%, 12% 100%); border-radius: 0; }
@@ -190,7 +191,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 .hero .arm b { position: relative; font: 4.4em/1 var(--f-mono); color: #1a2226; }
 .hero.target .pt, .minion.target .m-art { box-shadow: 0 0 0 0.6em var(--hud), 0 0 0 0.9em #ff5a3a, 0 0 2.2em #ff5a3a; animation: tpulse 0.9s ease-in-out infinite; }
 .hero.target.friendly .pt, .minion.target.friendly .m-art { box-shadow: 0 0 0 0.6em var(--hud), 0 0 0 0.9em #3dff8a, 0 0 2.2em #3dff8a; }
-@keyframes tpulse { 50% { filter: brightness(1.25); } }
+@keyframes tpulse { 50% { transform: scale(1.05); } }
 .hero.shaken .pt { animation: shake 0.35s infinite; filter: hue-rotate(-20deg) saturate(1.4); }
 @keyframes shake { 25% { transform: translate(0.3em, -0.2em); } 75% { transform: translate(-0.3em, 0.2em); } }
 .hinfo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: calc(var(--u) * 0.9); padding: calc(var(--u) * 1.4) calc(var(--u) * 2); border-radius: calc(var(--u) * 2); background: var(--hud); box-shadow: inset 0 0 0 1px var(--hud-line); }
@@ -198,9 +199,9 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 .hname b { font: 700 calc(var(--u) * 3.8) / 1 var(--f-serif); color: var(--paper); text-shadow: 0 0.1em 0.3em #000; overflow: hidden; text-overflow: ellipsis; }
 .hname i { flex: none; font: calc(var(--u) * 3.2) / 1 var(--f-mono); color: var(--layer-accent); font-style: normal; letter-spacing: 0.08em; opacity: 0.85; }
 .meter { display: flex; align-items: center; gap: calc(var(--u) * 0.7); height: calc(var(--u) * 3.8); }
-.meter .lbl { flex: none; font: calc(var(--u) * 3.2) / 1 var(--f-mono); width: calc(var(--u) * 10.5); color: var(--paper); opacity: 0.92; letter-spacing: 0.02em; white-space: nowrap; }
-.pips { display: flex; gap: calc(var(--u) * 0.4); min-width: 0; }
-.pip { width: calc(var(--u) * 2.3); height: calc(var(--u) * 2.8); flex: none; }
+.meter .lbl { flex: none; font: calc(var(--u) * 3.1) / 1 var(--f-mono); width: calc(var(--u) * 12.5); color: var(--paper); opacity: 0.92; letter-spacing: 0.02em; white-space: nowrap; }
+.pips { display: flex; gap: calc(var(--u) * 0.35); min-width: 0; }
+.pip { width: calc(var(--u) * 2.1); height: calc(var(--u) * 2.7); flex: none; }
 .pip.mana { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); background: var(--mana-dk); transition: background 0.3s; }
 .pip.mana.on { background: radial-gradient(circle at 40% 35%, #e0f4ff, var(--mana) 55%, #1d5fa8); box-shadow: 0 0 6px var(--mana); }
 .pip.mana.lock { background: #2a2a2a; }
@@ -215,10 +216,11 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 .hp-btn .c { position: absolute; top: -1.2em; left: 50%; transform: translateX(-50%); width: 4.6em; height: 4.6em; display: grid; place-items: center; }
 .hp-btn .c::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 35% 30%, #c8ecff, #3d8fe0 55%, #123a6a); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
 .hp-btn .c b { position: relative; font: 3.6em/1 var(--f-mono); color: #fff; text-shadow: 0 0 0.1em #000; }
-.hp-btn.ready { animation: hpglow 1.6s ease-in-out infinite; }
+.hp-btn::after { content: ''; position: absolute; inset: -0.9em; border-radius: 50%; box-shadow: 0 0 0 0.35em var(--green), 0 0 1.6em var(--green); opacity: 0; pointer-events: none; }
+.hp-btn.ready::after { animation: hpglow 1.6s ease-in-out infinite; }
 .hp-btn.used { filter: grayscale(1) brightness(0.55); transform: rotateY(180deg); }
 .hp-btn.sel { box-shadow: 0 0 0 0.5em var(--hud), 0 0 0 0.85em #ff5a3a, 0 0 2em #ff5a3a; }
-@keyframes hpglow { 50% { box-shadow: 0 0 0 0.5em var(--hud), 0 0 0 0.85em var(--green), 0 0 1.6em var(--green); } }
+@keyframes hpglow { 50% { opacity: 1; } }
 .ehand { display: flex; align-items: flex-start; justify-content: center; width: calc(var(--u) * 15); height: calc(var(--u) * 8.5); --cw: calc(var(--u) * 5.6); }
 .ehand .cardback { margin-left: calc(var(--u) * -3.6); transform-origin: 50% 0; }
 .ehand .cardback:first-child { margin-left: 0; }
@@ -253,12 +255,12 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 .minion .m-ic i.tg { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12z' fill='none' stroke='%23f2d64b' stroke-width='2'/%3E%3Ccircle cx='12' cy='12' r='3' fill='%23f2d64b'/%3E%3C/svg%3E"); }
 .minion .m-ic i.ps { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C9 8 6 11 6 15a6 6 0 0 0 12 0c0-4-3-7-6-13z' fill='%233dff8a'/%3E%3C/svg%3E"); }
 .minion.taunt::before { content: ''; position: absolute; left: -0.6em; right: -0.6em; top: -0.8em; bottom: 1.4em; background: repeating-linear-gradient(-45deg, #f2d64b 0 0.9em, #1d1a10 0.9em 1.8em); clip-path: polygon(50% 0, 100% 12%, 96% 62%, 50% 100%, 4% 62%, 0 12%); filter: drop-shadow(0 0.4em 0.5em rgba(0, 0, 0, 0.6)); }
-.minion.divine .m-art::after { content: ''; position: absolute; inset: -0.2em; border-radius: inherit; background: radial-gradient(ellipse at 40% 30%, rgba(255, 255, 255, 0.55), rgba(255, 236, 160, 0.25) 45%, rgba(255, 220, 120, 0.05) 70%); box-shadow: inset 0 0 1.2em rgba(255, 240, 180, 0.95); animation: bubble 2.6s ease-in-out infinite; }
+.minion.divine .m-art::after { content: ''; position: absolute; inset: -0.2em; border-radius: inherit; background: radial-gradient(ellipse at 40% 30%, rgba(255, 255, 255, 0.55), rgba(255, 236, 160, 0.25) 45%, rgba(255, 220, 120, 0.05) 70%); box-shadow: inset 0 0 1.2em rgba(255, 240, 180, 0.95); animation: bubble 2.6s ease-in-out infinite; will-change: opacity; }
 .minion.divine .m-art { box-shadow: 0 0 0 0.45em #ffe7a0, 0 0 1.8em rgba(255, 230, 150, 0.9), 0 0.8em 1.2em rgba(0, 0, 0, 0.55); }
-@keyframes bubble { 50% { filter: hue-rotate(40deg) brightness(1.15); } }
+@keyframes bubble { 50% { opacity: 0.65; } }
 .minion.stealth .m-art { filter: brightness(0.45) contrast(1.3) saturate(0.4); }
-.minion.stealth .m-art::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0 0.25em, transparent 0.25em 0.6em); animation: noise 0.6s steps(3) infinite; }
-@keyframes noise { 0% { background-position: 0 0; } 100% { background-position: 0 1.8em; } }
+.minion.stealth .m-art::after { content: ''; position: absolute; left: 0; right: 0; top: -1.8em; bottom: 0; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0 0.25em, transparent 0.25em 0.6em); will-change: transform; animation: noise 0.6s steps(3) infinite; }
+@keyframes noise { 0% { transform: translateY(0); } 100% { transform: translateY(1.8em); } }
 .minion.frozen .m-art { filter: saturate(0.35) brightness(1.2) hue-rotate(160deg); }
 .minion.frozen::after { content: ''; position: absolute; left: 0.4em; right: 0.4em; top: 0.2em; bottom: 2em; border-radius: 50% / 46%; background: linear-gradient(160deg, rgba(220, 250, 255, 0.75), rgba(120, 210, 240, 0.25) 60%, rgba(200, 245, 255, 0.6)), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 80'%3E%3Cpath d='M10 0 22 30 14 44 30 80M50 4 36 26 44 40 30 58' stroke='white' stroke-width='1.4' fill='none' opacity='.9'/%3E%3C/svg%3E") center/cover; box-shadow: inset 0 0 1em #fff, 0 0 1em rgba(159, 243, 255, 0.8); z-index: 2; pointer-events: none; }
 .minion.silenced .m-art { filter: grayscale(0.8); }
@@ -275,7 +277,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 .mid { flex: none; position: relative; height: calc(var(--u) * 14); display: flex; align-items: center; gap: calc(var(--u) * 2); padding: 0 calc(var(--u) * 2.4); }
 .mid::before { content: ''; position: absolute; left: calc(var(--u) * 1); right: calc(var(--u) * 1); top: calc(var(--u) * 0.8); bottom: calc(var(--u) * 0.8); border-radius: calc(var(--u) * 3); background: var(--hud); box-shadow: inset 0 0 0 1px var(--hud-line), 0 calc(var(--u) * 1) calc(var(--u) * 3) rgba(0, 0, 0, 0.35); pointer-events: none; }
 .mid > * { position: relative; }
-.field { position: relative; flex: none; width: calc(var(--u) * 19); height: calc(var(--u) * 11); border-radius: calc(var(--u) * 1.6); border: 1px dashed var(--hud-line); display: grid; place-items: center; font: calc(var(--u) * 3) / 1 var(--f-mono); color: var(--paper); opacity: 0.55; overflow: hidden; background: var(--hud); }
+.field { position: relative; flex: none; width: calc(var(--u) * 19); height: calc(var(--u) * 11.6); border-radius: calc(var(--u) * 1.6); border: 1px dashed var(--hud-line); display: grid; place-items: center; font: calc(var(--u) * 3) / 1 var(--f-mono); color: var(--paper); opacity: 0.55; overflow: hidden; background: var(--hud); }
 .field.on { opacity: 1; border: 0; background: #111 center/cover; box-shadow: 0 0 0 calc(var(--u) * 0.5) #2b2310, 0 0 0 calc(var(--u) * 0.8) var(--yellow), 0 0 calc(var(--u) * 4) rgba(242, 214, 75, 0.4); }
 .field.on.mine { box-shadow: 0 0 0 calc(var(--u) * 0.5) #2b2310, 0 0 0 calc(var(--u) * 0.8) var(--green), 0 0 calc(var(--u) * 4) rgba(61, 255, 138, 0.3); }
 .field.on.theirs { box-shadow: 0 0 0 calc(var(--u) * 0.5) #2b2310, 0 0 0 calc(var(--u) * 0.8) var(--red), 0 0 calc(var(--u) * 4) rgba(255, 59, 78, 0.35); }
@@ -293,7 +295,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 .endturn { flex: none; min-width: calc(var(--u) * 22); height: calc(var(--u) * 12); padding: 0 calc(var(--u) * 2); border-radius: calc(var(--u) * 6); font: 700 calc(var(--u) * 3.6) / 1 var(--f-serif); letter-spacing: 0.08em; color: #1a1406; background: linear-gradient(#ffe9a0, #d9a93a); box-shadow: 0 calc(var(--u) * 0.8) 0 #7a5a10, 0 calc(var(--u) * 1.4) calc(var(--u) * 3) rgba(0, 0, 0, 0.5); transition: transform 0.12s, filter 0.3s; }
 .endturn:active { transform: translateY(calc(var(--u) * 0.6)); box-shadow: 0 calc(var(--u) * 0.2) 0 #7a5a10; }
 .endturn.done { background: linear-gradient(#b8ffd0, #2fcf6a); box-shadow: 0 calc(var(--u) * 0.8) 0 #0e5a2a, 0 0 calc(var(--u) * 4) rgba(61, 255, 138, 0.6); animation: etpulse 1.4s ease-in-out infinite; }
-@keyframes etpulse { 50% { filter: brightness(1.2); } }
+@keyframes etpulse { 50% { transform: scale(1.04); } }
 .endturn.wait { background: linear-gradient(#5a5446, #3a362c); color: #b9ae94; box-shadow: 0 calc(var(--u) * 0.8) 0 #1a1812; cursor: default; }
 .menu-btn { position: relative; width: calc(var(--u) * 11.5); height: calc(var(--u) * 11.5); display: grid; place-items: center; border-radius: 50%; background: var(--hud); box-shadow: inset 0 0 0 1px var(--hud-line); }
 .menu-btn span, .menu-btn span::before, .menu-btn span::after { display: block; width: calc(var(--u) * 4.4); height: 2px; background: var(--paper); position: relative; }
@@ -380,9 +382,10 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 #layerT canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 #layerT .flash { position: absolute; inset: 0; background: #fffbe8; opacity: 0; }
 #layerT .title { position: absolute; left: 0; right: 0; top: 40%; display: flex; flex-direction: column; align-items: center; gap: 2vh; opacity: 0; }
-#layerT .title .n { font: 3.4vh/1 var(--f-mono); letter-spacing: 0.4em; color: var(--layer-accent); }
-#layerT .title .t { font: 900 6.4vh/1 var(--f-serif); letter-spacing: 0.3em; color: #fff; text-shadow: 0 0 2vh var(--layer-accent); }
-#layerT .title .r { max-width: 86vw; font: 2.2vh/1.5 var(--f-sans); color: var(--paper); text-align: center; opacity: 0.9; }
+#layerT .title { padding: 3vh 6vw; background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.72) 15%, rgba(0, 0, 0, 0.72) 85%, transparent); }
+#layerT .title .n { font: min(3vh, 4.4vw) / 1 var(--f-mono); letter-spacing: 0.18em; color: var(--layer-accent); white-space: nowrap; }
+#layerT .title .t { font: 900 min(6vh, 8.6vw) / 1.1 var(--f-serif); letter-spacing: 0.12em; color: #fff; text-shadow: 0 0 2vh var(--layer-accent); white-space: nowrap; }
+#layerT .title .r { max-width: min(86vw, 640px); font: min(2.2vh, 3.8vw) / 1.5 var(--f-sans); color: var(--paper); text-align: center; opacity: 0.9; }
 #layerT .osd { position: absolute; left: 4vw; top: calc(env(safe-area-inset-top, 0px) + 3vh); font: 3.2vh/1 var(--f-mono); color: #fff; text-shadow: 2px 0 #ff0040, -2px 0 #00e0ff; opacity: 0; letter-spacing: 0.1em; }
 #layerT .skip { position: absolute; right: 4vw; bottom: calc(env(safe-area-inset-bottom, 0px) + 3vh); font: 2.4vh/1 var(--f-mono); color: #fff; opacity: 0.6; letter-spacing: 0.2em; }
 #app.glitching #stage { animation: vhs calc(100ms) steps(2) infinite; }
@@ -449,7 +452,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 /* deck builder */
 #screen-deck .menu-wrap { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--u) * 26); gap: calc(var(--u) * 2.4); }
 .filters { display: flex; flex-wrap: wrap; gap: calc(var(--u) * 1.4); }
-.chip { min-height: calc(var(--u) * 10); min-width: calc(var(--u) * 10); padding: 0 calc(var(--u) * 2.4); border-radius: calc(var(--u) * 5); background: var(--hud); box-shadow: inset 0 0 0 1px var(--hud-line); font: calc(var(--u) * 3.4) / 1 var(--f-mono); letter-spacing: 0.06em; display: inline-flex; align-items: center; justify-content: center; gap: 0.3em; }
+.chip { min-height: max(44px, calc(var(--u) * 10)); min-width: max(44px, calc(var(--u) * 10)); padding: 0 calc(var(--u) * 2.4); border-radius: calc(var(--u) * 5); background: var(--hud); box-shadow: inset 0 0 0 1px var(--hud-line); font: calc(var(--u) * 3.4) / 1 var(--f-mono); letter-spacing: 0.06em; display: inline-flex; align-items: center; justify-content: center; gap: 0.3em; }
 .chip.on { background: var(--layer-accent); color: #1a1406; }
 .chip svg { width: 1.2em; height: 1.2em; }
 .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(var(--u) * 2.4) calc(var(--u) * 2); --cw: calc(var(--u) * 28); justify-items: center; }
@@ -469,7 +472,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 .dcount.ok { color: var(--green); }
 .dlist { display: none; max-height: 42vh; overflow-y: auto; flex-direction: column; gap: 3px; }
 .dock.open .dlist { display: flex; }
-.dli { display: flex; align-items: center; gap: calc(var(--u) * 2); min-height: calc(var(--u) * 10); padding: 0 calc(var(--u) * 2); border-radius: calc(var(--u) * 0.8); background: linear-gradient(90deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)); text-align: left; position: relative; overflow: hidden; }
+.dli { display: flex; align-items: center; gap: calc(var(--u) * 2); min-height: max(44px, calc(var(--u) * 10)); padding: 0 calc(var(--u) * 2); border-radius: calc(var(--u) * 0.8); background: linear-gradient(90deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)); text-align: left; position: relative; overflow: hidden; }
 .dli .bg { position: absolute; right: 0; top: 0; bottom: 0; width: 45%; background: center/cover; opacity: 0.45; -webkit-mask: linear-gradient(90deg, transparent, #000); mask: linear-gradient(90deg, transparent, #000); }
 .dli .mc { position: relative; width: calc(var(--u) * 6.6); height: calc(var(--u) * 6.6); display: grid; place-items: center; font: calc(var(--u) * 4.4) / 1 var(--f-mono); color: #fff; background: radial-gradient(circle at 35% 30%, #c8ecff, #3d8fe0 55%, #123a6a); clip-path: polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%); flex: none; }
 .dli b { position: relative; flex: 1; font: 700 calc(var(--u) * 3.6) / 1.1 var(--f-serif); }
@@ -488,12 +491,12 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 /* settings & end */
 .set-row { display: flex; align-items: center; justify-content: space-between; gap: calc(var(--u) * 3); min-height: calc(var(--u) * 12); padding: 0 calc(var(--u) * 1); border-bottom: 1px solid rgba(255, 255, 255, 0.08); font: calc(var(--u) * 3.8) / 1.3 var(--f-sans); }
 .set-row small { display: block; font-size: 0.78em; opacity: 0.6; }
-.toggle { position: relative; width: calc(var(--u) * 16); height: calc(var(--u) * 9); border-radius: calc(var(--u) * 5); background: #333; flex: none; transition: background 0.2s; }
-.toggle::after { content: ''; position: absolute; left: calc(var(--u) * 1); top: calc(var(--u) * 1); width: calc(var(--u) * 7); height: calc(var(--u) * 7); border-radius: 50%; background: #ddd; transition: transform 0.2s; }
+.toggle { position: relative; width: max(72px, calc(var(--u) * 16)); height: max(44px, calc(var(--u) * 9)); border-radius: calc(var(--u) * 5); background: #333; flex: none; transition: background 0.2s; }
+.toggle::after { content: ''; position: absolute; left: 5px; top: 5px; width: calc(max(44px, calc(var(--u) * 9)) - 10px); height: calc(max(44px, calc(var(--u) * 9)) - 10px); border-radius: 50%; background: #ddd; transition: transform 0.2s; }
 .toggle.on { background: var(--layer-accent); }
-.toggle.on::after { transform: translateX(calc(var(--u) * 7)); background: #1a1406; }
+.toggle.on::after { transform: translateX(calc(max(72px, calc(var(--u) * 16)) - max(44px, calc(var(--u) * 9)))); background: #1a1406; }
 .seg3 { display: flex; gap: 4px; }
-.seg3 button { min-width: calc(var(--u) * 11); min-height: calc(var(--u) * 9); border-radius: calc(var(--u) * 1); background: #222; font: calc(var(--u) * 3.4) / 1 var(--f-mono); }
+.seg3 button { min-width: max(44px, calc(var(--u) * 11)); min-height: max(44px, calc(var(--u) * 9)); border-radius: calc(var(--u) * 1); background: #222; font: calc(var(--u) * 3.4) / 1 var(--f-mono); }
 .seg3 button.on { background: var(--layer-accent); color: #1a1406; }
 .panel { margin: auto; width: calc(var(--u) * 90); max-height: 90%; overflow-y: auto; padding: calc(var(--u) * 5); border-radius: calc(var(--u) * 2); background: #12100c; box-shadow: 0 0 0 1px var(--hud-line), 0 calc(var(--u) * 3) calc(var(--u) * 8) rgba(0, 0, 0, 0.8); display: flex; flex-direction: column; gap: calc(var(--u) * 3); }
 #endov { flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--u) * 4); padding: calc(var(--u) * 6); text-align: center; }
@@ -525,6 +528,19 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 }
 #app.calm .sc0::before, #app.calm .sc2 .neon, #app.calm .logo .zh, #app.calm .card .cf::after, #app.calm .minion.stealth .m-art::after { animation: none !important; }
 #screen-game { touch-action: none; }
+
+.mute { position: absolute; top: calc(env(safe-area-inset-top, 0px) + var(--u) * 3); right: calc(var(--u) * 3); width: max(44px, calc(var(--u) * 11)); height: max(44px, calc(var(--u) * 11)); border-radius: 50%; background: var(--hud); box-shadow: inset 0 0 0 1px var(--hud-line); font: calc(var(--u) * 5) / 1 var(--f-mono); color: var(--paper); }
+.mute.off { color: var(--red); text-decoration: line-through; }
+
+/* gatekeepers are not still pictures */
+#heroE[data-boss='broadcast'] .pt { animation: bcast 2.2s ease-in-out infinite; }
+#heroE[data-boss='lifeguard'] .pt { animation: bob 4.6s ease-in-out infinite; }
+#heroE[data-boss='manager'] .pt { animation: dim 7s steps(1) infinite; }
+@keyframes bcast { 50% { transform: scale(1.04); } }
+@keyframes bob { 50% { transform: translateY(calc(var(--u) * -0.8)) rotate(-1.5deg); } }
+@keyframes dim { 0%, 88%, 92%, 100% { opacity: 1; } 89%, 91% { opacity: 0.55; } }
+#app.calm #heroE .pt { animation: none; }
+@media (prefers-reduced-motion: reduce) { #heroE .pt { animation: none !important; } }
 
 </style>
 <div id="app" data-layer="0">
@@ -558,6 +574,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
           <button class="btn ghost" data-go="settings">设置</button>
         </div>
         <div class="mfoot" id="titleFoot">请勿在走廊中奔跑 · 请勿注视墙缝</div>
+        <button class="mute" id="muteTitle" aria-label="静音">♪</button>
       </div>
     </section>
 
@@ -2217,6 +2234,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
   card({
     id: 'S18', num: 19, name: 'LMN-019 冰封档案库', faction: 'site', type: 'minion', rarity: 'legendary', cost: 6, san: 3, atk: 4, hp: 9, kw: ['taunt'],
     text: '嘲讽。在你的回合结束时，冻结攻击力最高的敌方随从。',
+    whisper: '（霜上的第十三行，写的是你的名字。）',
     lore: { k: '档', t: 'LMN-019 是一座无法打开的档案库。我们知道里面保存着回声-4 的全部记录，因为每天早上，柜门上的霜都会多出一行字。' },
     art: ['void', 'vault x.5 s1.1', 'snow n40', 'textlines n7'],
     on: {
@@ -2327,6 +2345,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
   card({
     id: 'B12', name: '电梯间', faction: 'level', type: 'field', rarity: 'rare', cost: 3,
     text: '场地：在你的回合结束时，召唤一个 1/1 并具有潜行的「游荡的影子」。',
+    whisper: '（电梯里一共站着五个人。）',
     lore: { k: '讯', t: '[14:00:41] 电梯到了，门开了。里面站着我们四个人。他们在等我们进去。' },
     art: ['hall', 'elevator x.5 s1', 'faceless x.42 y.66 s.35 c#111', 'faceless x.58 y.66 s.35 c#111'],
     on: { turnEnd: (G, c) => { if (c.ev.pid === c.p) E.summon(G, c.p, 'T_SHADOW', null, { how: 'field' }); } },
@@ -2565,6 +2584,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
   card({
     id: 'N03', name: '失眠者', faction: 'neutral', type: 'minion', rarity: 'common', cost: 3, san: 1, atk: 4, hp: 4,
     text: '',
+    whisper: '（现在几点了？你也该睡了。）',
     lore: { k: '档', t: '警告：长时间处于理智低值状态的人员，会在手中看见「不存在的卡片」。请勿使用它们。若已使用，请勿告诉任何人。' },
     art: ['room', { dark: 0.5 }, 'faceless x.5 s.9 c#cfc4d8 eyes1', 'clock x.78 y.24 s.45'],
   });
@@ -3219,6 +3239,87 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
   };
 
   E.U_rand = (G) => L.U.rand(G);
+})();
+
+/* ---- 32-aiworker.js ---- */
+/* LIMINAL · runs the gatekeeper's thinking in a Web Worker built from this very script,
+   so the main thread keeps animating while it decides. Falls back to synchronous search. */
+(function () {
+  'use strict';
+  const L = globalThis.LMN;
+  const W = (L.AIW = {});
+  // capture our own source while it is executing (inline single-file build)
+  const SRC = typeof document !== 'undefined' && document.currentScript ? document.currentScript.textContent : null;
+  let worker = null;
+  let failed = false;
+  let seq = 0;
+  const pending = new Map();
+
+  function shim() {
+    self.onmessage = function (e) {
+      const d = e.data;
+      let a;
+      try {
+        a = self.LMN.AI.decide(d.G, d.pid, d.persona, d.memo);
+      } catch (err) {
+        a = { t: 'end' };
+      }
+      self.postMessage({ id: d.id, a: a, memo: d.memo });
+    };
+  }
+
+  function ensure() {
+    if (worker || failed) return worker;
+    if (typeof Worker === 'undefined' || !SRC) { failed = true; return null; }
+    try {
+      const blob = new Blob([SRC + '\n;(' + shim.toString() + ')();'], { type: 'text/javascript' });
+      worker = new Worker(URL.createObjectURL(blob));
+      worker.onmessage = (e) => {
+        const p = pending.get(e.data.id);
+        if (p) { pending.delete(e.data.id); clearTimeout(p.timer); p.res(e.data); }
+      };
+      worker.onerror = () => { failed = true; worker = null; for (const p of pending.values()) p.fallback(); pending.clear(); };
+    } catch (e) {
+      failed = true;
+      worker = null;
+    }
+    return worker;
+  }
+
+  // resolves to the decided action; memo is updated in place
+  W.decide = function (G, pid, persona, memo) {
+    const sync = () => L.AI.decide(G, pid, persona, memo);
+    const w = ensure();
+    if (!w) return Promise.resolve(sync());
+    return new Promise((resolve) => {
+      const id = ++seq;
+      const fallback = () => resolve(sync());
+      const timer = setTimeout(() => { if (pending.has(id)) { pending.delete(id); fallback(); } }, 8000);
+      pending.set(id, {
+        timer,
+        fallback,
+        res: (d) => {
+          for (const k in memo) delete memo[k];
+          Object.assign(memo, d.memo);
+          resolve(d.a);
+        },
+      });
+      const ev = G.events;
+      G.events = [];
+      try {
+        w.postMessage({ id, G, pid, persona, memo: JSON.parse(JSON.stringify(memo)) });
+      } catch (e) {
+        pending.delete(id);
+        clearTimeout(timer);
+        failed = true;
+        G.events = ev;
+        resolve(sync());
+        return;
+      }
+      G.events = ev;
+    });
+  };
+  W.warm = function () { ensure(); };
 })();
 
 /* ---- 40-store.js ---- */
@@ -4870,6 +4971,8 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
   let shakeAmp = 0, shakeX = 0, shakeY = 0, shakeEl = null;
   let reduced = false;
   let dirtyFront = false;
+  let coarse = false;
+  let backScale = 1;
   FX.speed = 1;
 
   const COLORS = {
@@ -4887,6 +4990,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     dark: ['#1a1612', '#2b2310', '#000000'],
   };
   FX.COLORS = COLORS;
+  const RAINBOW = ['#ff8fb5', '#ffc38f', '#fff38f', '#a8f0a8', '#8fd8ff', '#c8a8ff'];
 
   // pre-rendered glow sprites
   const sprites = {};
@@ -4912,8 +5016,8 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     fctx = front.getContext('2d');
     bctx = back.getContext('2d');
     reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-    if (coarse) { maxBudget = 420; budget = 360; }
+    coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    if (coarse) { maxBudget = 420; budget = 360; backScale = 0.5; }
     FX.resize();
     window.addEventListener('resize', FX.resize);
     requestAnimationFrame(loop);
@@ -4925,11 +5029,12 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
   FX.resize = function () {
     VW = window.innerWidth;
     VH = window.innerHeight;
-    dpr = Math.min(2, window.devicePixelRatio || 1);
+    dpr = Math.min(coarse ? 1.5 : 2, window.devicePixelRatio || 1);
     front.width = Math.round(VW * dpr);
     front.height = Math.round(VH * dpr);
-    back.width = Math.round(VW);
-    back.height = Math.round(VH);
+    // ambience is soft by nature: render it at reduced resolution on phones and let CSS stretch it
+    back.width = Math.round(VW * backScale);
+    back.height = Math.round(VH * backScale);
     ambient.motes = [];
     caustic = null;
   };
@@ -5082,6 +5187,57 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
       g.restore();
     });
   };
+  // 后室: eyes opening in the darkness around a rect
+  FX.eyes = function (rect, n) {
+    const eyes = [];
+    n = reduced ? 2 : n || 5;
+    for (let i = 0; i < n; i++) eyes.push({ x: rect.left + rect.width / 2 + rnd(-rect.width * 1.1, rect.width * 1.1), y: rect.top + rect.height / 2 + rnd(-rect.height * 0.6, rect.height * 0.6), w: rnd(7, 13), d: rnd(0, 0.35) });
+    return effect(1.3, (g, k) => {
+      g.save();
+      for (const e of eyes) {
+        const kk = Math.max(0, Math.min(1, (k - e.d) / 0.65));
+        const open = kk < 0.3 ? kk / 0.3 : kk > 0.75 ? Math.max(0, (1 - kk) / 0.25) : 1;
+        if (open <= 0) continue;
+        const x = e.x * dpr, y = e.y * dpr, w = e.w * dpr, h = w * 0.55 * open;
+        g.globalAlpha = 0.95;
+        g.fillStyle = 'rgba(0,0,0,.55)';
+        g.beginPath();
+        g.ellipse(x, y, w * 1.6, w, 0, 0, 6.283);
+        g.fill();
+        g.fillStyle = '#fff4c8';
+        g.shadowColor = '#f2d64b';
+        g.shadowBlur = 10 * dpr;
+        g.beginPath();
+        g.moveTo(x - w, y);
+        g.quadraticCurveTo(x, y - h, x + w, y);
+        g.quadraticCurveTo(x, y + h, x - w, y);
+        g.fill();
+        g.shadowBlur = 0;
+        g.fillStyle = '#1a0f00';
+        g.beginPath();
+        g.arc(x, y, Math.min(h, w * 0.32), 0, 6.283);
+        g.fill();
+      }
+      g.restore();
+    });
+  };
+  // 梦核: a soft halo that is gentle, and slightly wrong
+  FX.halo = function (x, y, r) {
+    return effect(1.1, (g, k) => {
+      const rr = (r || 80) * (0.6 + k * 0.7) * dpr;
+      const hue = 300 + Math.sin(k * 9) * 40;
+      const gr = g.createRadialGradient(x * dpr, y * dpr, rr * 0.2, x * dpr, y * dpr, rr);
+      gr.addColorStop(0, `hsla(${hue},100%,92%,0)`);
+      gr.addColorStop(0.6, `hsla(${hue},100%,85%,${0.35 * (1 - k)})`);
+      gr.addColorStop(0.8, `hsla(${(hue + 120) % 360},90%,80%,${0.18 * (1 - k)})`);
+      gr.addColorStop(1, `hsla(${hue},100%,90%,0)`);
+      g.globalCompositeOperation = 'lighter';
+      g.fillStyle = gr;
+      g.fillRect(x * dpr - rr, y * dpr - rr, rr * 2, rr * 2);
+      g.globalCompositeOperation = 'source-over';
+    });
+  };
+
   // red alarm sweep (breach)
   FX.alarm = function () {
     return effect(1.2, (g, k) => {
@@ -5137,7 +5293,8 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
           const y = (1 - e) * (1 - e) * y0 + 2 * (1 - e) * e * my + e * e * y1;
           for (let i = 0; i < (reduced ? 1 : 3); i++) {
             const p = P();
-            Object.assign(p, { x: x + rnd(-3, 3), y: y + rnd(-3, 3), vx: rnd(-30, 30), vy: rnd(-30, 30), ax: 0, ay: style === 'dream' ? -30 : 40, drag: 3, life: rnd(0.25, 0.5), size: rnd(3, 7), col: pick(cols), type: style === 'level' ? 'px' : style === 'dream' && Math.random() < 0.4 ? 'bubble' : 'glow', rot: 0, vr: 0 });
+            const col = style === 'dream' ? RAINBOW[Math.floor((e * 14 + i) % RAINBOW.length)] : pick(cols);
+            Object.assign(p, { x: x + rnd(-3, 3), y: y + rnd(-3, 3), vx: rnd(-30, 30), vy: rnd(-30, 30), ax: 0, ay: style === 'dream' ? -30 : 40, drag: 3, life: rnd(0.25, 0.5) * (style === 'dream' ? 1.8 : 1), size: rnd(3, 7), col, type: style === 'level' ? 'px' : style === 'dream' && Math.random() < 0.3 ? 'bubble' : 'glow', rot: 0, vr: 0 });
             if (p.type === 'glow') p.size *= 2.4;
             add(p);
           }
@@ -5757,7 +5914,8 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     const boss = L.HEROES[c.boss];
     const deck = c.deck.slice();
     G = E.newGame({
-      seed: (Math.random() * 2 ** 31) | 0,
+      seed: c.seed != null ? c.seed : (Math.random() * 2 ** 31) | 0,
+      first: c.first,
       depth: boss.startDepth,
       rec: true,
       players: [
@@ -5780,6 +5938,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     $('codeE').textContent = boss.code;
     els.heroP.querySelector('.pt').style.backgroundImage = `url("${L.Art.portrait(c.agent)}")`;
     els.heroE.querySelector('.pt').style.backgroundImage = `url("${L.Art.portrait(boss.id)}")`;
+    els.heroE.dataset.boss = boss.bossKey;
     els.hpP.querySelector('.ic').innerHTML = CV.HP_ICON[c.agent];
     els.hpE.querySelector('.ic').innerHTML = CV.HP_ICON[boss.id];
     L.Layers.set(G.layer, true);
@@ -5801,12 +5960,39 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
         await sleep(1500);
       }
       E.mulligan(G, AI_PID, L.AI.mulligan(G, AI_PID));
+      if (!L.Store.progress.briefed) await briefing();
       await mulligan();
       E.begin(G);
       await drain();
+      // the gatekeeper may have won the coin flip
+      if (!G.over && G.active === AI_PID) await aiTurn();
       afterAction();
     })();
   };
+
+  // ------------------------------------------------------------------ first-time briefing
+  function briefing() {
+    return new Promise((res) => {
+      const ov = $('mull');
+      ov.classList.remove('four');
+      ov.innerHTML = `<div class="ttl">外勤须知</div><div class="sub">LMN-000 · 第一次进入</div>
+        <div class="kwl" style="width:calc(var(--u)*86)">
+          <div><b>出牌</b>轻触手牌选中，再轻触战场或目标；也可以直接把牌拖上去。按住手牌左右滑动可以放大阅读。</div>
+          <div><b>攻击</b>轻触一个发光的随从，再轻触敌人；或者从随从拖向目标。长按任何东西查看详情。</div>
+          <div><b>${CV.SYM}理智</b>带 ${CV.SYM} 的牌更强，但要额外支付理智。理智太低，你的手里会出现不存在的牌。</div>
+          <div><b>梦深</b>消耗的理智和时间会让梦往下沉。沉到下一层时，规则会对双方同时改变，而且回不去。</div>
+          <div><b>收容</b>被收容的敌人会进入你的牌库。及时打出它，它就是你的；拖得太久，它会突破回去。</div>
+        </div><button class="btn" id="briefOk">明白了</button>`;
+      ov.classList.add('on');
+      $('briefOk').onclick = () => {
+        A.play('click');
+        L.Store.progress.briefed = true;
+        L.Store.saveProgress();
+        ov.classList.remove('on');
+        res();
+      };
+    });
+  }
 
   // ------------------------------------------------------------------ mulligan
   function mulligan() {
@@ -6145,6 +6331,11 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
         if (src) aim(center(src), { x: e.clientX, y: e.clientY });
       }
     });
+    els.hand.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse' || press) return;
+      const uid = cardIndexAt(e.clientX);
+      if (uid != null && uid !== els.hand._hover) { els.hand._hover = uid; showSidePreview(uid); }
+    });
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible' && G && !G.over && L.Menus.current() === 'game') setTimeout(() => toast('你离开的时候，走廊变长了。'), 400);
     });
@@ -6240,13 +6431,15 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     if (p.kind === 'hand') {
       if (p.drag) {
         p.el.classList.remove('dragging');
+        UI._suppress = performance.now(); // the synthetic click after a drag must not cancel targeting
         dropCard(p.uid, e.clientX, e.clientY);
         return;
       }
-      if (p.previewed) return;
-      // a tap
+      // the hand is a scrubber: press, slide to the card you want, release to pick it up
+      if (p.previewed && !(UI.isMyTurn() && !busy && E.canPlay(G, ME, p.uid))) return;
+      // a tap (or a scrub release)
       if (!UI.isMyTurn() || busy) { UI.inspectHand(p.uid); return; }
-      if (sel && sel.uid === p.uid && sel.kind === 'card') { setSel(null); return; }
+      if (!p.previewed && sel && sel.uid === p.uid && sel.kind === 'card') { setSel(null); return; }
       if (!E.canPlay(G, ME, p.uid)) { toast(whyCantPlay(p.uid)); A.play('error'); setSel(null); return; }
       A.play('hover');
       const ci = G.players[ME].hand.find((c) => c.uid === p.uid);
@@ -6430,7 +6623,8 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     const boss = L.HEROES[cfg.boss];
     await sleep(450);
     for (let i = 0; i < 40 && !G.over && G.active === AI_PID; i++) {
-      const a = L.AI.decide(G, AI_PID, boss.persona, aiMemo);
+      const a = await L.AIW.decide(G, AI_PID, boss.persona, aiMemo);
+      if (!G || G.over) break;
       if (a.t === 'end') break;
       if (a.t === 'atk') {
         const el = minEls.get(a.a);
@@ -6665,6 +6859,9 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     FX.ring(c.x, c.y + r.height * 0.2, FX.COLORS[d.faction][0], 110, 0.5, 7);
     FX.burst(c.x, c.y + r.height * 0.25, d.faction, 22, { dir: -Math.PI / 2, spread: 1.4, speed: 0.8 });
     if (ev.how === 'tamed') { FX.lattice(r, '#9ff3ff'); FX.word(c.x, r.top - 6, '收容物 · 为你作战', 'cold'); }
+    const sm = E.char(G, ev.uid);
+    if (d.faction === 'level' && sm && sm.kw && sm.kw.stealth) FX.eyes(r, 4);
+    if (d.faction === 'dream') FX.halo(c.x, c.y, r.width * 1.2);
     if (ev.how === 'exit') FX.burst(c.x, c.y, 'heal', 16);
     FX.shake(3);
     await sleep(140);
@@ -6727,7 +6924,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
   };
   H.ambush = async (ev) => {
     const r = rectOf(ev.uid);
-    if (r) FX.word(center(r).x, r.top - 4, '暗袭', 'bad');
+    if (r) { FX.word(center(r).x, r.top - 4, '暗袭', 'bad'); FX.eyes(r, 6); }
   };
   H.damage = async (ev) => {
     const el = elOf(ev.target);
@@ -7246,6 +7443,9 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
   UI.relayout = function () {
     if (snap) layoutHand();
   };
+  UI._forceRender = function () {
+    if (G) render(E.snapshot(G));
+  };
 
   // test / debug hooks
   UI.debug = {
@@ -7449,6 +7649,10 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
       else M.show('title');
     });
     titleTV();
+    const mt = $('muteTitle');
+    const syncMute = () => mt.classList.toggle('off', !!S.settings.mute);
+    mt.addEventListener('click', (e) => { e.stopPropagation(); A.init(); S.settings.mute = !S.settings.mute; S.saveSettings(); M.applySettings(); syncMute(); });
+    syncMute();
     const enter = () => {
       A.init();
       L.Layers.set(0);
@@ -7863,6 +8067,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     const p = $('pausePanel');
     p.innerHTML = `<div class="hdr"><h2>暂停</h2><button class="back" id="pClose" aria-label="关闭">×</button></div>
       <button class="btn" id="pResume">继续</button>
+      <button class="btn ghost" id="pMute">${S.settings.mute ? '取消静音' : '静音'}</button>
       <button class="btn ghost" id="pSet">设置</button>
       <button class="btn ghost" id="pLog">本局记录</button>
       <button class="btn ghost" id="pRules">规则速查</button>
@@ -7870,6 +8075,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
       <div id="pExtra"></div>`;
     $('pClose').onclick = $('pResume').onclick = () => ov.classList.remove('on');
     $('pSet').onclick = () => { ov.classList.remove('on'); M.settings(); };
+    $('pMute').onclick = () => { S.settings.mute = !S.settings.mute; S.saveSettings(); M.applySettings(); $('pMute').textContent = S.settings.mute ? '取消静音' : '静音'; const mt = $('muteTitle'); if (mt) mt.classList.toggle('off', !!S.settings.mute); };
     $('pLog').onclick = () => {
       $('pExtra').innerHTML = '<div class="log" style="max-height:40vh;-webkit-mask:none;mask:none">' + L.UI.logLines().slice(-60).map((l) => `<div class="${l.cls || ''}">${esc(l.t)}</div>`).join('') + '</div>';
     };
@@ -7969,6 +8175,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     L.Layers.set(0, true);
     // keep the noise-filtered SVG art off the hot path: bitmap it while the player reads the title
     setTimeout(() => L.Art.rasterizeAll(), 600);
+    setTimeout(() => L.AIW.warm(), 1200);
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         document.querySelectorAll('.ov.on').forEach((o) => o.classList.remove('on'));

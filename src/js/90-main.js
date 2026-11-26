@@ -53,6 +53,7 @@
     L.Layers.set(0, true);
     // keep the noise-filtered SVG art off the hot path: bitmap it while the player reads the title
     setTimeout(() => L.Art.rasterizeAll(), 600);
+    setTimeout(() => L.AIW.warm(), 1200);
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         document.querySelectorAll('.ov.on').forEach((o) => o.classList.remove('on'));

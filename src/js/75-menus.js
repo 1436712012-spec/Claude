@@ -40,6 +40,10 @@
       else M.show('title');
     });
     titleTV();
+    const mt = $('muteTitle');
+    const syncMute = () => mt.classList.toggle('off', !!S.settings.mute);
+    mt.addEventListener('click', (e) => { e.stopPropagation(); A.init(); S.settings.mute = !S.settings.mute; S.saveSettings(); M.applySettings(); syncMute(); });
+    syncMute();
     const enter = () => {
       A.init();
       L.Layers.set(0);
@@ -454,6 +458,7 @@
     const p = $('pausePanel');
     p.innerHTML = `<div class="hdr"><h2>暂停</h2><button class="back" id="pClose" aria-label="关闭">×</button></div>
       <button class="btn" id="pResume">继续</button>
+      <button class="btn ghost" id="pMute">${S.settings.mute ? '取消静音' : '静音'}</button>
       <button class="btn ghost" id="pSet">设置</button>
       <button class="btn ghost" id="pLog">本局记录</button>
       <button class="btn ghost" id="pRules">规则速查</button>
@@ -461,6 +466,7 @@
       <div id="pExtra"></div>`;
     $('pClose').onclick = $('pResume').onclick = () => ov.classList.remove('on');
     $('pSet').onclick = () => { ov.classList.remove('on'); M.settings(); };
+    $('pMute').onclick = () => { S.settings.mute = !S.settings.mute; S.saveSettings(); M.applySettings(); $('pMute').textContent = S.settings.mute ? '取消静音' : '静音'; const mt = $('muteTitle'); if (mt) mt.classList.toggle('off', !!S.settings.mute); };
     $('pLog').onclick = () => {
       $('pExtra').innerHTML = '<div class="log" style="max-height:40vh;-webkit-mask:none;mask:none">' + L.UI.logLines().slice(-60).map((l) => `<div class="${l.cls || ''}">${esc(l.t)}</div>`).join('') + '</div>';
     };

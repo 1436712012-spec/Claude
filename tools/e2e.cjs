@@ -35,6 +35,7 @@ fs.mkdirSync(out, { recursive: true });
   await page.waitForSelector('#mull.on', { timeout: 15000 });
   await page.waitForTimeout(400);
   await page.screenshot({ path: path.join(out, '04-mulligan.png') });
+  if (await page.$('#briefOk')) { await page.click('#briefOk'); await page.waitForSelector('#mullOk'); }
   await page.click('#mullOk');
   await page.waitForTimeout(2500);
   await page.screenshot({ path: path.join(out, '05-board.png') });
