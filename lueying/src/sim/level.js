@@ -238,10 +238,26 @@ export function buildStaticBoxes(groundAt) {
 export function buildFences() {
   const F = MAP, segs = [];
   const sx = F.fenceHalfX;
-  segs.push({ id: 'fenceS', ax: -sx, az: F.fenceSouthZ, bx: sx, bz: F.fenceSouthZ, h: 3.4 });
+  segs.push({ id: 'fenceS1', ax: -sx, az: F.fenceSouthZ, bx: -102, bz: F.fenceSouthZ, h: 3.4 });
+  segs.push({ id: 'fenceS2', ax: -98, az: F.fenceSouthZ, bx: sx, bz: F.fenceSouthZ, h: 3.4 });
   segs.push({ id: 'fenceE', ax: sx, az: F.fenceSouthZ, bx: sx, bz: F.fenceNorthZ, h: 3.4 });
   segs.push({ id: 'fenceW', ax: -sx, az: F.fenceSouthZ, bx: -sx, bz: F.fenceNorthZ, h: 3.4 });
   segs.push({ id: 'fenceN1', ax: -sx, az: F.fenceNorthZ, bx: -13, bz: F.fenceNorthZ, h: 3.4 });
   segs.push({ id: 'fenceN2', ax: 13, az: F.fenceNorthZ, bx: sx, bz: F.fenceNorthZ, h: 3.4 });
-  return segs;
+  // 切成约 10 m 一段，便于被打穿
+  const out = [];
+  for (const g of segs) {
+    const L = Math.hypot(g.bx - g.ax, g.bz - g.az);
+    const n = Math.max(1, Math.round(L / 10));
+    for (let i = 0; i < n; i++) {
+      const t0 = i / n, t1 = (i + 1) / n;
+      out.push({ id: g.id + '_' + i, ax: g.ax + (g.bx - g.ax) * t0, az: g.az + (g.bz - g.az) * t0, bx: g.ax + (g.bx - g.ax) * t1, bz: g.az + (g.bz - g.az) * t1, h: g.h, broken: false, hp: 90 });
+    }
+  }
+  return out;
 }
+
+export const GATES = [
+  { id: 'south', inner: [-100, -207], outer: [-100, -193] },
+  { id: 'north', inner: [0, -493], outer: [0, -508] },
+];
