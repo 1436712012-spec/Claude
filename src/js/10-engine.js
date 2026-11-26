@@ -739,7 +739,9 @@
       const b = G.players[order[k]].board.slice();
       for (let i = 0; i < b.length; i++) {
         const m = b[i];
-        if (m.silenced || m.dead || m.hp <= 0) continue;
+        if (m.silenced) continue;
+        // a minion still reacts to the blow that kills it
+        if ((m.dead || m.hp <= 0) && !(name === 'damaged' && ev && ev.t === m)) continue;
         const d = def(m.cid);
         const h = d.on && d.on[name];
         if (!h) continue;
@@ -1128,11 +1130,8 @@
     const t = char(G, tUid);
     return act(G, () => {
       const ad = def(a.cid);
-      const ambush = a.kw.stealth && ad.ambush && !a.silenced ? ad.ambush : null;
-      if (a.kw.stealth) {
-        a.kw.stealth = false;
-        a.tempStealth = false;
-      }
+      const wasStealth = !!a.kw.stealth;
+      const ambush = wasStealth && ad.ambush && !a.silenced ? ad.ambush : null;
       emit(G, 'attack', { from: a.uid, to: t.uid, ambush: !!ambush });
       let dA = atkOf(G, a);
       if (ambush) {
@@ -1146,6 +1145,12 @@
         damage(G, a.uid, t.uid, dA, 'atk');
         if (dT > 0) damage(G, t.uid, a.uid, dT, 'atk');
       });
+      // stealth breaks once the blow has landed (auras keyed to stealth apply to the strike itself)
+      if (wasStealth) {
+        a.kw.stealth = false;
+        a.tempStealth = false;
+        emit(G, 'unstealth', { uid: a.uid });
+      }
       fire(G, 'afterAttack', { a, t });
       // layer 1: drifting
       if (G.layer === 1 && a.hp > 0 && !a.dead && onBoard(G, a)) {
