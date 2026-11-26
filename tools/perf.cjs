@@ -17,6 +17,8 @@ const path = require('path');
     if (mode.includes('nosheen')) { const st = document.createElement('style'); st.textContent = '.card .cf::after{animation:none!important;display:none!important}'; document.head.appendChild(st); }
     if (mode.includes('noamb')) { LMN.FX.setAmbient(-1); }
   }, mode);
+  if (mode.includes('waitart')) await page.waitForFunction(() => LMN.Art.pending() === 0 && LMN.Art.painted > 70, null, { timeout: 400000, polling: 1000 });
+  if (mode.includes('nodream')) await page.evaluate(() => { const d = document.getElementById('dream'); if (d) d.remove(); document.querySelectorAll('.far').forEach((f) => f.remove()); });
   await page.evaluate(() => { LMN.UI.start({ agent: 'agent_man', deck: LMN.PRESETS[2].cards.slice(), boss: 'boss_broadcast', first: 1 }); });
   await page.waitForSelector('#mull.on', { timeout: 30000 });
   if (await page.$('#briefOk')) { await page.click('#briefOk'); await page.waitForSelector('#mullOk'); }

@@ -259,7 +259,7 @@
     // pale subjects in bright rooms become lit silhouettes, so they read against the wall
     const lumi = (h) => { const v = parseInt(h.slice(1, 7), 16); return (((v >> 16) & 255) * 0.3 + ((v >> 8) & 255) * 0.59 + (v & 255) * 0.11) / 255; };
     if (base.length === 4) base = '#' + base.slice(1).split('').map((ch) => ch + ch).join('');
-    if (ctx.bright && !o.nosep && lumi(base) > 0.55) base = mix(base, '#1a2328', 0.68);
+    if (ctx.bright && !ctx.dream && !o.nosep && lumi(base) > 0.55) base = mix(base, '#1a2328', 0.68);
     const hi = mix(base, lt.col, 0.55), lo = shade(base, -0.55);
     let g = `<defs><g id="f${n}">${body}</g><linearGradient id="vg${n}" x1="${f1(0.5 + ux * 0.5)}" y1="${f1(0.5 + uy * 0.5)}" x2="${f1(0.5 - ux * 0.5)}" y2="${f1(0.5 - uy * 0.5)}"><stop offset="0" stop-color="${hi}"/><stop offset=".45" stop-color="${base}"/><stop offset="1" stop-color="${lo}"/></linearGradient><mask id="mk${n}"><use href="#f${n}" fill="#fff" stroke="#fff"/></mask></defs>`;
     g += `<g transform="${tf}" ${o.clip ? `clip-path="url(#${o.clip})"` : ''}>`;
@@ -814,7 +814,7 @@
       const cloth = o.faded ? '#e8d8f0' : o.c || '#5a3a6a';
       const skin = o.faded ? '#f4ecf6' : '#e8d4c2';
       const tf = `translate(${f1(x)} ${f1(base)}) scale(${f1(s)})`;
-      (ctx.figs = ctx.figs || []).push({ x, y: base - (o.sleep ? 10 : 28) * s, h: (o.sleep ? 44 : 66) * s });
+      (ctx.figs = ctx.figs || []).push({ x: o.sleep ? x - 9 * s : x, y: base - (o.sleep ? 12 : 28) * s, h: (o.sleep ? 50 : 66) * s });
       if (o.sleep) {
         const cl = `<path d="M-22 -2 C-24 -12 -10 -16 6 -14 C20 -13 30 -10 30 -3 C30 2 -20 3 -22 -2 Z"/>`;
         const sk = `<circle cx="-26" cy="-10" r="8.5"/><ellipse cx="-14" cy="-4" rx="3" ry="2.2"/>`;
@@ -1025,6 +1025,7 @@
 <radialGradient id="hl"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
 <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="${seed % 97}" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 1.4 -.55"/></filter>
 ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".018 .03" numOctaves="2" seed="${seed % 53}"/><feDisplacementMap in="SourceGraphic" scale="${f1(warp * 26)}" xChannelSelector="R" yChannelSelector="G"/></filter>` : ''}
+<radialGradient id="vigw" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#fff2fb" stop-opacity="0"/><stop offset="1" stop-color="#fff2fb" stop-opacity=".4"/></radialGradient>
 <radialGradient id="vig" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
 <radialGradient id="halo"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".4" stop-color="#ffe6f6" stop-opacity=".6"/><stop offset="1" stop-color="#ffd0ee" stop-opacity="0"/></radialGradient>
 <radialGradient id="bub" cx=".4" cy=".35"><stop offset="0" stop-color="#fff" stop-opacity=".15"/><stop offset=".8" stop-color="#e8f4ff" stop-opacity=".1"/><stop offset="1" stop-color="#ffd8f0" stop-opacity=".45"/></radialGradient>
@@ -1047,6 +1048,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     const bg = (SCENES[scene] || SCENES.void)(r, ctx);
     ctx.light = (LIGHTS[scene] || LIGHTS.void)(ctx);
     ctx.bright = ['hall', 'lab', 'office', 'sky', 'room', 'kinder', 'pool', 'stair'].includes(scene);
+    ctx.dream = !!(opts && opts.faction === 'dream');
     for (const item of spec.slice(1)) if (typeof item === 'object' && item.light) Object.assign(ctx.light, item.light);
     let dark = 0;
     for (const item of spec.slice(1)) if (typeof item === 'object' && item.dark) dark = Math.max(dark, item.dark);
@@ -1065,6 +1067,15 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
         if (item.bright) post += `<rect width="${W}" height="${H}" fill="#fff" opacity="${item.bright * 0.4}"/>`;
       }
     }
+    // dreamcore cards: pastel light leaks and sparkles, gentle and slightly wrong
+    if (opts && opts.faction === 'dream') {
+      fg += `<defs><radialGradient id="dl1" cx=".18" cy=".15" r=".7"><stop offset="0" stop-color="#ffc4ec" stop-opacity=".75"/><stop offset="1" stop-color="#ffc4ec" stop-opacity="0"/></radialGradient><radialGradient id="dl2" cx=".86" cy=".9" r=".7"><stop offset="0" stop-color="#b8ecff" stop-opacity=".6"/><stop offset="1" stop-color="#b8ecff" stop-opacity="0"/></radialGradient></defs>`;
+      fg += `<rect width="${W}" height="${H}" fill="url(#dl1)" style="mix-blend-mode:screen"/><rect width="${W}" height="${H}" fill="url(#dl2)" style="mix-blend-mode:screen"/>`;
+      for (let i = 0; i < 9; i++) {
+        const sx = r.range(8, W - 8), sy = r.range(6, H - 20), sl = r.range(1.5, 4);
+        fg += `<path d="M${f1(sx - sl)} ${f1(sy)} L${f1(sx + sl)} ${f1(sy)} M${f1(sx)} ${f1(sy - sl)} L${f1(sx)} ${f1(sy + sl)}" stroke="#fffaf0" stroke-width=".8" opacity=".9" filter="url(#glw)"/>`;
+      }
+    }
     // key light, god rays, floor haze
     const lt = ctx.light;
     const k = 1 - dark * 0.75;
@@ -1078,10 +1089,12 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     }
     light += `<rect y="${f1(H * 0.62)}" width="${W}" height="${f1(H * 0.38)}" fill="url(#fogg)" opacity="${f1(k * 0.7)}"/>`;
     // lower the key of bright rooms so the subject carries the picture
-    const lowkey = ctx.bright ? `<rect width="${W}" height="${H}" fill="#120e08" opacity=".22"/>` : '';
+    // dreamcore goes the other way: high key, milky, overexposed
+    const lowkey = ctx.dream ? '' : ctx.bright ? `<rect width="${W}" height="${H}" fill="#120e08" opacity=".22"/>` : '';
+    if (ctx.dream) post += `<rect width="${W}" height="${H}" fill="#fff6fb" opacity=".06"/><rect width="${W}" height="${H}" fill="url(#vigw)"/>`;
     let body = `<g ${warp ? 'filter="url(#warp)"' : ''}>${bg}${lowkey}${fg}${light}</g>${post}`;
-    body += `<rect width="${W}" height="${H}" fill="url(#vig)"/>`;
-    body += `<rect width="${W}" height="${H}" filter="url(#grain)" opacity=".2"/>`;
+    if (!ctx.dream) body += `<rect width="${W}" height="${H}" fill="url(#vig)"/>`;
+    body += `<rect width="${W}" height="${H}" filter="url(#grain)" opacity="${ctx.dream ? 0.1 : 0.2}"/>`;
     // framing: minions get a half-length portrait crop on their subject, spells a closer landscape crop
     let vb = [0, 0, W, H];
     const type = (opts && opts.type) || 'field';
@@ -1171,7 +1184,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
   }
   Art.card = function (cid) {
     const d = L.CARDS[cid];
-    return key('c:' + cid, () => build(d.art || ['void'], U.hash(cid), { type: d.type })).url;
+    return key('c:' + cid, () => build(d.art || ['void'], U.hash(cid), { type: d.type, faction: d.faction })).url;
   };
   Art.portrait = function (heroId) {
     return key('p:' + heroId, () => portrait(L.HEROES[heroId])).url;
@@ -1185,9 +1198,9 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
   // ---------------------------------------------------------------- painterly renderer
   // Coarse-to-fine brush strokes over the composed image (after Hertzmann): each pass only
   // repaints where the canvas still differs from the composition, strokes follow the edges.
-  const ART_VER = 'v9';
+  const ART_VER = 'v16';
   Art.painted = 0;
-  function* painter(img, W2, H2, seed) {
+  function* painter(img, W2, H2, seed, hk) {
     const src = document.createElement('canvas');
     src.width = W2;
     src.height = H2;
@@ -1253,7 +1266,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
         // slight saturation push and value jitter, like pigment
         const j = (rnd() - 0.5) * 22;
         const avg = (sd[i] + sd[i + 1] + sd[i + 2]) / 3;
-        const sat = 1.22, con = 1.14;
+        const sat = hk ? 1.2 : 1.18, con = hk ? 1.12 : 1.12;
         const cc = (v) => Math.max(0, Math.min(255, 128 + (v - 128) * con));
         const cr = cc(avg + (sd[i] - avg) * sat + j), cg = cc(avg + (sd[i + 1] - avg) * sat + j), cb = cc(avg + (sd[i + 2] - avg) * sat + j * 1.2);
         o.strokeStyle = `rgba(${cr | 0},${cg | 0},${cb | 0},${(0.72 + rnd() * 0.25).toFixed(2)})`;
@@ -1267,10 +1280,10 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
       yield;
     }
     // glazing: keep small crisp lights (eyes, signs) from the composition
-    o.globalAlpha = 0.12;
+    o.globalAlpha = hk ? 0.3 : 0.12;
     o.drawImage(src, 0, 0);
     // bloom on the brightest parts
-    o.globalAlpha = 0.22;
+    o.globalAlpha = hk ? 0.08 : 0.2;
     o.globalCompositeOperation = 'lighter';
     const bl = document.createElement('canvas');
     bl.width = Math.ceil(W2 / 6);
@@ -1278,9 +1291,14 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     const bx = bl.getContext('2d');
     bx.drawImage(src, 0, 0, bl.width, bl.height);
     const bd = bx.getImageData(0, 0, bl.width, bl.height);
+    // bloom only the picture's own highlights (top ~8%), not everything that happens to be pale
+    const ls = [];
+    for (let i = 0; i < bd.data.length; i += 4) ls.push(bd.data[i] * 0.3 + bd.data[i + 1] * 0.59 + bd.data[i + 2] * 0.11);
+    const sorted = ls.slice().sort((a, b) => a - b);
+    const th = Math.max(170, sorted[Math.floor(sorted.length * 0.92)] || 255);
     for (let i = 0; i < bd.data.length; i += 4) {
-      const l = bd.data[i] * 0.3 + bd.data[i + 1] * 0.59 + bd.data[i + 2] * 0.11;
-      const k2 = Math.max(0, (l - 170) / 85);
+      const l = ls[i / 4];
+      const k2 = Math.max(0, (l - th) / Math.max(12, 255 - th));
       bd.data[i] *= k2; bd.data[i + 1] *= k2; bd.data[i + 2] *= k2;
     }
     bx.putImageData(bd, 0, 0);
@@ -1297,13 +1315,16 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
       for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc > tot * 0.02) { lo = v; break; } }
       acc = 0;
       for (let v = 255; v >= 0; v--) { acc += hist[v]; if (acc > tot * 0.02) { hi = v; break; } }
-      const span = Math.max(40, hi - lo);
+      // never stretch a soft, low-contrast picture into a harsh one
+      const span = Math.max(hk ? 255 : 120, hi - lo);
+      const lo2 = hk ? 0 : Math.min(lo, 255 - span);
       const lut = new Uint8ClampedArray(256);
-      for (let v = 0; v < 256; v++) lut[v] = 255 * Math.pow(Math.max(0, Math.min(1, (v - lo) / span)), 0.88);
+      for (let v = 0; v < 256; v++) lut[v] = 255 * Math.pow(Math.max(0, Math.min(1, (v - lo2) / span)), hk ? 1.35 : 0.9);
+      const satK = hk ? 1.35 : 1.08;
       for (let i = 0; i < d.length; i += 4) {
         const r0 = lut[d[i]], g0 = lut[d[i + 1]], b0 = lut[d[i + 2]];
         const m = (r0 + g0 + b0) / 3;
-        d[i] = m + (r0 - m) * 1.12; d[i + 1] = m + (g0 - m) * 1.12; d[i + 2] = m + (b0 - m) * 1.12;
+        d[i] = m + (r0 - m) * satK; d[i + 1] = m + (g0 - m) * satK; d[i + 2] = m + (b0 - m) * satK;
       }
       o.putImageData(id, 0, 0);
     }
@@ -1380,7 +1401,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
           canvas.width = cw; canvas.height = ch;
           canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
         } else {
-          const gen = painter(img, cw, ch, U.hash(k));
+          const gen = painter(img, cw, ch, U.hash(k), isCard && L.CARDS[k.slice(2)].faction === 'dream');
           let r;
           await new Promise((done) => {
             const tick = (dl) => {
@@ -1427,7 +1448,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     }
     work();
   };
-  Art.pending = () => queue.length;
+  Art.pending = () => queue.length + (running ? 1 : 0);
   Art._painter = painter;
 
   // faction crests (inline SVG strings)

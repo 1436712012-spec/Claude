@@ -80,13 +80,13 @@ ${r ? `<radialGradient id="rg"><stop offset="0" stop-color="#fff"/><stop offset=
     s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" width="400" height="560"><defs>${grads(m, r)}</defs>`;
     // art window bezel (the art itself is a separate element clipped to the same shape)
     if (w.kind === 'ellipse') {
-      s += `<ellipse cx="${w.cx}" cy="${w.cy + 2}" rx="${w.rx + 7}" ry="${w.ry + 7}" fill="#000" opacity=".55"/>`;
+      s += `<ellipse cx="${w.cx}" cy="${w.cy + 2}" rx="${w.rx + 7}" ry="${w.ry + 7}" fill="none" stroke="#000" stroke-width="7" stroke-opacity=".55"/>`;
       s += `<ellipse cx="${w.cx}" cy="${w.cy}" rx="${w.rx + 5}" ry="${w.ry + 5}" fill="none" stroke="url(#mt)" stroke-width="9"/>`;
       s += `<ellipse cx="${w.cx}" cy="${w.cy}" rx="${w.rx + 0.5}" ry="${w.ry + 0.5}" fill="none" stroke="#000" stroke-width="2" stroke-opacity=".7"/>`;
       s += `<ellipse cx="${w.cx}" cy="${w.cy}" rx="${w.rx + 9}" ry="${w.ry + 9}" fill="none" stroke="#fff" stroke-width=".7" stroke-opacity=".45"/>`;
       s += rivets(w.cx, w.cy, w.rx + 5, w.ry + 5, 10);
     } else if (w.kind === 'rect') {
-      s += `<rect x="${w.x - 7}" y="${w.y - 5}" width="${w.w + 14}" height="${w.h + 14}" rx="${w.r + 6}" fill="#000" opacity=".55"/>`;
+      s += `<rect x="${w.x - 7}" y="${w.y - 5}" width="${w.w + 14}" height="${w.h + 14}" rx="${w.r + 6}" fill="none" stroke="#000" stroke-width="7" stroke-opacity=".55"/>`;
       s += `<rect x="${w.x - 5}" y="${w.y - 5}" width="${w.w + 10}" height="${w.h + 10}" rx="${w.r + 5}" fill="none" stroke="url(#mt)" stroke-width="9"/>`;
       s += `<rect x="${w.x}" y="${w.y}" width="${w.w}" height="${w.h}" rx="${w.r}" fill="none" stroke="#000" stroke-width="2" stroke-opacity=".7"/>`;
       for (const [x, y] of [[w.x + 4, w.y + 4], [w.x + w.w - 4, w.y + 4], [w.x + 4, w.y + w.h - 4], [w.x + w.w - 4, w.y + w.h - 4]]) s += `<circle cx="${x}" cy="${y}" r="3" fill="url(#mt2)" stroke="#000" stroke-opacity=".5" stroke-width=".6"/>`;

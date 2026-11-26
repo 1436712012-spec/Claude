@@ -448,13 +448,37 @@
     ambient.layer = layer;
     ambient.motes = [];
   };
+  const BOKEH = {
+    0: ['255,236,170', '255,214,190', '255,250,220'],
+    1: ['200,245,255', '255,210,240', '220,210,255', '255,255,230'],
+    2: ['255,80,120', '255,90,210', '90,230,255'],
+    3: ['255,190,230', '190,225,255', '255,245,190', '220,200,255'],
+  };
+  const bokehCache = {};
+  function bokehSprite(col) {
+    if (bokehCache[col]) return bokehCache[col];
+    const c = document.createElement('canvas');
+    c.width = c.height = 96;
+    const g = c.getContext('2d');
+    const gr = g.createRadialGradient(48, 48, 0, 48, 48, 48);
+    gr.addColorStop(0, `rgba(${col},.22)`);
+    gr.addColorStop(0.7, `rgba(${col},.30)`);
+    gr.addColorStop(0.86, `rgba(${col},.55)`);
+    gr.addColorStop(0.93, `rgba(${col},.25)`);
+    gr.addColorStop(1, `rgba(${col},0)`);
+    g.fillStyle = gr;
+    g.beginPath();
+    g.arc(48, 48, 48, 0, 6.283);
+    g.fill();
+    return (bokehCache[col] = c);
+  }
   function drawAmbient(dt) {
     const g = bctx;
     const w = back.width, h = back.height;
     g.clearRect(0, 0, w, h);
     ambient.t += dt;
     const lay = ambient.layer;
-    const want = reduced ? 10 : lay === 1 ? 14 : 36;
+    const want = reduced ? 8 : lay === 1 ? 12 : lay === 3 ? 18 : 28;
     while (ambient.motes.length < want) {
       ambient.motes.push({ x: Math.random() * w, y: Math.random() * h, vx: rnd(-6, 6), vy: lay === 1 ? rnd(-26, -10) : rnd(-10, 4), r: rnd(1, 3.2), ph: Math.random() * 6.28, sp: rnd(0.5, 1.6) });
     }
@@ -479,7 +503,49 @@
       g.fillRect(0, 0, w / 3 + 192, h / 3 + 192);
       g.restore();
     }
-    const col = lay === 0 ? '255,244,200' : lay === 1 ? '230,255,255' : '255,80,110';
+    // dreamcore bokeh: soft out-of-focus discs with a brighter rim, drifting with parallax, plus twinkles
+    const pal = BOKEH[lay] || BOKEH[3];
+    const S = backScale;
+    if (!ambient.bokeh || ambient.bokehLayer !== lay) {
+      ambient.bokehLayer = lay;
+      ambient.bokeh = [];
+      const n = reduced ? 6 : coarse ? 12 : 18;
+      for (let i = 0; i < n; i++) {
+        const z = Math.random();
+        ambient.bokeh.push({ x: Math.random() * w, y: Math.random() * h, z, r: (14 + z * 40) * S, vx: rnd(-4, 4) * (0.3 + z), vy: (lay === 2 ? -rnd(4, 10) : -rnd(2, 7)) * (0.3 + z), col: pal[i % pal.length], ph: Math.random() * 6.28, sp: rnd(0.2, 0.6) });
+      }
+      ambient.stars = [];
+      for (let i = 0; i < (reduced ? 4 : 14); i++) ambient.stars.push({ x: Math.random() * w, y: Math.random() * h, s: rnd(3, 7) * S, ph: Math.random() * 6.28, sp: rnd(0.8, 2.2), col: pal[(i + 1) % pal.length] });
+    }
+    g.globalCompositeOperation = 'lighter';
+    for (const b of ambient.bokeh) {
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
+      b.ph += dt * b.sp;
+      if (b.y < -b.r) { b.y = h + b.r; b.x = Math.random() * w; }
+      if (b.x < -b.r) b.x = w + b.r;
+      if (b.x > w + b.r) b.x = -b.r;
+      g.globalAlpha = (0.35 + Math.sin(b.ph) * 0.15) * (lay === 0 ? 0.7 : 1);
+      const spr = bokehSprite(b.col);
+      g.drawImage(spr, b.x - b.r, b.y - b.r, b.r * 2, b.r * 2);
+    }
+    for (const st of ambient.stars) {
+      st.ph += dt * st.sp;
+      const k = Math.max(0, Math.sin(st.ph));
+      if (k < 0.05) { if (Math.sin(st.ph) < -0.98) { st.x = Math.random() * w; st.y = Math.random() * h; } continue; }
+      const L2 = st.s * (0.6 + k);
+      g.globalAlpha = k * 0.85;
+      g.strokeStyle = `rgb(${st.col})`;
+      g.lineWidth = Math.max(1, S * 1.2);
+      g.beginPath();
+      g.moveTo(st.x - L2, st.y); g.lineTo(st.x + L2, st.y);
+      g.moveTo(st.x, st.y - L2); g.lineTo(st.x, st.y + L2);
+      g.stroke();
+      g.drawImage(sprite('#ffffff'), st.x - L2 * 0.6, st.y - L2 * 0.6, L2 * 1.2, L2 * 1.2);
+    }
+    g.globalCompositeOperation = 'source-over';
+    g.globalAlpha = 1;
+    const col = lay === 0 ? '255,244,200' : lay === 1 ? '230,255,255' : lay === 2 ? '255,80,110' : '255,230,250';
     for (const m of ambient.motes) {
       m.x += m.vx * dt;
       m.y += m.vy * dt;

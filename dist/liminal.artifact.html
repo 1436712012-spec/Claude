@@ -571,6 +571,94 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 @keyframes fing { 0% { transform: translate(var(--fx), var(--fy)); opacity: 0; } 10% { opacity: 1; transform: translate(var(--fx), var(--fy)); } 22% { transform: translate(var(--fx), var(--fy)) scale(0.85); } 75% { transform: translate(var(--tx), var(--ty)) scale(0.85); opacity: 1; } 92%, 100% { transform: translate(var(--tx), var(--ty)) scale(0.85); opacity: 0; } }
 .btn .rec { margin-left: 0.4em; padding: 0.15em 0.45em; font: 0.65em/1 var(--f-mono); background: #8a1a2a; color: #fff; border-radius: 0.3em; letter-spacing: 0.1em; }
 
+/* =========================================================== DREAMCORE */
+/* the entrance of the dream: pastel sky over an endless soft floor */
+.sc3 { background:
+    radial-gradient(ellipse at 72% 18%, rgba(255, 250, 230, 0.9), rgba(255, 250, 230, 0) 32%),
+    linear-gradient(180deg, #9fd2ff 0%, #c9c4ff 30%, #ffc9ea 52%, #ffeede 64%, #ffe1f1 64.2%, #f2d2ff 100%); }
+.sc3 .floor { position: absolute; left: -50%; right: -50%; top: 64%; bottom: -20%; transform-origin: 50% 0; transform: perspective(38vh) rotateX(62deg);
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.55) 0 2px, transparent 2px 6%), repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.55) 0 2px, transparent 2px 9%); opacity: 0.7; }
+.sc3::after { content: ''; position: absolute; left: 0; right: 0; top: 56%; height: 14%; background: linear-gradient(180deg, transparent, rgba(255, 245, 250, 0.85) 50%, transparent); }
+#app[data-layer='3'] { --layer-accent: #ffb3e6; --hud: rgba(40, 22, 52, 0.66); --hud-line: rgba(255, 190, 235, 0.45); }
+
+/* far floating objects (pre-blurred sprites, transform-only motion) */
+.far { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.fo { position: absolute; height: auto; will-change: transform; animation-duration: var(--d); animation-delay: var(--dl); animation-iteration-count: infinite; }
+.fo.m-drift { animation-name: fdrift; animation-timing-function: linear; }
+.fo.m-rise { animation-name: frise; animation-timing-function: linear; }
+.fo.m-bob { animation-name: fbob; animation-timing-function: ease-in-out; animation-direction: alternate; }
+@keyframes fdrift { from { transform: translateX(-60vw); } to { transform: translateX(80vw); } }
+@keyframes frise { 0% { transform: translate(0, 70vh) rotate(-4deg); } 50% { transform: translate(3vw, 10vh) rotate(4deg); } 100% { transform: translate(-2vw, -60vh) rotate(-3deg); } }
+@keyframes fbob { from { transform: translateY(-1.4vmin) rotate(-3deg); } to { transform: translateY(1.4vmin) rotate(3deg); } }
+
+/* film: overexposed halation at the edges, drifting light leaks, grain */
+#dream { position: absolute; inset: 0; z-index: 5; pointer-events: none; overflow: hidden; --halo: rgba(255, 236, 200, 0.5); --leak1: rgba(255, 190, 150, 0.5); --leak2: rgba(255, 230, 160, 0.45); }
+#app[data-layer='1'] #dream { --halo: rgba(220, 245, 255, 0.5); --leak1: rgba(150, 240, 255, 0.45); --leak2: rgba(255, 190, 235, 0.42); }
+#app[data-layer='2'] #dream { --halo: rgba(255, 70, 150, 0.3); --leak1: rgba(255, 60, 150, 0.38); --leak2: rgba(90, 220, 255, 0.3); }
+#app[data-layer='3'] #dream { --halo: rgba(255, 226, 246, 0.62); --leak1: rgba(255, 180, 230, 0.5); --leak2: rgba(190, 210, 255, 0.5); }
+#dream .halo { position: absolute; inset: -4%; background: radial-gradient(ellipse at 50% 50%, transparent 52%, var(--halo) 88%, var(--halo) 100%); will-change: opacity; animation: breathe 7s ease-in-out infinite; }
+#dream .leak { position: absolute; width: 90vmax; height: 70vmax; border-radius: 50%; opacity: 0.22; will-change: transform; }
+#dream .leak.a { left: -50vmax; top: -30vmax; background: radial-gradient(closest-side, var(--leak1), transparent); animation: leakA 27s ease-in-out infinite alternate; }
+#dream .leak.b { right: -55vmax; bottom: -35vmax; background: radial-gradient(closest-side, var(--leak2), transparent); animation: leakB 34s ease-in-out infinite alternate; }
+#dream .grain { position: absolute; inset: -40px; opacity: 0.07; will-change: transform; animation: grain 0.6s steps(3) infinite; }
+@keyframes breathe { 0%, 100% { opacity: 0.75; } 50% { opacity: 1; } }
+@keyframes leakA { from { transform: translate(0, 0) scale(1); } to { transform: translate(55vw, 40vh) scale(1.25); } }
+@keyframes leakB { from { transform: translate(0, 0) scale(1.1); } to { transform: translate(-50vw, -45vh) scale(0.9); } }
+@keyframes grain { 0% { transform: translate(0, 0); } 33% { transform: translate(-22px, 14px); } 66% { transform: translate(16px, -20px); } 100% { transform: translate(-8px, 8px); } }
+#app.calm #dream .halo, #app.calm #dream .leak, #app.calm #dream .grain, #app.calm .fo { animation: none; }
+@media (prefers-reduced-motion: reduce) { #dream .halo, #dream .leak, #dream .grain, .fo { animation: none !important; } }
+/* the board reads softer: blurred far planes, slightly washed layers */
+/* (no live filters on scenes: far objects animate inside them, blur is baked into the sprites) */
+
+/* holographic foil on dreamcore cards, legendaries, and anything held up to the light */
+.card .art .holo { position: absolute; inset: 0; opacity: 0; pointer-events: none; background: linear-gradient(115deg, transparent 18%, rgba(255, 120, 200, 0.75) 32%, rgba(255, 240, 160, 0.65) 42%, rgba(140, 240, 255, 0.75) 52%, rgba(200, 150, 255, 0.65) 62%, transparent 78%) var(--hx, 30%) var(--hy, 30%) / 260% 260%; mix-blend-mode: color-dodge; transition: opacity 0.4s; }
+.card.f-dream .art .holo { opacity: 0.28; animation: holo 7s ease-in-out infinite alternate; }
+.card.r-legendary .art .holo { opacity: 0.22; animation: holo 9s ease-in-out infinite alternate; }
+.card.tilt { transition: transform 0.15s ease-out; transform-style: preserve-3d; animation: sway 5s ease-in-out infinite; }
+.card.tilt.held { animation: none; }
+.card.tilt .art .holo { opacity: 0.5; animation: none; }
+.card.tilt.held .art .holo { opacity: 0.7; }
+@keyframes holo { from { background-position: 0% 10%; } to { background-position: 100% 90%; } }
+@keyframes sway { 0%, 100% { transform: perspective(900px) rotateY(-5deg) rotateX(3deg); --hx: 20%; } 50% { transform: perspective(900px) rotateY(5deg) rotateX(-2deg); --hx: 80%; } }
+#app.calm .card .art .holo, #app.calm .card.tilt { animation: none; }
+/* dream minions on the board glow softly, gently wrong */
+.minion.f-dream .m-art { box-shadow: 0 0 1.6em rgba(255, 190, 235, 0.55); }
+
+/* menus float in the dream instead of sitting on a black page */
+.menu-wrap { background: linear-gradient(180deg, rgba(36, 20, 48, 0.74), rgba(24, 14, 34, 0.84)); }
+#screen-title .menu-wrap { background: none; }
+.tv { box-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 8) rgba(120, 60, 140, 0.45), 0 0 calc(var(--u) * 14) rgba(255, 210, 240, 0.55), inset 0 0 0 calc(var(--u) * 0.8) #5a5044; animation: tvfloat 6s ease-in-out infinite alternate; }
+@keyframes tvfloat { from { transform: translateY(calc(var(--u) * -1)); } to { transform: translateY(calc(var(--u) * 1)); } }
+.logo .zh { text-shadow: 3px 0 rgba(255, 110, 200, 0.75), -3px 0 rgba(110, 220, 255, 0.75), 0 0 calc(var(--u) * 6) rgba(255, 230, 250, 0.9); }
+.tap-hint, .mfoot { color: #fff; text-shadow: 0 0 8px rgba(180, 80, 160, 0.9); }
+#app.calm .tv { animation: none; }
+/* turn banners as soft light */
+.banner .bt { color: #fffaf4; text-shadow: 0 0 calc(var(--u) * 2) #fff, 0 0 calc(var(--u) * 5) var(--layer-accent), 0 0 calc(var(--u) * 10) rgba(255, 180, 235, 0.7); }
+.banner::before { background: linear-gradient(90deg, transparent, rgba(40, 20, 50, 0.55) 20%, rgba(40, 20, 50, 0.55) 80%, transparent); }
+/* low sanity: the dream leans in — pastel, not just dark */
+#sanv { background: radial-gradient(ellipse at center, transparent 45%, rgba(255, 140, 220, 0.35) 75%, rgba(140, 90, 255, 0.55) 100%); }
+
+/* the entrance of the dream: pastel plastic, soft static, frosted buttons */
+#app[data-layer='3'] .tv { background: linear-gradient(160deg, #f4e8ff, #d4bdf0 60%, #bfa6e4); box-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 8) rgba(150, 90, 170, 0.4), 0 0 calc(var(--u) * 14) rgba(255, 220, 245, 0.7), inset 0 0 0 calc(var(--u) * 0.8) rgba(255, 255, 255, 0.7), inset 0 calc(var(--u) * -1.5) calc(var(--u) * 3) rgba(120, 80, 160, 0.25); }
+#app[data-layer='3'] .tv .scr { box-shadow: inset 0 0 calc(var(--u) * 6) rgba(90, 40, 110, 0.5); }
+#app[data-layer='3'] .tv .knobs { color: #7a5a9a; }
+#app[data-layer='3'] .logo .en { color: #fff2a8; text-shadow: 0 0 10px rgba(255, 180, 230, 0.9); }
+#app[data-layer='3'] .logo .tag { color: #fff; }
+#titleMenu .btn { background: linear-gradient(180deg, rgba(255, 252, 255, 0.82), rgba(255, 220, 242, 0.72)); color: #4a2458; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9), 0 calc(var(--u) * 0.8) 0 rgba(190, 140, 210, 0.7), 0 calc(var(--u) * 2) calc(var(--u) * 5) rgba(160, 90, 180, 0.35); }
+#titleMenu .btn:first-child { background: linear-gradient(180deg, #fffbe8, #ffd9ef 55%, #e6cdff); }
+#titleMenu .btn.ghost { background: rgba(255, 248, 255, 0.5); color: #4a2458; }
+#titleMenu .btn .rec { background: #ff6fb5; }
+#app[data-layer='3'] .tap-hint, #app[data-layer='3'] .mfoot { color: #5a2470; text-shadow: 0 0 6px #fff, 0 0 14px #fff; opacity: 1; }
+#app[data-layer='3'] .mute { background: rgba(255, 248, 255, 0.6); color: #5a2470; }
+#app[data-layer='3'].crt #crt { background: repeating-linear-gradient(0deg, rgba(120, 70, 150, 0.07) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 62%, rgba(110, 60, 140, 0.28) 100%); }
+/* dreamcore art keeps its milk-glass light: pearl edges instead of dark vignettes */
+.card.f-dream .art::before { background: radial-gradient(ellipse at 50% 40%, transparent 58%, rgba(255, 236, 250, 0.42) 100%); }
+.minion.f-dream .m-art::before { background: radial-gradient(ellipse at 50% 35%, transparent 52%, rgba(255, 232, 248, 0.5) 100%); }
+.card .art .holo { mix-blend-mode: overlay; }
+.card.f-dream .art .holo { opacity: 0.4; }
+.card.tilt .art .holo { opacity: 0.6; }
+.card.tilt.held .art .holo { opacity: 0.85; }
+
 </style>
 <div id="app" data-layer="0">
   <div id="scene">
@@ -583,6 +671,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
       <span class="neon flick2" style="right:9%;top:46%;font-size:3.4vh">闭店</span>
       <span class="neon c" style="left:5%;bottom:14%;font-size:2.4vh;font-family:var(--f-mono)">B∞ PARKING</span>
     </div>
+    <div class="sc sc3"><div class="floor"></div></div>
   </div>
   <canvas id="fxBack"></canvas>
   <div class="side left" id="sideL"><h4>记录 · LOG</h4><div class="log" id="log"></div></div>
@@ -2580,7 +2669,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     id: 'D17', num: 7, name: 'LMN-007 不会醒的孩子', faction: 'dream', type: 'minion', rarity: 'legendary', cost: 5, san: 2, atk: 4, hp: 5,
     text: '亡语：随机获得一个敌方随从的控制权。',
     lore: { k: '档', t: 'LMN-007：一个蜷在午睡垫上的孩子，呼吸平稳。所有试图叫醒它的人员都会在一小时内入睡，梦见同一间幼儿园。他们醒来后，会坚称自己才是那个孩子。' },
-    art: ['kinder', 'child x.5 y.7 s.8 sleep1', 'halo x.5 y.62 s.9', 'stars n6'],
+    art: ['kinder', 'window x.72 y.28 s.8', 'halo x.5 y.5 s1.3', 'child x.5 y.5 s1.6 sleep1', 'stars n9 glow1'],
     dr: (G, c) => { const t = H.pick(G, live(en(G, c).board)); if (t) E.takeControl(G, c.p, t); },
   });
   card({
@@ -3807,6 +3896,61 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     }, 2000);
     return { gain: g, nodes, timer };
   }
+  // the entrance of the dream: warm detuned pad, a music box that forgets the tune, vinyl dust
+  function startDream() {
+    const g = ctx.createGain();
+    g.gain.value = 0.0001;
+    g.connect(ambBus);
+    const nodes = [];
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 1500;
+    lp.connect(g);
+    const send = ctx.createGain();
+    send.gain.value = 0.7;
+    lp.connect(send);
+    send.connect(verbSend);
+    const wob = ctx.createOscillator();
+    wob.frequency.value = 0.22;
+    const wobG = ctx.createGain();
+    wobG.gain.value = 9;
+    wob.connect(wobG);
+    wob.start();
+    nodes.push(wob);
+    const chords = [[60, 64, 67, 71, 74], [57, 60, 64, 67, 71], [53, 57, 60, 64, 69], [55, 59, 62, 66, 69]];
+    const voices = chords[0].map((n, i) => {
+      const o = ctx.createOscillator();
+      o.type = i % 2 ? 'sine' : 'triangle';
+      o.frequency.value = midi(n - 12);
+      wobG.connect(o.detune);
+      const og = ctx.createGain();
+      og.gain.value = 0.028;
+      o.connect(og);
+      og.connect(lp);
+      o.start();
+      nodes.push(o);
+      return o;
+    });
+    let ci = 0, tick = 0;
+    g.gain.setTargetAtTime(0.9, ctx.currentTime, 2);
+    const scale = [72, 74, 76, 79, 81, 84, 86, 88];
+    const timer = setInterval(() => {
+      tick++;
+      if (tick % 6 === 0) {
+        const ch = chords[++ci % chords.length];
+        voices.forEach((o, i) => o.frequency.setTargetAtTime(midi(ch[i] - 12), ctx.currentTime, 0.8));
+      }
+      // music box: a note or two, slightly out of tune, with a long tail
+      if (Math.random() < 0.75) {
+        const n = scale[(Math.random() * scale.length) | 0];
+        tone({ f: midi(n) * (1 + (Math.random() - 0.5) * 0.012), dur: 1.8, v: 0.045, verb: 1.1 });
+        tone({ f: midi(n) * 2.01, dur: 0.6, v: 0.012, verb: 1.1 });
+      }
+      if (Math.random() < 0.5) noise({ f: 3000 + Math.random() * 3000, dur: 0.03, v: 0.015, type: 'highpass' });
+    }, 700);
+    return { gain: g, nodes, timer };
+  }
+
   // the distant, garbled PA voice
   function announce() {
     if (!ctx) return;
@@ -3868,7 +4012,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     stopAmb(0.6);
     ambLayer = layer;
     if (layer == null || layer < 0) return;
-    amb = layer === 0 ? startHum() : layer === 1 ? startWater() : startMall();
+    amb = layer === 0 ? startHum() : layer === 1 ? startWater() : layer === 2 ? startMall() : startDream();
   };
   A.duck = function (on) {
     if (!ambBus) return;
@@ -4147,7 +4291,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     // pale subjects in bright rooms become lit silhouettes, so they read against the wall
     const lumi = (h) => { const v = parseInt(h.slice(1, 7), 16); return (((v >> 16) & 255) * 0.3 + ((v >> 8) & 255) * 0.59 + (v & 255) * 0.11) / 255; };
     if (base.length === 4) base = '#' + base.slice(1).split('').map((ch) => ch + ch).join('');
-    if (ctx.bright && !o.nosep && lumi(base) > 0.55) base = mix(base, '#1a2328', 0.68);
+    if (ctx.bright && !ctx.dream && !o.nosep && lumi(base) > 0.55) base = mix(base, '#1a2328', 0.68);
     const hi = mix(base, lt.col, 0.55), lo = shade(base, -0.55);
     let g = `<defs><g id="f${n}">${body}</g><linearGradient id="vg${n}" x1="${f1(0.5 + ux * 0.5)}" y1="${f1(0.5 + uy * 0.5)}" x2="${f1(0.5 - ux * 0.5)}" y2="${f1(0.5 - uy * 0.5)}"><stop offset="0" stop-color="${hi}"/><stop offset=".45" stop-color="${base}"/><stop offset="1" stop-color="${lo}"/></linearGradient><mask id="mk${n}"><use href="#f${n}" fill="#fff" stroke="#fff"/></mask></defs>`;
     g += `<g transform="${tf}" ${o.clip ? `clip-path="url(#${o.clip})"` : ''}>`;
@@ -4702,7 +4846,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
       const cloth = o.faded ? '#e8d8f0' : o.c || '#5a3a6a';
       const skin = o.faded ? '#f4ecf6' : '#e8d4c2';
       const tf = `translate(${f1(x)} ${f1(base)}) scale(${f1(s)})`;
-      (ctx.figs = ctx.figs || []).push({ x, y: base - (o.sleep ? 10 : 28) * s, h: (o.sleep ? 44 : 66) * s });
+      (ctx.figs = ctx.figs || []).push({ x: o.sleep ? x - 9 * s : x, y: base - (o.sleep ? 12 : 28) * s, h: (o.sleep ? 50 : 66) * s });
       if (o.sleep) {
         const cl = `<path d="M-22 -2 C-24 -12 -10 -16 6 -14 C20 -13 30 -10 30 -3 C30 2 -20 3 -22 -2 Z"/>`;
         const sk = `<circle cx="-26" cy="-10" r="8.5"/><ellipse cx="-14" cy="-4" rx="3" ry="2.2"/>`;
@@ -4913,6 +5057,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 <radialGradient id="hl"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
 <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="${seed % 97}" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 1.4 -.55"/></filter>
 ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".018 .03" numOctaves="2" seed="${seed % 53}"/><feDisplacementMap in="SourceGraphic" scale="${f1(warp * 26)}" xChannelSelector="R" yChannelSelector="G"/></filter>` : ''}
+<radialGradient id="vigw" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#fff2fb" stop-opacity="0"/><stop offset="1" stop-color="#fff2fb" stop-opacity=".4"/></radialGradient>
 <radialGradient id="vig" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
 <radialGradient id="halo"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".4" stop-color="#ffe6f6" stop-opacity=".6"/><stop offset="1" stop-color="#ffd0ee" stop-opacity="0"/></radialGradient>
 <radialGradient id="bub" cx=".4" cy=".35"><stop offset="0" stop-color="#fff" stop-opacity=".15"/><stop offset=".8" stop-color="#e8f4ff" stop-opacity=".1"/><stop offset="1" stop-color="#ffd8f0" stop-opacity=".45"/></radialGradient>
@@ -4935,6 +5080,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     const bg = (SCENES[scene] || SCENES.void)(r, ctx);
     ctx.light = (LIGHTS[scene] || LIGHTS.void)(ctx);
     ctx.bright = ['hall', 'lab', 'office', 'sky', 'room', 'kinder', 'pool', 'stair'].includes(scene);
+    ctx.dream = !!(opts && opts.faction === 'dream');
     for (const item of spec.slice(1)) if (typeof item === 'object' && item.light) Object.assign(ctx.light, item.light);
     let dark = 0;
     for (const item of spec.slice(1)) if (typeof item === 'object' && item.dark) dark = Math.max(dark, item.dark);
@@ -4953,6 +5099,15 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
         if (item.bright) post += `<rect width="${W}" height="${H}" fill="#fff" opacity="${item.bright * 0.4}"/>`;
       }
     }
+    // dreamcore cards: pastel light leaks and sparkles, gentle and slightly wrong
+    if (opts && opts.faction === 'dream') {
+      fg += `<defs><radialGradient id="dl1" cx=".18" cy=".15" r=".7"><stop offset="0" stop-color="#ffc4ec" stop-opacity=".75"/><stop offset="1" stop-color="#ffc4ec" stop-opacity="0"/></radialGradient><radialGradient id="dl2" cx=".86" cy=".9" r=".7"><stop offset="0" stop-color="#b8ecff" stop-opacity=".6"/><stop offset="1" stop-color="#b8ecff" stop-opacity="0"/></radialGradient></defs>`;
+      fg += `<rect width="${W}" height="${H}" fill="url(#dl1)" style="mix-blend-mode:screen"/><rect width="${W}" height="${H}" fill="url(#dl2)" style="mix-blend-mode:screen"/>`;
+      for (let i = 0; i < 9; i++) {
+        const sx = r.range(8, W - 8), sy = r.range(6, H - 20), sl = r.range(1.5, 4);
+        fg += `<path d="M${f1(sx - sl)} ${f1(sy)} L${f1(sx + sl)} ${f1(sy)} M${f1(sx)} ${f1(sy - sl)} L${f1(sx)} ${f1(sy + sl)}" stroke="#fffaf0" stroke-width=".8" opacity=".9" filter="url(#glw)"/>`;
+      }
+    }
     // key light, god rays, floor haze
     const lt = ctx.light;
     const k = 1 - dark * 0.75;
@@ -4966,10 +5121,12 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     }
     light += `<rect y="${f1(H * 0.62)}" width="${W}" height="${f1(H * 0.38)}" fill="url(#fogg)" opacity="${f1(k * 0.7)}"/>`;
     // lower the key of bright rooms so the subject carries the picture
-    const lowkey = ctx.bright ? `<rect width="${W}" height="${H}" fill="#120e08" opacity=".22"/>` : '';
+    // dreamcore goes the other way: high key, milky, overexposed
+    const lowkey = ctx.dream ? '' : ctx.bright ? `<rect width="${W}" height="${H}" fill="#120e08" opacity=".22"/>` : '';
+    if (ctx.dream) post += `<rect width="${W}" height="${H}" fill="#fff6fb" opacity=".06"/><rect width="${W}" height="${H}" fill="url(#vigw)"/>`;
     let body = `<g ${warp ? 'filter="url(#warp)"' : ''}>${bg}${lowkey}${fg}${light}</g>${post}`;
-    body += `<rect width="${W}" height="${H}" fill="url(#vig)"/>`;
-    body += `<rect width="${W}" height="${H}" filter="url(#grain)" opacity=".2"/>`;
+    if (!ctx.dream) body += `<rect width="${W}" height="${H}" fill="url(#vig)"/>`;
+    body += `<rect width="${W}" height="${H}" filter="url(#grain)" opacity="${ctx.dream ? 0.1 : 0.2}"/>`;
     // framing: minions get a half-length portrait crop on their subject, spells a closer landscape crop
     let vb = [0, 0, W, H];
     const type = (opts && opts.type) || 'field';
@@ -5059,7 +5216,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
   }
   Art.card = function (cid) {
     const d = L.CARDS[cid];
-    return key('c:' + cid, () => build(d.art || ['void'], U.hash(cid), { type: d.type })).url;
+    return key('c:' + cid, () => build(d.art || ['void'], U.hash(cid), { type: d.type, faction: d.faction })).url;
   };
   Art.portrait = function (heroId) {
     return key('p:' + heroId, () => portrait(L.HEROES[heroId])).url;
@@ -5073,9 +5230,9 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
   // ---------------------------------------------------------------- painterly renderer
   // Coarse-to-fine brush strokes over the composed image (after Hertzmann): each pass only
   // repaints where the canvas still differs from the composition, strokes follow the edges.
-  const ART_VER = 'v9';
+  const ART_VER = 'v16';
   Art.painted = 0;
-  function* painter(img, W2, H2, seed) {
+  function* painter(img, W2, H2, seed, hk) {
     const src = document.createElement('canvas');
     src.width = W2;
     src.height = H2;
@@ -5141,7 +5298,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
         // slight saturation push and value jitter, like pigment
         const j = (rnd() - 0.5) * 22;
         const avg = (sd[i] + sd[i + 1] + sd[i + 2]) / 3;
-        const sat = 1.22, con = 1.14;
+        const sat = hk ? 1.2 : 1.18, con = hk ? 1.12 : 1.12;
         const cc = (v) => Math.max(0, Math.min(255, 128 + (v - 128) * con));
         const cr = cc(avg + (sd[i] - avg) * sat + j), cg = cc(avg + (sd[i + 1] - avg) * sat + j), cb = cc(avg + (sd[i + 2] - avg) * sat + j * 1.2);
         o.strokeStyle = `rgba(${cr | 0},${cg | 0},${cb | 0},${(0.72 + rnd() * 0.25).toFixed(2)})`;
@@ -5155,10 +5312,10 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
       yield;
     }
     // glazing: keep small crisp lights (eyes, signs) from the composition
-    o.globalAlpha = 0.12;
+    o.globalAlpha = hk ? 0.3 : 0.12;
     o.drawImage(src, 0, 0);
     // bloom on the brightest parts
-    o.globalAlpha = 0.22;
+    o.globalAlpha = hk ? 0.08 : 0.2;
     o.globalCompositeOperation = 'lighter';
     const bl = document.createElement('canvas');
     bl.width = Math.ceil(W2 / 6);
@@ -5166,9 +5323,14 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     const bx = bl.getContext('2d');
     bx.drawImage(src, 0, 0, bl.width, bl.height);
     const bd = bx.getImageData(0, 0, bl.width, bl.height);
+    // bloom only the picture's own highlights (top ~8%), not everything that happens to be pale
+    const ls = [];
+    for (let i = 0; i < bd.data.length; i += 4) ls.push(bd.data[i] * 0.3 + bd.data[i + 1] * 0.59 + bd.data[i + 2] * 0.11);
+    const sorted = ls.slice().sort((a, b) => a - b);
+    const th = Math.max(170, sorted[Math.floor(sorted.length * 0.92)] || 255);
     for (let i = 0; i < bd.data.length; i += 4) {
-      const l = bd.data[i] * 0.3 + bd.data[i + 1] * 0.59 + bd.data[i + 2] * 0.11;
-      const k2 = Math.max(0, (l - 170) / 85);
+      const l = ls[i / 4];
+      const k2 = Math.max(0, (l - th) / Math.max(12, 255 - th));
       bd.data[i] *= k2; bd.data[i + 1] *= k2; bd.data[i + 2] *= k2;
     }
     bx.putImageData(bd, 0, 0);
@@ -5185,13 +5347,16 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
       for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc > tot * 0.02) { lo = v; break; } }
       acc = 0;
       for (let v = 255; v >= 0; v--) { acc += hist[v]; if (acc > tot * 0.02) { hi = v; break; } }
-      const span = Math.max(40, hi - lo);
+      // never stretch a soft, low-contrast picture into a harsh one
+      const span = Math.max(hk ? 255 : 120, hi - lo);
+      const lo2 = hk ? 0 : Math.min(lo, 255 - span);
       const lut = new Uint8ClampedArray(256);
-      for (let v = 0; v < 256; v++) lut[v] = 255 * Math.pow(Math.max(0, Math.min(1, (v - lo) / span)), 0.88);
+      for (let v = 0; v < 256; v++) lut[v] = 255 * Math.pow(Math.max(0, Math.min(1, (v - lo2) / span)), hk ? 1.35 : 0.9);
+      const satK = hk ? 1.35 : 1.08;
       for (let i = 0; i < d.length; i += 4) {
         const r0 = lut[d[i]], g0 = lut[d[i + 1]], b0 = lut[d[i + 2]];
         const m = (r0 + g0 + b0) / 3;
-        d[i] = m + (r0 - m) * 1.12; d[i + 1] = m + (g0 - m) * 1.12; d[i + 2] = m + (b0 - m) * 1.12;
+        d[i] = m + (r0 - m) * satK; d[i + 1] = m + (g0 - m) * satK; d[i + 2] = m + (b0 - m) * satK;
       }
       o.putImageData(id, 0, 0);
     }
@@ -5268,7 +5433,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
           canvas.width = cw; canvas.height = ch;
           canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
         } else {
-          const gen = painter(img, cw, ch, U.hash(k));
+          const gen = painter(img, cw, ch, U.hash(k), isCard && L.CARDS[k.slice(2)].faction === 'dream');
           let r;
           await new Promise((done) => {
             const tick = (dl) => {
@@ -5315,7 +5480,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     }
     work();
   };
-  Art.pending = () => queue.length;
+  Art.pending = () => queue.length + (running ? 1 : 0);
   Art._painter = painter;
 
   // faction crests (inline SVG strings)
@@ -5779,13 +5944,37 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     ambient.layer = layer;
     ambient.motes = [];
   };
+  const BOKEH = {
+    0: ['255,236,170', '255,214,190', '255,250,220'],
+    1: ['200,245,255', '255,210,240', '220,210,255', '255,255,230'],
+    2: ['255,80,120', '255,90,210', '90,230,255'],
+    3: ['255,190,230', '190,225,255', '255,245,190', '220,200,255'],
+  };
+  const bokehCache = {};
+  function bokehSprite(col) {
+    if (bokehCache[col]) return bokehCache[col];
+    const c = document.createElement('canvas');
+    c.width = c.height = 96;
+    const g = c.getContext('2d');
+    const gr = g.createRadialGradient(48, 48, 0, 48, 48, 48);
+    gr.addColorStop(0, `rgba(${col},.22)`);
+    gr.addColorStop(0.7, `rgba(${col},.30)`);
+    gr.addColorStop(0.86, `rgba(${col},.55)`);
+    gr.addColorStop(0.93, `rgba(${col},.25)`);
+    gr.addColorStop(1, `rgba(${col},0)`);
+    g.fillStyle = gr;
+    g.beginPath();
+    g.arc(48, 48, 48, 0, 6.283);
+    g.fill();
+    return (bokehCache[col] = c);
+  }
   function drawAmbient(dt) {
     const g = bctx;
     const w = back.width, h = back.height;
     g.clearRect(0, 0, w, h);
     ambient.t += dt;
     const lay = ambient.layer;
-    const want = reduced ? 10 : lay === 1 ? 14 : 36;
+    const want = reduced ? 8 : lay === 1 ? 12 : lay === 3 ? 18 : 28;
     while (ambient.motes.length < want) {
       ambient.motes.push({ x: Math.random() * w, y: Math.random() * h, vx: rnd(-6, 6), vy: lay === 1 ? rnd(-26, -10) : rnd(-10, 4), r: rnd(1, 3.2), ph: Math.random() * 6.28, sp: rnd(0.5, 1.6) });
     }
@@ -5810,7 +5999,49 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
       g.fillRect(0, 0, w / 3 + 192, h / 3 + 192);
       g.restore();
     }
-    const col = lay === 0 ? '255,244,200' : lay === 1 ? '230,255,255' : '255,80,110';
+    // dreamcore bokeh: soft out-of-focus discs with a brighter rim, drifting with parallax, plus twinkles
+    const pal = BOKEH[lay] || BOKEH[3];
+    const S = backScale;
+    if (!ambient.bokeh || ambient.bokehLayer !== lay) {
+      ambient.bokehLayer = lay;
+      ambient.bokeh = [];
+      const n = reduced ? 6 : coarse ? 12 : 18;
+      for (let i = 0; i < n; i++) {
+        const z = Math.random();
+        ambient.bokeh.push({ x: Math.random() * w, y: Math.random() * h, z, r: (14 + z * 40) * S, vx: rnd(-4, 4) * (0.3 + z), vy: (lay === 2 ? -rnd(4, 10) : -rnd(2, 7)) * (0.3 + z), col: pal[i % pal.length], ph: Math.random() * 6.28, sp: rnd(0.2, 0.6) });
+      }
+      ambient.stars = [];
+      for (let i = 0; i < (reduced ? 4 : 14); i++) ambient.stars.push({ x: Math.random() * w, y: Math.random() * h, s: rnd(3, 7) * S, ph: Math.random() * 6.28, sp: rnd(0.8, 2.2), col: pal[(i + 1) % pal.length] });
+    }
+    g.globalCompositeOperation = 'lighter';
+    for (const b of ambient.bokeh) {
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
+      b.ph += dt * b.sp;
+      if (b.y < -b.r) { b.y = h + b.r; b.x = Math.random() * w; }
+      if (b.x < -b.r) b.x = w + b.r;
+      if (b.x > w + b.r) b.x = -b.r;
+      g.globalAlpha = (0.35 + Math.sin(b.ph) * 0.15) * (lay === 0 ? 0.7 : 1);
+      const spr = bokehSprite(b.col);
+      g.drawImage(spr, b.x - b.r, b.y - b.r, b.r * 2, b.r * 2);
+    }
+    for (const st of ambient.stars) {
+      st.ph += dt * st.sp;
+      const k = Math.max(0, Math.sin(st.ph));
+      if (k < 0.05) { if (Math.sin(st.ph) < -0.98) { st.x = Math.random() * w; st.y = Math.random() * h; } continue; }
+      const L2 = st.s * (0.6 + k);
+      g.globalAlpha = k * 0.85;
+      g.strokeStyle = `rgb(${st.col})`;
+      g.lineWidth = Math.max(1, S * 1.2);
+      g.beginPath();
+      g.moveTo(st.x - L2, st.y); g.lineTo(st.x + L2, st.y);
+      g.moveTo(st.x, st.y - L2); g.lineTo(st.x, st.y + L2);
+      g.stroke();
+      g.drawImage(sprite('#ffffff'), st.x - L2 * 0.6, st.y - L2 * 0.6, L2 * 1.2, L2 * 1.2);
+    }
+    g.globalCompositeOperation = 'source-over';
+    g.globalAlpha = 1;
+    const col = lay === 0 ? '255,244,200' : lay === 1 ? '230,255,255' : lay === 2 ? '255,80,110' : '255,230,250';
     for (const m of ambient.motes) {
       m.x += m.vx * dt;
       m.y += m.vy * dt;
@@ -5995,6 +6226,167 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
   }
 })();
 
+/* ---- 57-dream.js ---- */
+/* LIMINAL · dreamcore layer: floating far objects, film halation & light leaks, grain,
+   tap ripples, drag trails, holographic card foil that follows the finger */
+(function () {
+  'use strict';
+  const L = globalThis.LMN;
+  const D = (L.Dream = {});
+  if (typeof document === 'undefined') return;
+  const uri = (svg) => 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+
+  // ---------------------------------------------------------------- sprites (blur baked into the SVG)
+  function svg(vb, body, blur) {
+    return uri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}"><defs><filter id="b" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="${blur || 0}"/></filter>
+<radialGradient id="sh" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".5" stop-color="#fff" stop-opacity=".2"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><g filter="url(#b)">${body}</g></svg>`);
+  }
+  const SPR = {
+    cloud: (bl) => svg('0 0 200 110', `<ellipse cx="100" cy="82" rx="90" ry="18" fill="#f3d6ef" opacity=".7"/><ellipse cx="62" cy="64" rx="44" ry="30" fill="#fff"/><ellipse cx="110" cy="48" rx="50" ry="38" fill="#fff"/><ellipse cx="150" cy="66" rx="38" ry="26" fill="#fff"/><ellipse cx="100" cy="74" rx="84" ry="18" fill="#fff"/><ellipse cx="96" cy="36" rx="26" ry="12" fill="#fff" opacity=".8"/>`, bl),
+    ring: (bl) => {
+      let s = '';
+      for (let i = 0; i < 8; i++) {
+        const a0 = (i / 8) * Math.PI * 2, a1 = ((i + 1) / 8) * Math.PI * 2;
+        const p = (a, r) => `${(50 + Math.cos(a) * r).toFixed(1)} ${(50 + Math.sin(a) * r * 0.62).toFixed(1)}`;
+        s += `<path d="M${p(a0, 46)} A46 28.5 0 0 1 ${p(a1, 46)} L${p(a1, 24)} A24 14.9 0 0 0 ${p(a0, 24)} Z" fill="${i % 2 ? '#fff' : '#ff8fb8'}"/>`;
+      }
+      return svg('0 0 100 100', s + `<ellipse cx="34" cy="30" rx="12" ry="4" fill="#fff" opacity=".8"/>`, bl);
+    },
+    balloon: (col, bl) => svg('0 0 60 140', `<path d="M30 66 Q24 90 34 110 Q40 124 30 138" stroke="#fff" stroke-opacity=".7" stroke-width="1.2" fill="none"/><ellipse cx="30" cy="34" rx="24" ry="30" fill="${col}"/><path d="M26 63 L34 63 L30 69 Z" fill="${col}"/><ellipse cx="30" cy="34" rx="24" ry="30" fill="url(#sh)"/>`, bl),
+    door: (bl) => svg('0 0 80 150', `<ellipse cx="40" cy="144" rx="34" ry="5" fill="#b7a4d8" opacity=".5"/><rect x="10" y="8" width="60" height="132" rx="2" fill="#fff8fb"/><rect x="16" y="14" width="48" height="126" fill="#ffe9f6"/><rect x="38" y="14" width="4" height="126" fill="#fff" opacity=".95"/><rect x="30" y="10" width="20" height="134" fill="#fff" opacity=".35"/><circle cx="56" cy="80" r="2.5" fill="#d8b8e8"/>`, bl),
+    tv: (bl) => svg('0 0 120 110', `<line x1="44" y1="22" x2="30" y2="2" stroke="#c9b5e8" stroke-width="3"/><line x1="70" y1="22" x2="86" y2="4" stroke="#c9b5e8" stroke-width="3"/><rect x="6" y="20" width="108" height="84" rx="12" fill="#d9c6ff"/><rect x="16" y="30" width="76" height="64" rx="10" fill="#fff0fb"/><rect x="16" y="30" width="76" height="64" rx="10" fill="#bfe8ff" opacity=".55"/><circle cx="102" cy="44" r="4" fill="#9a7fc8"/><circle cx="102" cy="58" r="4" fill="#9a7fc8"/>`, bl),
+    star: (col, bl) => {
+      let d = '';
+      for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + (i * Math.PI) / 5, r = i % 2 ? 18 : 44; d += (i ? 'L' : 'M') + (50 + Math.cos(a) * r).toFixed(1) + ' ' + (50 + Math.sin(a) * r).toFixed(1); }
+      return svg('0 0 100 100', `<path d="${d}Z" fill="${col}"/><circle cx="50" cy="50" r="30" fill="${col}" opacity=".35"/>`, bl);
+    },
+    moon: (bl) => svg('0 0 100 100', `<circle cx="50" cy="50" r="40" fill="#fff6dc"/><circle cx="66" cy="40" r="34" fill="#cbb8f0"/>`, bl),
+    sun: (bl) => svg('0 0 100 100', `<circle cx="50" cy="50" r="46" fill="#fff4d6" opacity=".45"/><circle cx="50" cy="50" r="30" fill="#fff8e6"/>`, bl),
+  };
+
+  // far objects per layer: s=sprite, x/y in %, w in vmin, m=motion, d=duration(s), o=opacity
+  const FAR = {
+    0: [
+      { s: () => SPR.balloon('#ff9ac0', 3), x: 64, y: 40, w: 4, m: 'rise', d: 80, o: 0.5 },
+      { s: () => SPR.door(3), x: 46, y: 26, w: 4.5, m: 'bob', d: 9, o: 0.22 },
+    ],
+    1: [
+      { s: () => SPR.cloud(2), x: 4, y: 6, w: 36, m: 'drift', d: 150, o: 0.6 },
+      { s: () => SPR.cloud(3), x: 60, y: 14, w: 26, m: 'drift', d: 190, o: 0.45 },
+      { s: () => SPR.ring(1.5), x: 14, y: 60, w: 11, m: 'bob', d: 7, o: 0.7 },
+      { s: () => SPR.ring(2.5), x: 74, y: 72, w: 7, m: 'bob', d: 9, o: 0.55 },
+      { s: () => SPR.balloon('#a8d8ff', 2), x: 84, y: 34, w: 5, m: 'rise', d: 70, o: 0.6 },
+      { s: () => SPR.balloon('#ffb3d0', 3), x: 8, y: 30, w: 4, m: 'rise', d: 95, o: 0.5 },
+    ],
+    2: [
+      { s: () => SPR.balloon('#ff3b5c', 2), x: 18, y: 60, w: 5, m: 'rise', d: 60, o: 0.55 },
+      { s: () => SPR.balloon('#ff6ad5', 3), x: 78, y: 70, w: 4, m: 'rise', d: 80, o: 0.45 },
+      { s: () => SPR.balloon('#ff3b5c', 4), x: 50, y: 85, w: 3, m: 'rise', d: 110, o: 0.35 },
+      { s: () => SPR.star('#ff7ab8', 3), x: 86, y: 22, w: 4, m: 'bob', d: 6, o: 0.5 },
+    ],
+    3: [
+      { s: () => SPR.sun(2), x: 70, y: 6, w: 22, m: 'bob', d: 14, o: 0.8 },
+      { s: () => SPR.cloud(1.5), x: -6, y: 10, w: 42, m: 'drift', d: 160, o: 0.85 },
+      { s: () => SPR.cloud(2.5), x: 48, y: 22, w: 30, m: 'drift', d: 210, o: 0.7 },
+      { s: () => SPR.cloud(3.5), x: 20, y: 36, w: 22, m: 'drift', d: 260, o: 0.55 },
+      { s: () => SPR.cloud(1.5), x: 70, y: 52, w: 34, m: 'drift', d: 180, o: 0.6 },
+      { s: () => SPR.door(1.2), x: 76, y: 44, w: 9, m: 'bob', d: 11, o: 0.85 },
+      { s: () => SPR.tv(1.4), x: 8, y: 52, w: 11, m: 'bob', d: 9, o: 0.75 },
+      { s: () => SPR.ring(1.2), x: 82, y: 76, w: 10, m: 'bob', d: 8, o: 0.8 },
+      { s: () => SPR.balloon('#ffb3d0', 1.5), x: 26, y: 70, w: 5, m: 'rise', d: 85, o: 0.7 },
+      { s: () => SPR.balloon('#b8e0ff', 2.5), x: 60, y: 80, w: 4, m: 'rise', d: 110, o: 0.6 },
+      { s: () => SPR.star('#fff1a8', 2), x: 14, y: 14, w: 4, m: 'bob', d: 5, o: 0.8 },
+      { s: () => SPR.star('#ffd0f0', 2), x: 40, y: 8, w: 3, m: 'bob', d: 7, o: 0.7 },
+      { s: () => SPR.moon(1.5), x: 4, y: 2, w: 9, m: 'bob', d: 12, o: 0.6 },
+    ],
+  };
+
+  function buildFar() {
+    const scs = document.querySelectorAll('#scene .sc');
+    scs.forEach((sc, i) => {
+      const list = FAR[i];
+      if (!list) return;
+      const box = document.createElement('div');
+      box.className = 'far';
+      list.forEach((o, k) => {
+        const img = new Image();
+        img.alt = '';
+        img.src = o.s();
+        img.className = 'fo m-' + o.m;
+        img.style.left = o.x + '%';
+        img.style.top = o.y + '%';
+        img.style.width = o.w + 'vmin';
+        img.style.opacity = o.o;
+        img.style.setProperty('--d', o.d + 's');
+        img.style.setProperty('--dl', -((k * 7.3) % o.d) + 's');
+        box.appendChild(img);
+      });
+      sc.appendChild(box);
+    });
+  }
+
+  // ---------------------------------------------------------------- film: halation, leaks, grain
+  function buildFilm() {
+    const f = document.createElement('div');
+    f.id = 'dream';
+    f.innerHTML = '<div class="halo"></div><div class="leak a"></div><div class="leak b"></div><div class="grain"></div>';
+    const app = document.getElementById('app');
+    app.insertBefore(f, document.getElementById('fxFront'));
+    // grain tile
+    const c = document.createElement('canvas');
+    c.width = c.height = 160;
+    const g = c.getContext('2d');
+    const id = g.createImageData(160, 160);
+    for (let i = 0; i < id.data.length; i += 4) {
+      const v = Math.random() * 255;
+      id.data[i] = id.data[i + 1] = id.data[i + 2] = v;
+      id.data[i + 3] = Math.random() < 0.5 ? 40 : 0;
+    }
+    g.putImageData(id, 0, 0);
+    f.querySelector('.grain').style.backgroundImage = `url(${c.toDataURL()})`;
+  }
+
+  // ---------------------------------------------------------------- touch: ripples & trails
+  const PASTEL = ['#ffb3e6', '#b8e8ff', '#fff1a8', '#d8c4ff', '#c4ffe4'];
+  let lastTrail = { x: 0, y: 0 };
+  D.trail = function (x, y) {
+    if (L.FX.isCalm()) return;
+    if (Math.hypot(x - lastTrail.x, y - lastTrail.y) < 14) return;
+    lastTrail = { x, y };
+    L.FX.burst(x, y, 'dream', 2, { grav: -50, speed: 0.25, life: 1.2, size: 0.8 });
+  };
+  function ripple(e) {
+    if (L.FX.isCalm()) return;
+    const col = PASTEL[(Math.random() * PASTEL.length) | 0];
+    L.FX.ring(e.clientX, e.clientY, col, 42, 0.55, 3);
+    L.FX.burst(e.clientX, e.clientY, 'dream', 3, { grav: -40, speed: 0.3, life: 0.8, size: 0.7 });
+  }
+
+  // ---------------------------------------------------------------- holographic foil that follows the finger
+  D.tilt = function (card) {
+    if (!card) return;
+    card.classList.add('tilt');
+    const move = (e) => {
+      const r = card.getBoundingClientRect();
+      const px = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+      const py = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height));
+      card.style.setProperty('--hx', (px * 100).toFixed(1) + '%');
+      card.style.setProperty('--hy', (py * 100).toFixed(1) + '%');
+      card.style.transform = `perspective(900px) rotateY(${((px - 0.5) * 16).toFixed(2)}deg) rotateX(${((0.5 - py) * 14).toFixed(2)}deg)`;
+      card.classList.add('held');
+    };
+    const host = card.parentNode;
+    host.addEventListener('pointermove', move);
+    host.addEventListener('pointerleave', () => { card.style.transform = ''; card.classList.remove('held'); });
+  };
+
+  D.init = function () {
+    buildFar();
+    buildFilm();
+    window.addEventListener('pointerdown', ripple, { passive: true });
+  };
+})();
+
 /* ---- 58-frames.js ---- */
 /* LIMINAL · ornate card frames, gems and badges (SVG, generated once per combination) */
 (function () {
@@ -6078,13 +6470,13 @@ ${r ? `<radialGradient id="rg"><stop offset="0" stop-color="#fff"/><stop offset=
     s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" width="400" height="560"><defs>${grads(m, r)}</defs>`;
     // art window bezel (the art itself is a separate element clipped to the same shape)
     if (w.kind === 'ellipse') {
-      s += `<ellipse cx="${w.cx}" cy="${w.cy + 2}" rx="${w.rx + 7}" ry="${w.ry + 7}" fill="#000" opacity=".55"/>`;
+      s += `<ellipse cx="${w.cx}" cy="${w.cy + 2}" rx="${w.rx + 7}" ry="${w.ry + 7}" fill="none" stroke="#000" stroke-width="7" stroke-opacity=".55"/>`;
       s += `<ellipse cx="${w.cx}" cy="${w.cy}" rx="${w.rx + 5}" ry="${w.ry + 5}" fill="none" stroke="url(#mt)" stroke-width="9"/>`;
       s += `<ellipse cx="${w.cx}" cy="${w.cy}" rx="${w.rx + 0.5}" ry="${w.ry + 0.5}" fill="none" stroke="#000" stroke-width="2" stroke-opacity=".7"/>`;
       s += `<ellipse cx="${w.cx}" cy="${w.cy}" rx="${w.rx + 9}" ry="${w.ry + 9}" fill="none" stroke="#fff" stroke-width=".7" stroke-opacity=".45"/>`;
       s += rivets(w.cx, w.cy, w.rx + 5, w.ry + 5, 10);
     } else if (w.kind === 'rect') {
-      s += `<rect x="${w.x - 7}" y="${w.y - 5}" width="${w.w + 14}" height="${w.h + 14}" rx="${w.r + 6}" fill="#000" opacity=".55"/>`;
+      s += `<rect x="${w.x - 7}" y="${w.y - 5}" width="${w.w + 14}" height="${w.h + 14}" rx="${w.r + 6}" fill="none" stroke="#000" stroke-width="7" stroke-opacity=".55"/>`;
       s += `<rect x="${w.x - 5}" y="${w.y - 5}" width="${w.w + 10}" height="${w.h + 10}" rx="${w.r + 5}" fill="none" stroke="url(#mt)" stroke-width="9"/>`;
       s += `<rect x="${w.x}" y="${w.y}" width="${w.w}" height="${w.h}" rx="${w.r}" fill="none" stroke="#000" stroke-width="2" stroke-opacity=".7"/>`;
       for (const [x, y] of [[w.x + 4, w.y + 4], [w.x + w.w - 4, w.y + 4], [w.x + 4, w.y + w.h - 4], [w.x + w.w - 4, w.y + w.h - 4]]) s += `<circle cx="${x}" cy="${y}" r="3" fill="url(#mt2)" stroke="#000" stroke-opacity=".5" stroke-width=".6"/>`;
@@ -6284,7 +6676,7 @@ ${r ? `<radialGradient id="rg"><stop offset="0" stop-color="#fff"/><stop offset=
     const typeLine = TYPE[d.type] + ' · ' + L.FACTIONS[d.faction].name + (san ? ' · ⟁异常' : '');
     const whisper = d.whisper && opts.big ? `<span class="whisper">${esc(d.whisper)}</span>` : '';
     el.innerHTML =
-      `<div class="cf"><div class="art"></div><div class="fr"></div>` +
+      `<div class="cf"><div class="art"><div class="holo"></div></div><div class="fr"></div>` +
       `<div class="nm">${L.Frames.nameSVG(name, d.type, d.faction)}</div>` +
       `<div class="tl">${CV.sym(esc(typeLine))}</div>` +
       `<div class="tx"><div class="crest">${L.Art.crest[d.faction]}</div><p>${CV.textHTML(text, inst.fade, (inst.uid || 7) * 31 + 3)}${whisper}</p></div>` +
@@ -6954,6 +7346,7 @@ ${r ? `<radialGradient id="rg"><stop offset="0" stop-color="#fff"/><stop offset=
       }
       if (press.drag) {
         e.preventDefault();
+        if (L.Dream) L.Dream.trail(e.clientX, e.clientY);
         const el = press.el;
         const r0 = press.r0;
         const ci = G.players[ME].hand.find((c) => c.uid === press.uid);
@@ -6990,6 +7383,7 @@ ${r ? `<radialGradient id="rg"><stop offset="0" stop-color="#fff"/><stop offset=
       }
       if (press.drag) {
         e.preventDefault();
+        if (L.Dream) L.Dream.trail(e.clientX, e.clientY);
         aim(center(press.el.getBoundingClientRect()), { x: e.clientX, y: e.clientY });
       }
     }
@@ -7973,6 +8367,7 @@ ${r ? `<radialGradient id="rg"><stop offset="0" stop-color="#fff"/><stop offset=
       card.querySelector('.st.hp b').textContent = m.hp;
     }
     ov.appendChild(card);
+    if (L.Dream) L.Dream.tilt(card);
     const meta = document.createElement('div');
     meta.className = 'meta';
     const kws = CV.keywordsOf(cid);
@@ -8406,6 +8801,9 @@ ${r ? `<radialGradient id="rg"><stop offset="0" stop-color="#fff"/><stop offset=
       };
       L.Audio.duck(true);
       if (!calm) {
+        // the dream exhales before it tears: a soft burst of bubbles and light
+        L.FX.burst(window.innerWidth / 2, window.innerHeight * 0.45, 'dream', 46, { grav: -70, speed: 1.1, life: 1.6, size: 1.4 });
+        L.FX.ring(window.innerWidth / 2, window.innerHeight * 0.45, '#ffe6f6', Math.max(window.innerWidth, window.innerHeight) * 0.6, 1.1, 18);
         L.Audio.play('flicker');
         flash.animate([{ opacity: 0 }, { opacity: 0.85 }, { opacity: 0 }, { opacity: 0 }, { opacity: 0.9 }, { opacity: 0.1 }, { opacity: 0 }], { duration: 520 });
         setTimeout(() => { if (!skipped) { L.Audio.play('layer'); $('app').classList.add('glitching'); L.FX.shake(12); } }, T.flick);
@@ -8488,7 +8886,7 @@ ${r ? `<radialGradient id="rg"><stop offset="0" stop-color="#fff"/><stop offset=
     if (name !== 'game') {
       $('sideL').classList.remove('on');
       $('sideR').classList.remove('on');
-      L.Layers.set(0);
+      L.Layers.set(3);
     }
     if (name === 'setup') renderSetup();
     if (name === 'deck') renderDeckManager();
@@ -8520,7 +8918,7 @@ ${r ? `<radialGradient id="rg"><stop offset="0" stop-color="#fff"/><stop offset=
     syncMute();
     const enter = () => {
       A.init();
-      L.Layers.set(0);
+      L.Layers.set(3);
       $('tapHint').hidden = true;
       $('titleMenu').hidden = false;
       const tb = $('goTut');
@@ -8563,11 +8961,19 @@ ${r ? `<radialGradient id="rg"><stop offset="0" stop-color="#fff"/><stop offset=
           g.fillStyle = '#2b2618';
           g.fillRect(78, 55, 4, 12);
         } else {
+          // pastel static: the snow of a dream television
+          const dreamy = L.Layers.current === 3;
           for (let i = 0; i < img.data.length; i += 4) {
-            const v = Math.random() * 140;
-            img.data[i] = v * 0.9;
-            img.data[i + 1] = v * 0.85;
-            img.data[i + 2] = v * 0.7;
+            const v = Math.random();
+            if (dreamy) {
+              img.data[i] = 150 + v * 105;
+              img.data[i + 1] = 120 + v * 110;
+              img.data[i + 2] = 170 + v * 85;
+            } else {
+              img.data[i] = v * 126;
+              img.data[i + 1] = v * 119;
+              img.data[i + 2] = v * 98;
+            }
             img.data[i + 3] = 255;
           }
           g.putImageData(img, 0, 0);
@@ -9044,7 +9450,8 @@ ${r ? `<radialGradient id="rg"><stop offset="0" stop-color="#fff"/><stop offset=
     L.Menus.init();
     L.Menus.applySettings();
     try { barrelMap(); } catch (e) { /* barrel is optional */ }
-    L.Layers.set(0, true);
+    L.Dream.init();
+    L.Layers.set(3, true);
     // keep the noise-filtered SVG art off the hot path: bitmap it while the player reads the title
     setTimeout(() => L.Art.rasterizeAll(), 600);
     setTimeout(() => L.AIW.warm(), 1200);

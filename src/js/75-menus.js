@@ -15,7 +15,7 @@
     if (name !== 'game') {
       $('sideL').classList.remove('on');
       $('sideR').classList.remove('on');
-      L.Layers.set(0);
+      L.Layers.set(3);
     }
     if (name === 'setup') renderSetup();
     if (name === 'deck') renderDeckManager();
@@ -47,7 +47,7 @@
     syncMute();
     const enter = () => {
       A.init();
-      L.Layers.set(0);
+      L.Layers.set(3);
       $('tapHint').hidden = true;
       $('titleMenu').hidden = false;
       const tb = $('goTut');
@@ -90,11 +90,19 @@
           g.fillStyle = '#2b2618';
           g.fillRect(78, 55, 4, 12);
         } else {
+          // pastel static: the snow of a dream television
+          const dreamy = L.Layers.current === 3;
           for (let i = 0; i < img.data.length; i += 4) {
-            const v = Math.random() * 140;
-            img.data[i] = v * 0.9;
-            img.data[i + 1] = v * 0.85;
-            img.data[i + 2] = v * 0.7;
+            const v = Math.random();
+            if (dreamy) {
+              img.data[i] = 150 + v * 105;
+              img.data[i + 1] = 120 + v * 110;
+              img.data[i + 2] = 170 + v * 85;
+            } else {
+              img.data[i] = v * 126;
+              img.data[i + 1] = v * 119;
+              img.data[i + 2] = v * 98;
+            }
             img.data[i + 3] = 255;
           }
           g.putImageData(img, 0, 0);

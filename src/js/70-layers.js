@@ -72,6 +72,9 @@
       };
       L.Audio.duck(true);
       if (!calm) {
+        // the dream exhales before it tears: a soft burst of bubbles and light
+        L.FX.burst(window.innerWidth / 2, window.innerHeight * 0.45, 'dream', 46, { grav: -70, speed: 1.1, life: 1.6, size: 1.4 });
+        L.FX.ring(window.innerWidth / 2, window.innerHeight * 0.45, '#ffe6f6', Math.max(window.innerWidth, window.innerHeight) * 0.6, 1.1, 18);
         L.Audio.play('flicker');
         flash.animate([{ opacity: 0 }, { opacity: 0.85 }, { opacity: 0 }, { opacity: 0 }, { opacity: 0.9 }, { opacity: 0.1 }, { opacity: 0 }], { duration: 520 });
         setTimeout(() => { if (!skipped) { L.Audio.play('layer'); $('app').classList.add('glitching'); L.FX.shake(12); } }, T.flick);

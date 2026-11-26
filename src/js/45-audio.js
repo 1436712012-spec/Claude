@@ -389,6 +389,61 @@
     }, 2000);
     return { gain: g, nodes, timer };
   }
+  // the entrance of the dream: warm detuned pad, a music box that forgets the tune, vinyl dust
+  function startDream() {
+    const g = ctx.createGain();
+    g.gain.value = 0.0001;
+    g.connect(ambBus);
+    const nodes = [];
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 1500;
+    lp.connect(g);
+    const send = ctx.createGain();
+    send.gain.value = 0.7;
+    lp.connect(send);
+    send.connect(verbSend);
+    const wob = ctx.createOscillator();
+    wob.frequency.value = 0.22;
+    const wobG = ctx.createGain();
+    wobG.gain.value = 9;
+    wob.connect(wobG);
+    wob.start();
+    nodes.push(wob);
+    const chords = [[60, 64, 67, 71, 74], [57, 60, 64, 67, 71], [53, 57, 60, 64, 69], [55, 59, 62, 66, 69]];
+    const voices = chords[0].map((n, i) => {
+      const o = ctx.createOscillator();
+      o.type = i % 2 ? 'sine' : 'triangle';
+      o.frequency.value = midi(n - 12);
+      wobG.connect(o.detune);
+      const og = ctx.createGain();
+      og.gain.value = 0.028;
+      o.connect(og);
+      og.connect(lp);
+      o.start();
+      nodes.push(o);
+      return o;
+    });
+    let ci = 0, tick = 0;
+    g.gain.setTargetAtTime(0.9, ctx.currentTime, 2);
+    const scale = [72, 74, 76, 79, 81, 84, 86, 88];
+    const timer = setInterval(() => {
+      tick++;
+      if (tick % 6 === 0) {
+        const ch = chords[++ci % chords.length];
+        voices.forEach((o, i) => o.frequency.setTargetAtTime(midi(ch[i] - 12), ctx.currentTime, 0.8));
+      }
+      // music box: a note or two, slightly out of tune, with a long tail
+      if (Math.random() < 0.75) {
+        const n = scale[(Math.random() * scale.length) | 0];
+        tone({ f: midi(n) * (1 + (Math.random() - 0.5) * 0.012), dur: 1.8, v: 0.045, verb: 1.1 });
+        tone({ f: midi(n) * 2.01, dur: 0.6, v: 0.012, verb: 1.1 });
+      }
+      if (Math.random() < 0.5) noise({ f: 3000 + Math.random() * 3000, dur: 0.03, v: 0.015, type: 'highpass' });
+    }, 700);
+    return { gain: g, nodes, timer };
+  }
+
   // the distant, garbled PA voice
   function announce() {
     if (!ctx) return;
@@ -450,7 +505,7 @@
     stopAmb(0.6);
     ambLayer = layer;
     if (layer == null || layer < 0) return;
-    amb = layer === 0 ? startHum() : layer === 1 ? startWater() : startMall();
+    amb = layer === 0 ? startHum() : layer === 1 ? startWater() : layer === 2 ? startMall() : startDream();
   };
   A.duck = function (on) {
     if (!ambBus) return;

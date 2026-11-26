@@ -106,7 +106,7 @@
     const typeLine = TYPE[d.type] + ' · ' + L.FACTIONS[d.faction].name + (san ? ' · ⟁异常' : '');
     const whisper = d.whisper && opts.big ? `<span class="whisper">${esc(d.whisper)}</span>` : '';
     el.innerHTML =
-      `<div class="cf"><div class="art"></div><div class="fr"></div>` +
+      `<div class="cf"><div class="art"><div class="holo"></div></div><div class="fr"></div>` +
       `<div class="nm">${L.Frames.nameSVG(name, d.type, d.faction)}</div>` +
       `<div class="tl">${CV.sym(esc(typeLine))}</div>` +
       `<div class="tx"><div class="crest">${L.Art.crest[d.faction]}</div><p>${CV.textHTML(text, inst.fade, (inst.uid || 7) * 31 + 3)}${whisper}</p></div>` +

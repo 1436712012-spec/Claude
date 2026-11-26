@@ -496,7 +496,7 @@
     id: 'D17', num: 7, name: 'LMN-007 不会醒的孩子', faction: 'dream', type: 'minion', rarity: 'legendary', cost: 5, san: 2, atk: 4, hp: 5,
     text: '亡语：随机获得一个敌方随从的控制权。',
     lore: { k: '档', t: 'LMN-007：一个蜷在午睡垫上的孩子，呼吸平稳。所有试图叫醒它的人员都会在一小时内入睡，梦见同一间幼儿园。他们醒来后，会坚称自己才是那个孩子。' },
-    art: ['kinder', 'child x.5 y.7 s.8 sleep1', 'halo x.5 y.62 s.9', 'stars n6'],
+    art: ['kinder', 'window x.72 y.28 s.8', 'halo x.5 y.5 s1.3', 'child x.5 y.5 s1.6 sleep1', 'stars n9 glow1'],
     dr: (G, c) => { const t = H.pick(G, live(en(G, c).board)); if (t) E.takeControl(G, c.p, t); },
   });
   card({

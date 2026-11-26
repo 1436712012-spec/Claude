@@ -52,7 +52,8 @@
     L.Menus.init();
     L.Menus.applySettings();
     try { barrelMap(); } catch (e) { /* barrel is optional */ }
-    L.Layers.set(0, true);
+    L.Dream.init();
+    L.Layers.set(3, true);
     // keep the noise-filtered SVG art off the hot path: bitmap it while the player reads the title
     setTimeout(() => L.Art.rasterizeAll(), 600);
     setTimeout(() => L.AIW.warm(), 1200);

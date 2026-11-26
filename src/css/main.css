@@ -563,3 +563,91 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 #coach .finger { position: absolute; left: 0; top: 0; width: 46px; height: 46px; margin: -4px 0 0 -12px; display: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath d='M18 44c-4-6-10-11-10-16 0-3 3-4 5-2l4 4V8c0-3 4-3 4 0v12c0-3 4-3 4 0v2c0-3 4-3 4 0v2c0-3 4-3 4 0v10c0 4-2 7-4 10z' fill='%23fff8e6' stroke='%231a1612' stroke-width='2.4' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6)); animation: fing 1.9s ease-in-out infinite; }
 @keyframes fing { 0% { transform: translate(var(--fx), var(--fy)); opacity: 0; } 10% { opacity: 1; transform: translate(var(--fx), var(--fy)); } 22% { transform: translate(var(--fx), var(--fy)) scale(0.85); } 75% { transform: translate(var(--tx), var(--ty)) scale(0.85); opacity: 1; } 92%, 100% { transform: translate(var(--tx), var(--ty)) scale(0.85); opacity: 0; } }
 .btn .rec { margin-left: 0.4em; padding: 0.15em 0.45em; font: 0.65em/1 var(--f-mono); background: #8a1a2a; color: #fff; border-radius: 0.3em; letter-spacing: 0.1em; }
+
+/* =========================================================== DREAMCORE */
+/* the entrance of the dream: pastel sky over an endless soft floor */
+.sc3 { background:
+    radial-gradient(ellipse at 72% 18%, rgba(255, 250, 230, 0.9), rgba(255, 250, 230, 0) 32%),
+    linear-gradient(180deg, #9fd2ff 0%, #c9c4ff 30%, #ffc9ea 52%, #ffeede 64%, #ffe1f1 64.2%, #f2d2ff 100%); }
+.sc3 .floor { position: absolute; left: -50%; right: -50%; top: 64%; bottom: -20%; transform-origin: 50% 0; transform: perspective(38vh) rotateX(62deg);
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.55) 0 2px, transparent 2px 6%), repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.55) 0 2px, transparent 2px 9%); opacity: 0.7; }
+.sc3::after { content: ''; position: absolute; left: 0; right: 0; top: 56%; height: 14%; background: linear-gradient(180deg, transparent, rgba(255, 245, 250, 0.85) 50%, transparent); }
+#app[data-layer='3'] { --layer-accent: #ffb3e6; --hud: rgba(40, 22, 52, 0.66); --hud-line: rgba(255, 190, 235, 0.45); }
+
+/* far floating objects (pre-blurred sprites, transform-only motion) */
+.far { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.fo { position: absolute; height: auto; will-change: transform; animation-duration: var(--d); animation-delay: var(--dl); animation-iteration-count: infinite; }
+.fo.m-drift { animation-name: fdrift; animation-timing-function: linear; }
+.fo.m-rise { animation-name: frise; animation-timing-function: linear; }
+.fo.m-bob { animation-name: fbob; animation-timing-function: ease-in-out; animation-direction: alternate; }
+@keyframes fdrift { from { transform: translateX(-60vw); } to { transform: translateX(80vw); } }
+@keyframes frise { 0% { transform: translate(0, 70vh) rotate(-4deg); } 50% { transform: translate(3vw, 10vh) rotate(4deg); } 100% { transform: translate(-2vw, -60vh) rotate(-3deg); } }
+@keyframes fbob { from { transform: translateY(-1.4vmin) rotate(-3deg); } to { transform: translateY(1.4vmin) rotate(3deg); } }
+
+/* film: overexposed halation at the edges, drifting light leaks, grain */
+#dream { position: absolute; inset: 0; z-index: 5; pointer-events: none; overflow: hidden; --halo: rgba(255, 236, 200, 0.5); --leak1: rgba(255, 190, 150, 0.5); --leak2: rgba(255, 230, 160, 0.45); }
+#app[data-layer='1'] #dream { --halo: rgba(220, 245, 255, 0.5); --leak1: rgba(150, 240, 255, 0.45); --leak2: rgba(255, 190, 235, 0.42); }
+#app[data-layer='2'] #dream { --halo: rgba(255, 70, 150, 0.3); --leak1: rgba(255, 60, 150, 0.38); --leak2: rgba(90, 220, 255, 0.3); }
+#app[data-layer='3'] #dream { --halo: rgba(255, 226, 246, 0.62); --leak1: rgba(255, 180, 230, 0.5); --leak2: rgba(190, 210, 255, 0.5); }
+#dream .halo { position: absolute; inset: -4%; background: radial-gradient(ellipse at 50% 50%, transparent 52%, var(--halo) 88%, var(--halo) 100%); will-change: opacity; animation: breathe 7s ease-in-out infinite; }
+#dream .leak { position: absolute; width: 90vmax; height: 70vmax; border-radius: 50%; opacity: 0.22; will-change: transform; }
+#dream .leak.a { left: -50vmax; top: -30vmax; background: radial-gradient(closest-side, var(--leak1), transparent); animation: leakA 27s ease-in-out infinite alternate; }
+#dream .leak.b { right: -55vmax; bottom: -35vmax; background: radial-gradient(closest-side, var(--leak2), transparent); animation: leakB 34s ease-in-out infinite alternate; }
+#dream .grain { position: absolute; inset: -40px; opacity: 0.07; will-change: transform; animation: grain 0.6s steps(3) infinite; }
+@keyframes breathe { 0%, 100% { opacity: 0.75; } 50% { opacity: 1; } }
+@keyframes leakA { from { transform: translate(0, 0) scale(1); } to { transform: translate(55vw, 40vh) scale(1.25); } }
+@keyframes leakB { from { transform: translate(0, 0) scale(1.1); } to { transform: translate(-50vw, -45vh) scale(0.9); } }
+@keyframes grain { 0% { transform: translate(0, 0); } 33% { transform: translate(-22px, 14px); } 66% { transform: translate(16px, -20px); } 100% { transform: translate(-8px, 8px); } }
+#app.calm #dream .halo, #app.calm #dream .leak, #app.calm #dream .grain, #app.calm .fo { animation: none; }
+@media (prefers-reduced-motion: reduce) { #dream .halo, #dream .leak, #dream .grain, .fo { animation: none !important; } }
+/* the board reads softer: blurred far planes, slightly washed layers */
+/* (no live filters on scenes: far objects animate inside them, blur is baked into the sprites) */
+
+/* holographic foil on dreamcore cards, legendaries, and anything held up to the light */
+.card .art .holo { position: absolute; inset: 0; opacity: 0; pointer-events: none; background: linear-gradient(115deg, transparent 18%, rgba(255, 120, 200, 0.75) 32%, rgba(255, 240, 160, 0.65) 42%, rgba(140, 240, 255, 0.75) 52%, rgba(200, 150, 255, 0.65) 62%, transparent 78%) var(--hx, 30%) var(--hy, 30%) / 260% 260%; mix-blend-mode: color-dodge; transition: opacity 0.4s; }
+.card.f-dream .art .holo { opacity: 0.28; animation: holo 7s ease-in-out infinite alternate; }
+.card.r-legendary .art .holo { opacity: 0.22; animation: holo 9s ease-in-out infinite alternate; }
+.card.tilt { transition: transform 0.15s ease-out; transform-style: preserve-3d; animation: sway 5s ease-in-out infinite; }
+.card.tilt.held { animation: none; }
+.card.tilt .art .holo { opacity: 0.5; animation: none; }
+.card.tilt.held .art .holo { opacity: 0.7; }
+@keyframes holo { from { background-position: 0% 10%; } to { background-position: 100% 90%; } }
+@keyframes sway { 0%, 100% { transform: perspective(900px) rotateY(-5deg) rotateX(3deg); --hx: 20%; } 50% { transform: perspective(900px) rotateY(5deg) rotateX(-2deg); --hx: 80%; } }
+#app.calm .card .art .holo, #app.calm .card.tilt { animation: none; }
+/* dream minions on the board glow softly, gently wrong */
+.minion.f-dream .m-art { box-shadow: 0 0 1.6em rgba(255, 190, 235, 0.55); }
+
+/* menus float in the dream instead of sitting on a black page */
+.menu-wrap { background: linear-gradient(180deg, rgba(36, 20, 48, 0.74), rgba(24, 14, 34, 0.84)); }
+#screen-title .menu-wrap { background: none; }
+.tv { box-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 8) rgba(120, 60, 140, 0.45), 0 0 calc(var(--u) * 14) rgba(255, 210, 240, 0.55), inset 0 0 0 calc(var(--u) * 0.8) #5a5044; animation: tvfloat 6s ease-in-out infinite alternate; }
+@keyframes tvfloat { from { transform: translateY(calc(var(--u) * -1)); } to { transform: translateY(calc(var(--u) * 1)); } }
+.logo .zh { text-shadow: 3px 0 rgba(255, 110, 200, 0.75), -3px 0 rgba(110, 220, 255, 0.75), 0 0 calc(var(--u) * 6) rgba(255, 230, 250, 0.9); }
+.tap-hint, .mfoot { color: #fff; text-shadow: 0 0 8px rgba(180, 80, 160, 0.9); }
+#app.calm .tv { animation: none; }
+/* turn banners as soft light */
+.banner .bt { color: #fffaf4; text-shadow: 0 0 calc(var(--u) * 2) #fff, 0 0 calc(var(--u) * 5) var(--layer-accent), 0 0 calc(var(--u) * 10) rgba(255, 180, 235, 0.7); }
+.banner::before { background: linear-gradient(90deg, transparent, rgba(40, 20, 50, 0.55) 20%, rgba(40, 20, 50, 0.55) 80%, transparent); }
+/* low sanity: the dream leans in — pastel, not just dark */
+#sanv { background: radial-gradient(ellipse at center, transparent 45%, rgba(255, 140, 220, 0.35) 75%, rgba(140, 90, 255, 0.55) 100%); }
+
+/* the entrance of the dream: pastel plastic, soft static, frosted buttons */
+#app[data-layer='3'] .tv { background: linear-gradient(160deg, #f4e8ff, #d4bdf0 60%, #bfa6e4); box-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 8) rgba(150, 90, 170, 0.4), 0 0 calc(var(--u) * 14) rgba(255, 220, 245, 0.7), inset 0 0 0 calc(var(--u) * 0.8) rgba(255, 255, 255, 0.7), inset 0 calc(var(--u) * -1.5) calc(var(--u) * 3) rgba(120, 80, 160, 0.25); }
+#app[data-layer='3'] .tv .scr { box-shadow: inset 0 0 calc(var(--u) * 6) rgba(90, 40, 110, 0.5); }
+#app[data-layer='3'] .tv .knobs { color: #7a5a9a; }
+#app[data-layer='3'] .logo .en { color: #fff2a8; text-shadow: 0 0 10px rgba(255, 180, 230, 0.9); }
+#app[data-layer='3'] .logo .tag { color: #fff; }
+#titleMenu .btn { background: linear-gradient(180deg, rgba(255, 252, 255, 0.82), rgba(255, 220, 242, 0.72)); color: #4a2458; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9), 0 calc(var(--u) * 0.8) 0 rgba(190, 140, 210, 0.7), 0 calc(var(--u) * 2) calc(var(--u) * 5) rgba(160, 90, 180, 0.35); }
+#titleMenu .btn:first-child { background: linear-gradient(180deg, #fffbe8, #ffd9ef 55%, #e6cdff); }
+#titleMenu .btn.ghost { background: rgba(255, 248, 255, 0.5); color: #4a2458; }
+#titleMenu .btn .rec { background: #ff6fb5; }
+#app[data-layer='3'] .tap-hint, #app[data-layer='3'] .mfoot { color: #5a2470; text-shadow: 0 0 6px #fff, 0 0 14px #fff; opacity: 1; }
+#app[data-layer='3'] .mute { background: rgba(255, 248, 255, 0.6); color: #5a2470; }
+#app[data-layer='3'].crt #crt { background: repeating-linear-gradient(0deg, rgba(120, 70, 150, 0.07) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 62%, rgba(110, 60, 140, 0.28) 100%); }
+/* dreamcore art keeps its milk-glass light: pearl edges instead of dark vignettes */
+.card.f-dream .art::before { background: radial-gradient(ellipse at 50% 40%, transparent 58%, rgba(255, 236, 250, 0.42) 100%); }
+.minion.f-dream .m-art::before { background: radial-gradient(ellipse at 50% 35%, transparent 52%, rgba(255, 232, 248, 0.5) 100%); }
+.card .art .holo { mix-blend-mode: overlay; }
+.card.f-dream .art .holo { opacity: 0.4; }
+.card.tilt .art .holo { opacity: 0.6; }
+.card.tilt.held .art .holo { opacity: 0.85; }

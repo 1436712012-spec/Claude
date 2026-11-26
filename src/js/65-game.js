@@ -555,6 +555,7 @@
       }
       if (press.drag) {
         e.preventDefault();
+        if (L.Dream) L.Dream.trail(e.clientX, e.clientY);
         const el = press.el;
         const r0 = press.r0;
         const ci = G.players[ME].hand.find((c) => c.uid === press.uid);
@@ -591,6 +592,7 @@
       }
       if (press.drag) {
         e.preventDefault();
+        if (L.Dream) L.Dream.trail(e.clientX, e.clientY);
         aim(center(press.el.getBoundingClientRect()), { x: e.clientX, y: e.clientY });
       }
     }
@@ -1574,6 +1576,7 @@
       card.querySelector('.st.hp b').textContent = m.hp;
     }
     ov.appendChild(card);
+    if (L.Dream) L.Dream.tilt(card);
     const meta = document.createElement('div');
     meta.className = 'meta';
     const kws = CV.keywordsOf(cid);
