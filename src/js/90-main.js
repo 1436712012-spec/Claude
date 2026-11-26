@@ -43,6 +43,8 @@
 
   function boot() {
     size();
+    const root = document.documentElement.style;
+    for (const k of ['mana', 'san', 'atk', 'hp', 'armor']) root.setProperty('--gem-' + k, `url("${L.Frames.gem(k)}")`);
     window.addEventListener('resize', size);
     window.addEventListener('orientationchange', () => setTimeout(size, 200));
     L.FX.init();

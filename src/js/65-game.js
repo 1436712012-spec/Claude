@@ -23,6 +23,10 @@
   let idleTimer = null;
   let logLines = [];
   let preview = null;
+  let lastTurnSeen = -1;
+  let aiStep = 0;
+  let hintTimer = null;
+  UI.cfg = () => cfg;
 
   UI.isMyTurn = () => !!G && G.active === ME && !G.over;
   UI.state = () => G;
@@ -81,6 +85,10 @@
         { hero: boss.id, deck: boss.deck, ai: true, name: boss.short },
       ],
     });
+    if (c.setup) c.setup(G);
+    lastTurnSeen = -1;
+    aiStep = 0;
+    L.Art.prioritize(deck.concat(boss.deck));
     minEls.clear();
     handEls.clear();
     dying.clear();
@@ -110,6 +118,12 @@
     busy = true;
     (async () => {
       await sleep(400);
+      if (c.tutorial) {
+        E.begin(G);
+        await drain();
+        afterAction();
+        return;
+      }
       const hour = new Date().getHours();
       const lines = boss.lines.intro.slice();
       if (hour >= 23 || hour < 5) lines.push(boss.lines.night[0]);
@@ -118,7 +132,7 @@
         await sleep(1500);
       }
       E.mulligan(G, AI_PID, L.AI.mulligan(G, AI_PID));
-      if (!L.Store.progress.briefed) await briefing();
+      if (!L.Store.progress.briefed && !L.Store.progress.trained) await briefing();
       await mulligan();
       E.begin(G);
       await drain();
@@ -285,7 +299,7 @@
     const n = list.length;
     const W = els.hand.clientWidth || 1;
     const cw = els.hand.querySelector('.card') ? els.hand.querySelector('.card').offsetWidth : W * 0.23;
-    const usable = W * 0.96 - cw;
+    const usable = W * 0.9 - cw;
     const step = n > 1 ? Math.min(cw * 0.8, usable / (n - 1)) : 0;
     list.forEach((c, i) => {
       const el = handEls.get(c.uid);
@@ -403,6 +417,8 @@
     }
   }
   function setSel(s) {
+    if (L.Tutorial && L.Tutorial.clearHint) L.Tutorial.clearHint();
+    if (!s) hideAim();
     sel = s;
     layoutHand();
     updateInteractivity();
@@ -735,6 +751,12 @@
 
   async function doAction(a) {
     if (busy || !UI.isMyTurn()) return;
+    if (cfg.gate && !cfg.gate(a, G)) {
+      A.play('error');
+      setSel(null);
+      render(E.snapshot(G));
+      return;
+    }
     const s = sel;
     setSel(null);
     // fake cards with a target: pretend, then play without effect
@@ -751,9 +773,11 @@
     }
     await drain();
     afterAction();
+    if (cfg.after) cfg.after(a, G);
   }
   async function endMyTurn() {
     if (busy) return;
+    if (cfg.gate && !cfg.gate({ t: 'end' }, G)) { A.play('error'); return; }
     busy = true;
     E.endTurn(G, ME);
     await drain();
@@ -764,7 +788,27 @@
     busy = false;
     render(E.snapshot(G));
     if (G.over) return finish();
+    if (G.active === ME && G.turn !== lastTurnSeen) {
+      lastTurnSeen = G.turn;
+      if (cfg.onTurn) { cfg.onTurn(G); render(E.snapshot(G)); }
+    }
     armIdle();
+    armHint();
+  }
+  // gentle in-match hints for new players: after a pause, point at the next sensible thing
+  function armHint() {
+    clearTimeout(hintTimer);
+    if (cfg.tutorial || !L.Store.settings.hints || !UI.isMyTurn()) return;
+    hintTimer = setTimeout(() => {
+      if (!UI.isMyTurn() || busy || sel || !L.Tutorial) return;
+      const p = G.players[ME];
+      const card = p.hand.find((c) => E.canPlay(G, ME, c.uid) && !c.fake);
+      const atk = p.board.find((m) => E.canAttack(G, m.uid));
+      if (card) L.Tutorial.hint(`#hand .card[data-uid="${card.uid}"]`, '这张牌现在就能打出：轻触它，再轻触战场或目标。');
+      else if (atk) L.Tutorial.hint(`#boardP .minion[data-uid="${atk.uid}"]`, '发光的随从可以攻击：轻触它，再轻触敌人。');
+      else if (E.canHeroPower(G, ME)) L.Tutorial.hint('#hpP', '还剩法力，可以用英雄技能。');
+      else L.Tutorial.hint('#endTurn', '没什么可做的了，结束回合吧。');
+    }, 9000);
   }
   function armIdle() {
     clearTimeout(idleTimer);
@@ -781,7 +825,7 @@
     const boss = L.HEROES[cfg.boss];
     await sleep(450);
     for (let i = 0; i < 40 && !G.over && G.active === AI_PID; i++) {
-      const a = await L.AIW.decide(G, AI_PID, boss.persona, aiMemo);
+      const a = cfg.script ? cfg.script(G, aiStep++) : await L.AIW.decide(G, AI_PID, boss.persona, aiMemo);
       if (!G || G.over) break;
       if (a.t === 'end') break;
       if (a.t === 'atk') {
@@ -1562,6 +1606,13 @@
   // ------------------------------------------------------------------ end of match
   function finish() {
     clearTimeout(idleTimer);
+    clearTimeout(hintTimer);
+    if (cfg.onFinish) {
+      A.heartbeat(false);
+      els.vign.classList.remove('low');
+      els.sanv.classList.remove('on');
+      return cfg.onFinish(G.winner === ME, G);
+    }
     A.heartbeat(false);
     els.vign.classList.remove('low');
     els.sanv.classList.remove('on');
@@ -1591,6 +1642,8 @@
   };
   UI.leave = function () {
     clearTimeout(idleTimer);
+    clearTimeout(hintTimer);
+    if (L.Tutorial) L.Tutorial.stop();
     A.heartbeat(false);
     els.vign.classList.remove('low');
     els.sanv.classList.remove('on');

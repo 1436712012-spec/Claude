@@ -30,6 +30,7 @@
         A.play('click');
         const go = b.dataset.go;
         if (go === 'settings') return M.settings();
+        if (go === 'tutorial') { A.init(); return L.Tutorial.start(); }
         M.show(go);
       })
     );
@@ -49,6 +50,10 @@
       L.Layers.set(0);
       $('tapHint').hidden = true;
       $('titleMenu').hidden = false;
+      const tb = $('goTut');
+      // newcomers see the training first and marked as recommended; veterans get it as a quiet option
+      if (!S.progress.trained) tb.innerHTML = '外勤训练<span class="rec">推荐</span>';
+      else { tb.className = 'btn ghost'; tb.parentNode.appendChild(tb); }
       $('titleFoot').textContent = S.isPersistent() ? '档案将保存在本机' : '无法写入本机存储 · 档案只保存在本次会话';
       if (!S.progress.firstSeen) { S.progress.firstSeen = Date.now(); S.saveProgress(); }
     };
@@ -415,6 +420,7 @@
       ${row('fast', '快速动画', '缩短对局中的演出时间')}
       ${row('calm', '减少动效', '关闭震屏、闪烁与大部分粒子')}
       ${row('vibrate', '触感振动', '受到伤害时振动（如设备支持）')}
+      ${row('hints', '新手提示', '对局中停顿时，提示下一步可以做什么')}
       <div class="set-row"><span>存储<small>${S.isPersistent() ? '档案与卡组保存在本机浏览器中' : '本机存储不可用，只在本次会话中保留'}</small></span></div>
       <div class="set-row"><span>重置进度<small>清除已收容的守门人与档案记录（不影响卡组）</small></span><button class="chip" id="resetProg">重置</button></div>`;
     p.querySelectorAll('.toggle').forEach((t) =>

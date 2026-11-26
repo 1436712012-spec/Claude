@@ -106,14 +106,16 @@
     const typeLine = TYPE[d.type] + ' · ' + L.FACTIONS[d.faction].name + (san ? ' · ⟁异常' : '');
     const whisper = d.whisper && opts.big ? `<span class="whisper">${esc(d.whisper)}</span>` : '';
     el.innerHTML =
-      `<div class="cf"><div class="art"></div><div class="tape"></div><div class="stamp">绝密</div><div class="ftag">FIELD</div>` +
-      `<div class="nm"><span class="${nameClass(name)}">${esc(name)}</span></div><div class="rg"></div>` +
+      `<div class="cf"><div class="art"></div><div class="fr"></div>` +
+      `<div class="nm">${L.Frames.nameSVG(name, d.type, d.faction)}</div>` +
       `<div class="tl">${CV.sym(esc(typeLine))}</div>` +
       `<div class="tx"><div class="crest">${L.Art.crest[d.faction]}</div><p>${CV.textHTML(text, inst.fade, (inst.uid || 7) * 31 + 3)}${whisper}</p></div>` +
       `<div class="code">${d.code}</div></div>` +
       `<div class="gem"><b>${cost}</b></div><div class="sanc"><b>${san}</b></div>` +
       (d.type === 'minion' ? `<div class="st atk"><b>${d.atk}</b></div><div class="st hp"><b>${d.hp}</b></div>` : '') +
       `<div class="brc">突破 ${inst.breach || 0}</div>`;
+    el.querySelector('.cf').style.backgroundImage = `url("${L.Frames.frame(d.faction, d.rarity, d.type, 'back')}")`;
+    el.querySelector('.fr').style.backgroundImage = `url("${L.Frames.frame(d.faction, d.rarity, d.type, 'front')}")`;
     el.querySelector('.art').style.backgroundImage = `url("${L.Art.card(cid)}")`;
     CV.updateCard(el, inst, true);
     return el;
@@ -152,8 +154,9 @@
     el.className = `minion f-${d.faction} r-${d.rarity}`;
     el.dataset.uid = m.uid;
     el.dataset.cid = m.cid;
-    el.innerHTML = `<div class="m-art"></div><div class="m-st atk"><b></b></div><div class="m-st hp"><b></b></div><div class="m-ic"></div>`;
+    el.innerHTML = `<div class="m-art"></div><div class="m-bz"></div><div class="m-st atk"><b></b></div><div class="m-st hp"><b></b></div><div class="m-ic"></div>`;
     el.querySelector('.m-art').style.backgroundImage = `url("${L.Art.card(m.cid)}")`;
+    el.querySelector('.m-bz').style.backgroundImage = `url("${L.Frames.bezel(d.faction, d.rarity)}")`;
     CV.updateMinion(el, m);
     return el;
   };
@@ -163,6 +166,7 @@
       const d = L.CARDS[m.cid];
       el.className = `minion f-${d.faction} r-${d.rarity}`;
       el.querySelector('.m-art').style.backgroundImage = `url("${L.Art.card(m.cid)}")`;
+      el.querySelector('.m-bz').style.backgroundImage = `url("${L.Frames.bezel(d.faction, d.rarity)}")`;
     }
     const a = el.querySelector('.m-st.atk b'),
       h = el.querySelector('.m-st.hp b');

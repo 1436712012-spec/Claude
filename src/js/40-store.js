@@ -28,7 +28,7 @@
   const S = (L.Store = { get, set, isPersistent: () => persistent });
 
   S.settings = Object.assign(
-    { mute: false, vol: 0.8, crt: true, barrel: false, speed: 1, calm: false, vibrate: true, fast: false },
+    { mute: false, vol: 0.8, crt: true, barrel: false, speed: 1, calm: false, vibrate: true, fast: false, hints: true },
     get('settings', {})
   );
   S.saveSettings = () => set('settings', S.settings);

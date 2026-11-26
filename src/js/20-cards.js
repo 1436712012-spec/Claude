@@ -28,7 +28,7 @@
     id: 'S01', name: '夜班巡逻员', faction: 'site', type: 'minion', rarity: 'common', cost: 1, atk: 1, hp: 2, kw: ['taunt'],
     text: '嘲讽。战吼：获得 1 点护甲。',
     lore: { k: '档', t: '收容措施：电视屏幕须朝墙放置。夜班人员不得与画面中的走廊产生眼神接触。是的，走廊。' },
-    art: ['lab', 'tv x.72 y.62 s.7 back1', 'faceless x.34 s.9 c#cfe', 'beam x.34 y.5 a-20'],
+    art: ['lab', 'tv x.66 y.62 s.6 back1', 'faceless x.42 s.95 c#2f4f58 hood1', 'beam x.42 y.5 a-20'],
     bc: (G, c) => E.armor(G, c.p, 1),
   });
   card({
@@ -48,7 +48,7 @@
     id: 'S03', name: '收容专员', faction: 'site', type: 'minion', rarity: 'common', cost: 3, atk: 3, hp: 2,
     text: '战吼：冻结一个敌方随从。',
     lore: { k: '档', t: '收容专员守则 第 1 条：不要在走廊里奔跑。第 2 条：不要在走廊里停下。第 3 条：如果你数得清灯管，请立即撤离。' },
-    art: ['hall', 'tubes n5', 'faceless x.3 s.8 c#dff', 'faceless x.68 s.75 c#dff', 'grid o.5', 'snow n12'],
+    art: ['hall', 'tubes n5', 'faceless x.38 s.8 c#dff', 'faceless x.62 s.75 c#dff', 'grid o.5', 'snow n12'],
     tgt: 'enemyMinion',
     bc: (G, c) => { if (T(G, c)) E.freeze(G, c.target); },
   });
@@ -89,7 +89,7 @@
     id: 'S08', name: '警戒线', faction: 'site', type: 'spell', rarity: 'common', cost: 2,
     text: '使一个友方随从获得 +1/+2 和嘲讽。',
     lore: { k: '记', t: '第 2 天。闻笛在每个转角拉上警戒线，说这样就知道哪些地方走过了。第二天早上，警戒线绕成了一个圈，把我们围在中间。' },
-    art: ['hall', 'tape n3', 'faceless x.5 s.7 c#ffe'],
+    art: ['hall', 'tape n3', 'faceless x.5 s.8 c#3a4a52 badge1'],
     tgt: 'friendlyMinion',
     spell: (G, c) => { const m = T(G, c); E.buff(G, m, 1, 2); E.giveKw(G, m, 'taunt'); },
   });
@@ -97,7 +97,7 @@
     id: 'S09', name: '防暴盾手', faction: 'site', type: 'minion', rarity: 'rare', cost: 4, atk: 3, hp: 5, kw: ['taunt'],
     text: '嘲讽。每当此随从受到伤害时，你获得 2 点护甲。',
     lore: { k: '讯', t: '[09:14:50] 盾牌上的划痕不是从外面来的。重复，不是从外面来的。' },
-    art: ['lab', 'faceless x.5 s1 c#cfe', 'shield x.5 y.62 s1.1 c#8ef scratch1'],
+    art: ['lab', 'faceless x.5 s1 c#1f3a42 cap1', 'shield x.5 y.62 s1.1 c#8ef scratch1'],
     on: { damaged: (G, c) => { if (c.ev.t === c.self) E.armor(G, c.p, 2); } },
   });
   card({
@@ -141,7 +141,7 @@
     id: 'S14', name: '收容小队', faction: 'site', type: 'minion', rarity: 'epic', cost: 5, atk: 4, hp: 4,
     text: '战吼：收容一个攻击力小于或等于 3 的敌方随从。',
     lore: { k: '讯', t: '[12:00:00] 收容小队第二梯队已进入。……第一梯队在门口迎接了我们。他们没有变老。' },
-    art: ['hall', 'faceless x.25 s.75 c#dff', 'faceless x.5 s.85 c#dff', 'faceless x.75 s.75 c#dff', 'chains n2'],
+    art: ['hall', 'faceless x.34 s.72 c#2c4c55 hood1', 'faceless x.5 s.88 c#24434c hood1', 'faceless x.66 s.72 c#2c4c55 hood1', 'chains n2'],
     tgt: 'enemyMinion',
     tgtCond: (G, t) => E.atkOf(G, t) <= 3,
     bc: (G, c) => { const t = T(G, c); if (t) E.contain(G, c.p, t); },
@@ -171,7 +171,7 @@
     id: 'S17', name: '收容主管 · 镜七', faction: 'site', type: 'minion', rarity: 'legendary', cost: 7, atk: 6, hp: 6, kw: ['taunt'],
     text: '嘲讽。战吼：收容所有攻击力小于或等于 2 的敌方随从。',
     lore: { k: '档', t: '回声-4 状态更新：闻笛，确认为「走廊尽头的管理员」；岑夏，确认为「泳池里的救生员」；陆鸣，确认为「闭店广播」；禾，未找到。签发人：主管 镜七。' },
-    art: ['lab', 'monitors n12', 'faceless x.5 s1 c#eff back1'],
+    art: ['lab', 'monitors n12', 'faceless x.5 s1 c#203a44 back1'],
     bc: (G, c) => {
       const t = live(en(G, c).board.slice()).filter((m) => E.atkOf(G, m) <= 2);
       E.group(G, () => { for (const m of t) E.contain(G, c.p, m); });
@@ -208,21 +208,21 @@
     id: 'B02', name: '迷路的同事', faction: 'level', type: 'minion', rarity: 'common', cost: 2, atk: 2, hp: 3, kw: ['stealth'],
     text: '潜行。亡语：随机使一个敌方随从坠入夹层。',
     lore: { k: '档', t: '实体记录：迷路的同事。外表与站点职员无异，工牌照片为空白。会礼貌地问路。请勿回答，它问的是你回家的路。' },
-    art: ['office', 'faceless x.5 s.95 c#ccb8 badge1'],
+    art: ['office', 'faceless x.5 s.95 c#4a4232 badge1 tie1'],
     dr: (G, c) => { const t = H.pick(G, live(en(G, c).board)); if (t) E.limbo(G, t); },
   });
   card({
-    id: 'B03', name: '数灯管的人', faction: 'level', type: 'minion', rarity: 'common', cost: 3, atk: 2, hp: 4,
+    id: 'B03', name: '数灯管的人', faction: 'level', type: 'minion', rarity: 'common', cost: 3, atk: 3, hp: 4,
     text: '战吼：如果场上有场地牌，获得 +1/+1 并抽一张牌。',
     lore: { k: '记', t: '第 2 天。灯管一共有 312 根。不对，是 313 根。陆鸣说多出来的那一根在看着我们。' },
     art: ['hall', 'tubes n13 dense1', 'faceless x.5 y.82 s.55 up1'],
     bc: (G, c) => { if (G.field) { E.buff(G, c.self, 1, 1); E.draw(G, c.p, 1); } },
   });
   card({
-    id: 'B04', name: '无面清洁工', faction: 'level', type: 'minion', rarity: 'common', cost: 4, atk: 4, hp: 5,
+    id: 'B04', name: '无面清洁工', faction: 'level', type: 'minion', rarity: 'common', cost: 4, atk: 5, hp: 5,
     text: '战吼：使你的其他随从获得潜行，直到你的下个回合。',
     lore: { k: '档', t: '实体记录：无面清洁工。在灯光熄灭时清理「痕迹」，包括脚印、声音与人。它对你很客气。' },
-    art: ['hall', 'wetfloor', 'faceless x.45 s.9 c#bb9', 'mop x.62 y.6 s.9'],
+    art: ['hall', 'wetfloor', 'faceless x.45 s.9 c#5a5a3a hood1', 'mop x.62 y.6 s.9'],
     bc: (G, c) => { E.group(G, () => { for (const m of live(me(G, c).board)) if (m !== c.self) E.giveKw(G, m, 'stealth', true); }); },
   });
   card({
@@ -236,7 +236,7 @@
     id: 'B06', name: '切出', faction: 'level', type: 'spell', rarity: 'common', cost: 2,
     text: '将一个敌方随从移回其拥有者的手牌，其法力值消耗增加 2 点。',
     lore: { k: '档', t: '「切出」现象：以特定角度贴墙行走时，人会滑入墙的另一侧。另一侧也是走廊。另一侧也有一个你，正在贴墙行走。' },
-    art: ['hall', 'faceless x.45 s.85 half1', 'pixtear x.5 n8'],
+    art: ['hall', 'faceless x.45 s.85 c#3a3020 half1 tie1', 'pixtear x.5 n8'],
     tgt: 'enemyMinion',
     spell: (G, c) => E.bounce(G, T(G, c), 2),
   });
@@ -249,7 +249,7 @@
     spell: (G, c) => { E.giveKw(G, T(G, c), 'stealth'); E.draw(G, c.p, 1); },
   });
   card({
-    id: 'B08', name: '坠入夹层', faction: 'level', type: 'spell', rarity: 'rare', cost: 3,
+    id: 'B08', name: '坠入夹层', faction: 'level', type: 'spell', rarity: 'rare', cost: 2,
     text: '使一个随从坠入夹层：将其移出战场，在其拥有者的下个回合结束时回到场上。抽一张牌。',
     lore: { k: '讯', t: '[--:--:--] 地板下面还有地板。地板下面的地板下面，还有人在走路。' },
     art: ['hall', 'hole x.5 y.66 s1', 'faceless x.5 y.7 s.4 fall1'],
@@ -329,7 +329,7 @@
     },
   });
   card({
-    id: 'B17', num: 40, name: 'LMN-040 无面之王', faction: 'level', type: 'minion', rarity: 'legendary', cost: 7, san: 2, atk: 6, hp: 6, kw: ['stealth'],
+    id: 'B17', num: 40, name: 'LMN-040 无面之王', faction: 'level', type: 'minion', rarity: 'legendary', cost: 6, san: 2, atk: 6, hp: 6, kw: ['stealth'],
     text: '潜行。你的其他潜行随从拥有剧毒。',
     lore: { k: '档', t: 'LMN-040：所有「无面」实体都朝向同一个方向。我们沿着它们面朝的方向走了七天，找到了一把空椅子。' },
     art: ['hall', 'throne x.5 s1', 'faceless x.18 s.55 c#c9b46a', 'faceless x.82 s.55 c#c9b46a', 'faceless x.33 y.85 s.4 c#c9b46a', 'faceless x.67 y.85 s.4 c#c9b46a'],
@@ -417,7 +417,7 @@
     id: 'D09', name: '镜中人', faction: 'dream', type: 'minion', rarity: 'rare', cost: 4, san: 1, atk: 3, hp: 3,
     text: '战吼：选择一个随从，变成它的复制。',
     lore: { k: '讯', t: '[06:12:33] 组长，有人在跟着我们。……不，不是有人。是我们在跟着我们。' },
-    art: ['room', 'mirror x.5 s1', 'faceless x.5 y.62 s.6 c#e8d0f0'],
+    art: ['room', 'mirror x.5 s1', 'faceless x.5 y.62 s.6 c#7a5a8e'],
     tgt: 'minion',
     bc: (G, c) => { const t = T(G, c); if (t && c.self) E.transform(G, c.self, t); },
   });
@@ -436,7 +436,7 @@
     id: 'D11', name: '梦游者', faction: 'dream', type: 'minion', rarity: 'rare', cost: 4, atk: 3, hp: 3, fade: true,
     text: '战吼：抽一张牌。褪色。',
     lore: { k: '记', t: '第 5 天。我的笔记本自己多写了一页。字迹是我的，日期是明天的。上面写着：不要相信明天的我。' },
-    art: ['sky', { dark: 0.4 }, 'moon x.72 y.25 s.8', 'faceless x.42 s.85 c#efe0ff arms1'],
+    art: ['sky', { dark: 0.4 }, 'moon x.72 y.25 s.8', 'faceless x.42 s.85 c#6a5a8a arms1'],
     bc: (G, c) => E.draw(G, c.p, 1),
   });
   card({
@@ -454,10 +454,10 @@
     spell: (G, c) => { E.group(G, () => { for (let i = 0; i < 3; i++) E.summon(G, c.p, 'T_PLAYMATE'); }); },
   });
   card({
-    id: 'D14', name: '另一个我', faction: 'dream', type: 'minion', rarity: 'epic', cost: 5, san: 3, atk: 5, hp: 5,
+    id: 'D14', name: '另一个我', faction: 'dream', type: 'minion', rarity: 'epic', cost: 5, san: 2, atk: 5, hp: 5,
     text: '战吼：复制对手手牌中的两张牌，将其置入你的手牌。',
     lore: { k: '讯', t: '[22:22:22] 这里是禾。……这里是禾。……请问，你们那边，也有一个禾吗？' },
-    art: ['room', 'faceless x.33 s.85 c#f0d8ff', 'faceless x.67 s.85 c#f0d8ff mirror1', 'line x.5'],
+    art: ['room', 'faceless x.39 s.85 c#6a4a7e', 'faceless x.61 s.85 c#6a4a7e mirror1', 'line x.5'],
     bc: (G, c) => {
       const h = en(G, c).hand.slice();
       H.shuffle(G, h);
@@ -532,7 +532,7 @@
     text: '',
     whisper: '（现在几点了？你也该睡了。）',
     lore: { k: '档', t: '警告：长时间处于理智低值状态的人员，会在手中看见「不存在的卡片」。请勿使用它们。若已使用，请勿告诉任何人。' },
-    art: ['room', { dark: 0.5 }, 'faceless x.5 s.9 c#cfc4d8 eyes1', 'clock x.78 y.24 s.45'],
+    art: ['room', { dark: 0.5 }, 'faceless x.5 s.9 c#3a3448 eyes1', 'clock x.78 y.24 s.45'],
   });
   card({
     id: 'N04', name: '堆积的纸箱', faction: 'neutral', type: 'minion', rarity: 'common', cost: 4, atk: 3, hp: 5, kw: ['taunt'],
@@ -544,12 +544,12 @@
     id: 'N05', name: '手电筒保安', faction: 'neutral', type: 'minion', rarity: 'common', cost: 5, atk: 4, hp: 5,
     text: '战吼：对一个敌方随从造成 2 点伤害。',
     lore: { k: '讯', t: '[01:15:00] 保安室有人。他让我们出示证件。我们出示了。他说：「照片上的人不是你们。」' },
-    art: ['mall', 'faceless x.35 s.9 c#9aa', 'beam x.38 y.45 a-12 long1'],
+    art: ['mall', 'faceless x.42 s.95 c#1e2a3a cap1 badge1', 'beam x.44 y.45 a-12 long1'],
     tgt: 'enemyMinion',
     bc: (G, c) => { if (T(G, c)) E.damage(G, c.self ? c.self.uid : heroOf(G, c.p), c.target, 2, 'effect'); },
   });
   card({
-    id: 'N06', name: '失物招领处', faction: 'neutral', type: 'minion', rarity: 'rare', cost: 3, atk: 2, hp: 3,
+    id: 'N06', name: '失物招领处', faction: 'neutral', type: 'minion', rarity: 'rare', cost: 3, atk: 3, hp: 3,
     text: '战吼：随机将一张收容站、后室层级或梦核卡牌置入你的手牌。',
     lore: { k: '档', t: '失物招领处的登记簿上有 4 条新记录：一串钥匙、一只哨子、一台对讲机、一本没写完的日记。认领人一栏都是空白。' },
     art: ['mall', 'counter x.5', 'keys x.3 y.52 s.5', 'whistle x.45 y.52 s.45', 'radio x.6 y.5 s.5', 'notebook x.75 y.53 s.35'],
@@ -673,7 +673,7 @@
     id: 'X06', boss: 'broadcast', name: '请尽快离开', faction: 'neutral', type: 'minion', rarity: 'rare', cost: 2, atk: 3, hp: 1, kw: ['charge'],
     text: '冲锋。',
     lore: { k: '讯', t: '[23:59:58] 这里是陆鸣，这里是陆鸣。我在广播室。我可以把所有人都叫出去，只要我一直广播下去就行。只要我一直——' },
-    art: ['mall', 'exit x.5 y.3 s.8 red1', 'faceless x.5 y.72 s.6 run1 c#ff5a6a'],
+    art: ['mall', 'exit x.5 y.3 s.8 red1', 'faceless x.5 y.72 s.6 run1 c#8a1a2a'],
   });
 
   // =====================================================================

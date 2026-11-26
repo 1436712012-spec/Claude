@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#070607">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&amp;family=VT323&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&amp;family=Lilita+One&amp;family=VT323&amp;display=swap">
 <style>
 /* LIMINAL · visual system
    layout concept: a single portrait "play column" (width = min(viewport, height*0.6)), every size in --u (1% of column width);
@@ -30,6 +30,7 @@
   --armor: #c9d2d6;
   --gold: #f3cf6a;
   --f-serif: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  --f-num: 'Lilita One', 'Arial Black', 'Impact', sans-serif;
   --f-mono: 'VT323', 'Courier New', ui-monospace, monospace;
   --f-sans: system-ui, -apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
   --u: 3.9px;
@@ -102,79 +103,62 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 .screen { position: absolute; inset: 0; display: none; }
 .screen.on { display: block; }
 
-/* ------------------------------------------------------------ card face (1em = 5% of card width) */
-.card { position: relative; width: var(--cw); height: calc(var(--cw) * 1.4); font-size: calc(var(--cw) / 20); border-radius: 1.1em; color: var(--c-ink); --c-ink: #2a2620; --c-rim: #9a8f74; --c-face: #e8e0cc; --c-box: rgba(255, 255, 255, 0.45); flex: none; }
-.card .cf { position: absolute; inset: 0; border-radius: 1.1em; overflow: hidden; background: var(--c-face); box-shadow: inset 0 0 0 0.32em var(--c-rim), inset 0 0 0 0.55em rgba(0, 0, 0, 0.18), 0 0.5em 1.4em rgba(0, 0, 0, 0.55); }
-.card.f-site { --c-ink: #10262c; --c-rim: #79b6c0; --c-face: linear-gradient(rgba(159, 243, 255, 0.18) 1px, transparent 1px) 0 0/1.6em 1.6em, linear-gradient(90deg, rgba(159, 243, 255, 0.18) 1px, transparent 1px) 0 0/1.6em 1.6em, linear-gradient(170deg, #f2fbfb, #cfe7ea); --c-box: rgba(255, 255, 255, 0.6); }
-.card.f-level { --c-ink: #2b2310; --c-rim: #8a7434; --c-face: repeating-linear-gradient(90deg, #dcc77c 0 0.9em, #d3be72 0.9em 1.8em); --c-box: rgba(255, 248, 214, 0.62); }
-.card.f-dream { --c-ink: #43264f; --c-rim: #c9a8e8; --c-face: radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.8) 0 0.15em, transparent 0.2em) 0 0/2.4em 2.4em, linear-gradient(160deg, #ffe3f4, #e6dcff 50%, #d6f1ff); --c-box: rgba(255, 255, 255, 0.55); }
-.card.f-neutral { --c-ink: #2a2620; --c-rim: #9a8f74; --c-face: repeating-linear-gradient(0deg, transparent 0 1.2em, rgba(0, 0, 0, 0.04) 1.2em 1.25em), linear-gradient(170deg, #efe8d6, #ddd3bb); --c-box: rgba(255, 255, 255, 0.5); }
-.card.r-rare .cf { box-shadow: inset 0 0 0 0.32em #9fc4e6, inset 0 0 0 0.5em #e8f4ff, inset 0 0 0 0.7em rgba(0, 0, 0, 0.2), 0 0.5em 1.4em rgba(0, 0, 0, 0.55); }
-.card.r-epic .cf { box-shadow: inset 0 0 0 0.36em #b97bff, inset 0 0 0 0.56em #f0dcff, inset 0 0 0 0.74em rgba(40, 0, 70, 0.25), 0 0.5em 1.4em rgba(0, 0, 0, 0.55), 0 0 1em rgba(185, 123, 255, 0.35); }
-.card.r-legendary .cf { box-shadow: inset 0 0 0 0.38em #d9a93a, inset 0 0 0 0.6em #fff1c0, inset 0 0 0 0.8em rgba(90, 60, 0, 0.28), 0 0.5em 1.4em rgba(0, 0, 0, 0.6), 0 0 1.4em rgba(243, 207, 106, 0.45); }
-.card.r-epic .cf::after, .card.r-legendary .cf::after { content: ''; position: absolute; top: -10%; bottom: -10%; left: 0; width: 60%; pointer-events: none; background: linear-gradient(105deg, transparent 20%, rgba(255, 235, 255, 0.28) 45%, rgba(255, 255, 255, 0.36) 50%, transparent 75%); transform: translateX(-120%); will-change: transform; animation: sheen 4.5s ease-in-out infinite; }
-.card.r-legendary .cf::after { background: linear-gradient(105deg, transparent 20%, rgba(255, 236, 170, 0.45) 45%, rgba(255, 255, 255, 0.5) 50%, transparent 75%); animation-duration: 3.2s; }
+/* ------------------------------------------------------------ card face (1em = 5% of card width; frame art is 200×280 units = 20em×28em) */
+.card { position: relative; width: var(--cw); height: calc(var(--cw) * 1.4); font-size: calc(var(--cw) / 20); color: var(--c-ink); --c-ink: #2a2620; flex: none; }
+.card.f-site { --c-ink: #10262c; }
+.card.f-level { --c-ink: #2b2310; }
+.card.f-dream { --c-ink: #43264f; }
+.card .cf { position: absolute; inset: 0; background: center/100% 100% no-repeat; filter: drop-shadow(0 0.5em 0.7em rgba(0, 0, 0, 0.55)); }
+.card .art { position: absolute; background: #1a1612 center/cover no-repeat; overflow: hidden; }
+.card.t-minion .art { left: 2.75em; top: 0.75em; width: 14.5em; height: 15.9em; clip-path: ellipse(50% 50% at 50% 50%); }
+.card.t-spell .art { left: 2.4em; top: 2em; width: 15.2em; height: 12em; border-radius: 2.2em; }
+.card.t-field .art { left: 2em; top: 1.8em; width: 16em; height: 12.2em; clip-path: polygon(0 0, 100% 0, 91.25% 100%, 8.75% 100%); }
+.card .art::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 40%, transparent 62%, rgba(0, 0, 0, 0.32) 100%); }
+.card.r-epic .art::after, .card.r-legendary .art::after { content: ''; position: absolute; top: -10%; bottom: -10%; left: 0; width: 60%; pointer-events: none; background: linear-gradient(105deg, transparent 20%, rgba(255, 235, 255, 0.28) 45%, rgba(255, 255, 255, 0.36) 50%, transparent 75%); transform: translateX(-120%); will-change: transform; animation: sheen 4.5s ease-in-out infinite; }
+.card.r-legendary .art::after { background: linear-gradient(105deg, transparent 20%, rgba(255, 236, 170, 0.45) 45%, rgba(255, 255, 255, 0.5) 50%, transparent 75%); animation-duration: 3.2s; }
 @keyframes sheen { 0%, 55% { transform: translateX(-120%); } 100% { transform: translateX(220%); } }
-.card .art { position: absolute; left: 1.3em; right: 1.3em; top: 1.5em; height: 12.4em; background: #222 center/cover no-repeat; border-radius: 0.7em; box-shadow: 0 0 0 0.22em rgba(0, 0, 0, 0.45), inset 0 0 1.2em rgba(0, 0, 0, 0.35); }
-.card.t-spell .art { left: 2.4em; right: 2.4em; border-radius: 50% / 48%; }
-.card.t-field .art { clip-path: polygon(0 0, 100% 0, 88% 100%, 12% 100%); border-radius: 0; }
-.card .tape { position: absolute; top: 0.9em; right: -0.6em; width: 5.6em; height: 1.5em; background: rgba(255, 252, 230, 0.8); transform: rotate(28deg); box-shadow: 0 0.1em 0.3em rgba(0, 0, 0, 0.25); display: none; }
-.card.r-legendary .tape { display: block; }
-.card .stamp { position: absolute; left: 1.8em; top: 10.6em; padding: 0.15em 0.5em; border: 0.16em solid #c22; color: #c22; font: 700 0.9em/1 var(--f-mono); letter-spacing: 0.1em; transform: rotate(-8deg); opacity: 0.85; display: none; background: rgba(255, 255, 255, 0.35); }
-.card.r-legendary .stamp { display: block; }
-.card .gem { position: absolute; left: -0.7em; top: -0.7em; width: 5em; height: 5em; display: grid; place-items: center; }
-.card .gem::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 35% 30%, #c8ecff, #3d8fe0 55%, #123a6a); clip-path: polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%); filter: drop-shadow(0 0.15em 0.2em rgba(0, 0, 0, 0.5)); }
-.card .gem b { position: relative; font: 4em/1 var(--f-mono); color: #fff; text-shadow: 0 0.06em 0 #062040, 0 0 0.12em #062040, 0 0 0.12em #062040; }
-.card .gem.up b { color: #ff9a9a; }
-.card .gem.down b { color: #9dffa8; }
-.card .sanc { position: absolute; left: 0.1em; top: 4.2em; width: 3.4em; height: 3.2em; display: none; place-items: center; }
-.card.anom .sanc { display: grid; }
-.card .sanc::before { content: ''; position: absolute; inset: 0; background: linear-gradient(#d2b4ff, #6a3fc0); clip-path: polygon(50% 0, 100% 100%, 0 100%); filter: drop-shadow(0 0.1em 0.15em rgba(0, 0, 0, 0.6)); }
-.card .sanc b { position: relative; top: 0.35em; font: 2.4em/1 var(--f-mono); color: #fff; text-shadow: 0 0 0.12em #2a0a55, 0 0 0.12em #2a0a55; }
-.card .nm { position: absolute; left: 0.9em; right: 0.9em; top: 13.6em; height: 3em; display: grid; place-items: center; background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.62) 12%, rgba(0, 0, 0, 0.62) 88%, transparent); border-top: 0.12em solid rgba(255, 255, 255, 0.35); border-bottom: 0.12em solid rgba(0, 0, 0, 0.35); }
-.card .nm span { font: 700 1.5em/1 var(--f-serif); color: #fff8e6; letter-spacing: 0.04em; text-shadow: 0 0.08em 0.2em #000; white-space: nowrap; max-width: 15em; overflow: hidden; text-overflow: clip; }
-.card .nm span.long { font-size: 1.22em; }
-.card .nm span.xlong { font-size: 1.05em; }
-.card .rg { position: absolute; left: 50%; top: 12.9em; width: 1.5em; height: 1.5em; transform: translateX(-50%) rotate(45deg); border: 0.14em solid rgba(0, 0, 0, 0.55); background: #ddd; }
-.card.r-rare .rg { background: linear-gradient(135deg, #e8f6ff, #4a9ee8); }
-.card.r-epic .rg { background: linear-gradient(135deg, #f3dcff, #9a4ce8); box-shadow: 0 0 0.6em #b97bff; }
-.card.r-legendary .rg { background: linear-gradient(135deg, #fff4c8, #e0a22a); box-shadow: 0 0 0.8em #f3cf6a; }
-.card .tl { position: absolute; left: 0; right: 0; top: 16.85em; text-align: center; font: 1em/1 var(--f-mono); letter-spacing: 0.08em; opacity: 0.7; }
-.card .tx { position: absolute; left: 1.4em; right: 1.4em; top: 18em; bottom: 3.3em; display: flex; align-items: center; justify-content: center; text-align: center; background: var(--c-box); border-radius: 0.5em; padding: 0.3em 0.6em; overflow: hidden; }
-.card .tx p { margin: 0; font: 500 1.2em/1.32 var(--f-sans); }
-.card .tx p b { font-weight: 800; }
-.card .tx .crest { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0.1; pointer-events: none; }
+.card .fr { position: absolute; inset: 0; background: center/100% 100% no-repeat; pointer-events: none; }
+.card .nm { position: absolute; left: 0; right: 0; top: 14.55em; height: 4em; pointer-events: none; }
+.card:not(.t-minion) .nm { top: 14.15em; }
+.card .nm svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.card .tl { position: absolute; left: 0; right: 0; bottom: 2.05em; text-align: center; font: 0.85em/1 var(--f-mono); letter-spacing: 0.08em; opacity: 0.65; white-space: nowrap; }
+.card .tx { position: absolute; left: 2.6em; right: 2.6em; top: 18.2em; bottom: 3.2em; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; }
+.card .tx p { position: relative; margin: 0; font: 600 1.2em/1.3 var(--f-sans); }
+.card .tx p b { font-weight: 900; }
+.card .tx .crest { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0.09; pointer-events: none; }
 .card .tx .crest svg { width: 7em; height: 7em; }
 .card .tx .whisper { display: block; margin-top: 0.3em; font-size: 0.72em; opacity: 0.22; letter-spacing: 0.05em; }
-.card .code { position: absolute; left: 0; right: 0; bottom: 0.9em; text-align: center; font: 1.05em/1 var(--f-mono); letter-spacing: 0.14em; opacity: 0.6; }
-.card .st { position: absolute; bottom: -0.5em; width: 4.6em; height: 4.6em; display: grid; place-items: center; }
-.card .st b { position: relative; font: 3.9em/1 var(--f-mono); color: #fff; text-shadow: 0 0 0.12em #000, 0 0 0.12em #000, 0 0.06em 0 #000; }
-.card .st.atk { left: -0.5em; }
-.card .st.atk::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 35% 30%, #ffe08a, #e0961a 60%, #6a3a00); clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%); }
-.card .st.hp { right: -0.5em; }
-.card .st.hp::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 35% 30%, #ff9a9a, #d42c3a 60%, #5a0008); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; }
-.card .st.dur::before { background: radial-gradient(circle at 35% 30%, #e0e8ea, #6f8a90 60%, #1a2a2e); }
+.card .code { position: absolute; left: 0; right: 0; bottom: 0.78em; text-align: center; font: 700 0.8em/1 var(--f-mono); letter-spacing: 0.14em; color: #1a140a; opacity: 0.75; }
+.card .gem { position: absolute; left: -0.9em; top: -0.7em; width: 5.4em; height: 5.4em; display: grid; place-items: center; background: var(--gem-mana) center/contain no-repeat; filter: drop-shadow(0 0.15em 0.25em rgba(0, 0, 0, 0.6)); }
+.card .gem b, .card .st b, .card .sanc b { position: relative; font: 3.5em/1 var(--f-num); color: #fff; -webkit-text-stroke: 0.09em #10080a; paint-order: stroke fill; text-shadow: 0 0.06em 0.1em rgba(0, 0, 0, 0.6); }
+.card .gem.up b { color: #ffb0b0; }
+.card .gem.down b { color: #9dffa8; }
+.card .sanc { position: absolute; left: -0.45em; top: 4.3em; width: 4em; height: 3.7em; display: none; place-items: center; background: var(--gem-san) center/contain no-repeat; }
+.card.anom .sanc { display: grid; }
+.card .sanc b { top: 0.32em; font-size: 2.3em; }
+.card .st { position: absolute; bottom: -0.7em; width: 5.4em; height: 5.4em; display: grid; place-items: center; background: center/contain no-repeat; filter: drop-shadow(0 0.15em 0.25em rgba(0, 0, 0, 0.6)); }
+.card .st.atk { left: -0.8em; background-image: var(--gem-atk); }
+.card .st.hp { right: -0.8em; bottom: -0.9em; height: 5.9em; background-image: var(--gem-hp); }
+.card .st.hp b { top: 0.12em; }
 .card.t-spell .st, .card.t-field .st { display: none; }
-.card .ftag { position: absolute; right: 1.2em; top: 11.2em; padding: 0.2em 0.5em; font: 1em/1 var(--f-mono); letter-spacing: 0.12em; background: #2b2310; color: #f2d64b; display: none; }
-.card.t-field .ftag { display: block; }
 /* 褪色 */
 .card .fz { display: inline; transition: filter 0.6s, opacity 0.6s; }
 .card .fz.f1 { filter: blur(0.12em); opacity: 0.7; }
 .card.faded3 .tx p { filter: blur(0.3em); opacity: 0.6; }
-.card.faded3 .tx::after { content: '已褪色 · 效果无法辨认'; position: absolute; inset: auto 0 0.4em; font: 1em/1 var(--f-mono); letter-spacing: 0.1em; opacity: 0.85; }
+.card.faded3 .tx::after { content: '已褪色 · 效果无法辨认'; position: absolute; inset: auto 0 0.2em; font: 0.95em/1 var(--f-mono); letter-spacing: 0.1em; opacity: 0.85; }
 .card.fading .art { filter: saturate(0.6) contrast(0.9); }
 .card.faded3 .art { filter: saturate(0.2) blur(0.08em) brightness(1.15); }
-.card.echo .cf { filter: saturate(0.45) brightness(1.08); opacity: 0.88; }
-.card.echo .cf::before { content: '回响复制'; position: absolute; z-index: 2; right: 0.6em; top: 14em; transform: translateY(-120%); font: 0.95em/1 var(--f-mono); color: #fff; background: rgba(106, 63, 192, 0.85); padding: 0.2em 0.4em; letter-spacing: 0.1em; }
+.card.echo .cf { filter: saturate(0.4) brightness(1.08) drop-shadow(0 0 0.5em rgba(190, 150, 255, 0.8)); opacity: 0.9; }
+.card.echo .tl::after { content: ' · 回响复制'; color: #6a3fc0; opacity: 1; }
 /* 收容 / 突破倒计时 */
 .card .brc { position: absolute; z-index: 3; right: -0.6em; top: 3.4em; padding: 0.35em 0.6em; background: #2a0006; border: 0.18em solid var(--red); color: #ffd0d4; font: 1.6em/1 var(--f-mono); letter-spacing: 0.06em; display: none; box-shadow: 0 0 0.8em rgba(255, 59, 78, 0.6); }
 .card.breach .brc { display: block; animation: alarm 1s steps(2) infinite; }
-.card.breach .cf { box-shadow: inset 0 0 0 0.4em var(--red), inset 0 0 1.6em rgba(255, 59, 78, 0.5), 0 0.5em 1.4em rgba(0, 0, 0, 0.55); }
-.card.breach .art::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: repeating-linear-gradient(45deg, transparent 0 1.2em, rgba(160, 200, 210, 0.35) 1.2em 1.5em); }
+.card.breach .cf { filter: drop-shadow(0 0 0.35em var(--red)) drop-shadow(0 0 0.8em rgba(255, 59, 78, 0.6)); }
+.card.breach .art::before { background: repeating-linear-gradient(45deg, transparent 0 1.2em, rgba(160, 200, 210, 0.35) 1.2em 1.5em); }
 @keyframes alarm { 50% { background: #7a0010; } }
 /* fake cards: subtle tells only */
 .card.fake .art { transform: scaleX(-1); }
-.card.fake .gem::before { transform: rotate(3deg); }
+.card.fake .gem { transform: rotate(4deg); }
 .card .cnt { position: absolute; z-index: 4; right: -0.7em; bottom: 5em; min-width: 3.2em; padding: 0.3em 0.5em; background: #111; color: var(--yellow); border: 0.14em solid var(--yellow); font: 2em/1 var(--f-mono); text-align: center; border-radius: 0.3em; }
 
 .cardback { width: var(--cw); height: calc(var(--cw) * 1.4); border-radius: calc(var(--cw) * 0.055); background: #111 center/cover; box-shadow: 0 0.3em 0.8em rgba(0, 0, 0, 0.6); flex: none; }
@@ -311,7 +295,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 /* hand */
 .hand { position: relative; flex: none; height: calc(var(--cw) * 1.08); --cw: calc(var(--u) * 23); }
 .hand .card { position: absolute; left: 50%; bottom: calc(var(--cw) * -0.3); margin-left: calc(var(--cw) * -0.5); transform-origin: 50% 120%; transition: transform calc(260ms * var(--sp)) cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.2s, box-shadow 0.2s; will-change: transform; }
-.hand .card.playable .cf { box-shadow: inset 0 0 0 0.32em var(--c-rim), 0 0 0 0.35em #3dff8a, 0 0 1.4em #3dff8a, 0 0.5em 1.4em rgba(0, 0, 0, 0.55); }
+.hand .card.playable .cf { filter: drop-shadow(0 0 0.25em #3dff8a) drop-shadow(0 0 0.7em #3dff8a); }
 .hand .card.sel { z-index: 30; }
 .hand .card.dim { filter: brightness(0.62) saturate(0.6); }
 .hand .card.dragging { transition: none; z-index: 40; }
@@ -547,6 +531,51 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
 #app.calm #heroE .pt { animation: none; }
 @media (prefers-reduced-motion: reduce) { #heroE .pt { animation: none !important; } }
 
+/* ---- minion tokens, refined (1em = 1u) */
+.minion .m-art { left: 1.7em; right: 1.7em; top: 1.5em; bottom: 3.2em; box-shadow: none; }
+.minion .m-bz { position: absolute; left: 0; right: 0; top: 0; bottom: 1.7em; background: center/100% 100% no-repeat; pointer-events: none; z-index: 1; filter: drop-shadow(0 0.6em 0.6em rgba(0, 0, 0, 0.55)); }
+.minion .m-art::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(ellipse at 50% 35%, transparent 55%, rgba(0, 0, 0, 0.5) 100%); z-index: 1; }
+.minion.r-legendary .m-art::before { background: radial-gradient(ellipse at 50% 35%, transparent 55%, rgba(0, 0, 0, 0.5) 100%); clip-path: none; width: auto; height: auto; left: 0; top: 0; transform: none; }
+.minion .m-st { width: 6em; height: 6em; background: center/contain no-repeat; }
+.minion .m-st::before { display: none; }
+.minion .m-st.atk { background-image: var(--gem-atk); left: -0.4em; }
+.minion .m-st.hp { background-image: var(--gem-hp); right: -0.4em; height: 6.5em; bottom: -0.3em; }
+.minion .m-st b { font: 4.4em/1 var(--f-num); -webkit-text-stroke: 0.09em #10080a; paint-order: stroke fill; }
+.minion .m-st.hp b { top: 0.12em; }
+.minion .m-st b.up { color: #9dffa8; }
+.minion .m-st b.hurt { color: #ff9a9a; }
+.minion.ready .m-art, .minion.sel .m-art { box-shadow: none; }
+.minion.ready .m-bz { filter: drop-shadow(0 0 0.5em #3dff8a) drop-shadow(0 0 1em #3dff8a); }
+.minion.sel .m-bz { filter: drop-shadow(0 0 0.6em #fff) drop-shadow(0 0 1.2em #ffe08a); }
+.minion.target .m-art { box-shadow: none; animation: none; }
+.minion.target .m-bz { filter: drop-shadow(0 0 0.5em #ff5a3a) drop-shadow(0 0 1.2em #ff5a3a); animation: tpulse 0.9s ease-in-out infinite; }
+.minion.target.friendly .m-bz { filter: drop-shadow(0 0 0.5em #3dff8a) drop-shadow(0 0 1.2em #3dff8a); }
+.minion.divine .m-art { box-shadow: none; }
+.minion.divine .m-bz { filter: drop-shadow(0 0 0.6em #ffe7a0) drop-shadow(0 0 1.2em rgba(255, 230, 150, 0.9)); }
+.minion.frozen::after { left: 1.4em; right: 1.4em; top: 1.2em; bottom: 2.9em; }
+.minion.taunt::before { top: -0.6em; bottom: 1.2em; }
+.hero .hpb::before { background: var(--gem-hp) center/contain no-repeat; border-radius: 0; box-shadow: none; }
+.hero .hpb b { font: 5em/1 var(--f-num); -webkit-text-stroke: 0.09em #10080a; paint-order: stroke fill; top: 0.12em; }
+.hero .arm::before { background: var(--gem-armor) center/contain no-repeat; clip-path: none; }
+.hero .arm b { font: 4em/1 var(--f-num); color: #1a2226; }
+.hp-btn .c::before { background: var(--gem-mana) center/contain no-repeat; clip-path: none; }
+.hp-btn .c b { font: 3.2em/1 var(--f-num); -webkit-text-stroke: 0.09em #10080a; paint-order: stroke fill; }
+.dli .mc { background: var(--gem-mana) center/contain no-repeat; clip-path: none; font-family: var(--f-num); -webkit-text-stroke: 1px #10080a; paint-order: stroke fill; }
+
+/* ---- coach (training + hints) */
+#coach { position: fixed; inset: 0; z-index: 19; pointer-events: none; display: none; }
+#coach .spot { position: absolute; display: none; border-radius: 14px; border: 2px solid var(--yellow); box-shadow: 0 0 18px var(--yellow); animation: spotp 1.2s ease-in-out infinite; transition: left 0.25s, top 0.25s, width 0.25s, height 0.25s; }
+#coach.dim .spot { box-shadow: 0 0 0 200vmax rgba(4, 3, 2, 0.55), 0 0 18px var(--yellow); }
+@keyframes spotp { 50% { border-color: #fff6c8; } }
+#coach .cbub { position: absolute; pointer-events: auto; width: min(84vw, 400px); padding: 14px 16px; background: #f6efdb; color: #1a1612; border-radius: 12px; font: 500 clamp(14px, calc(var(--u) * 3.6), 17px) / 1.6 var(--f-serif); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; gap: 10px; }
+#coach .cbub p { margin: 0; }
+#coach .cbub b { color: #8a1a2a; }
+#coach .cbub .btn { min-height: 44px; min-width: 0; align-self: flex-end; font-size: 15px; padding: 0 22px; }
+#coach.hint .cbub { width: min(76vw, 340px); background: rgba(246, 239, 219, 0.95); font-size: clamp(13px, calc(var(--u) * 3.3), 15px); }
+#coach .finger { position: absolute; left: 0; top: 0; width: 46px; height: 46px; margin: -4px 0 0 -12px; display: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath d='M18 44c-4-6-10-11-10-16 0-3 3-4 5-2l4 4V8c0-3 4-3 4 0v12c0-3 4-3 4 0v2c0-3 4-3 4 0v2c0-3 4-3 4 0v10c0 4-2 7-4 10z' fill='%23fff8e6' stroke='%231a1612' stroke-width='2.4' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6)); animation: fing 1.9s ease-in-out infinite; }
+@keyframes fing { 0% { transform: translate(var(--fx), var(--fy)); opacity: 0; } 10% { opacity: 1; transform: translate(var(--fx), var(--fy)); } 22% { transform: translate(var(--fx), var(--fy)) scale(0.85); } 75% { transform: translate(var(--tx), var(--ty)) scale(0.85); opacity: 1; } 92%, 100% { transform: translate(var(--tx), var(--ty)) scale(0.85); opacity: 0; } }
+.btn .rec { margin-left: 0.4em; padding: 0.15em 0.45em; font: 0.65em/1 var(--f-mono); background: #8a1a2a; color: #fff; border-radius: 0.3em; letter-spacing: 0.1em; }
+
 </style>
 </head>
 <body>
@@ -575,6 +604,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
           <div class="knobs">CH-00 ◐ ◑</div></div>
         <div class="tap-hint" id="tapHint">轻触以进入夹层</div>
         <div class="mlist" id="titleMenu" hidden>
+          <button class="btn" data-go="tutorial" id="goTut">外勤训练</button>
           <button class="btn" data-go="setup">开始下沉</button>
           <button class="btn ghost" data-go="deck">卡组构筑</button>
           <button class="btn ghost" data-go="archive">档案</button>
@@ -2089,7 +2119,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     id: 'S01', name: '夜班巡逻员', faction: 'site', type: 'minion', rarity: 'common', cost: 1, atk: 1, hp: 2, kw: ['taunt'],
     text: '嘲讽。战吼：获得 1 点护甲。',
     lore: { k: '档', t: '收容措施：电视屏幕须朝墙放置。夜班人员不得与画面中的走廊产生眼神接触。是的，走廊。' },
-    art: ['lab', 'tv x.72 y.62 s.7 back1', 'faceless x.34 s.9 c#cfe', 'beam x.34 y.5 a-20'],
+    art: ['lab', 'tv x.66 y.62 s.6 back1', 'faceless x.42 s.95 c#2f4f58 hood1', 'beam x.42 y.5 a-20'],
     bc: (G, c) => E.armor(G, c.p, 1),
   });
   card({
@@ -2109,7 +2139,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     id: 'S03', name: '收容专员', faction: 'site', type: 'minion', rarity: 'common', cost: 3, atk: 3, hp: 2,
     text: '战吼：冻结一个敌方随从。',
     lore: { k: '档', t: '收容专员守则 第 1 条：不要在走廊里奔跑。第 2 条：不要在走廊里停下。第 3 条：如果你数得清灯管，请立即撤离。' },
-    art: ['hall', 'tubes n5', 'faceless x.3 s.8 c#dff', 'faceless x.68 s.75 c#dff', 'grid o.5', 'snow n12'],
+    art: ['hall', 'tubes n5', 'faceless x.38 s.8 c#dff', 'faceless x.62 s.75 c#dff', 'grid o.5', 'snow n12'],
     tgt: 'enemyMinion',
     bc: (G, c) => { if (T(G, c)) E.freeze(G, c.target); },
   });
@@ -2150,7 +2180,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     id: 'S08', name: '警戒线', faction: 'site', type: 'spell', rarity: 'common', cost: 2,
     text: '使一个友方随从获得 +1/+2 和嘲讽。',
     lore: { k: '记', t: '第 2 天。闻笛在每个转角拉上警戒线，说这样就知道哪些地方走过了。第二天早上，警戒线绕成了一个圈，把我们围在中间。' },
-    art: ['hall', 'tape n3', 'faceless x.5 s.7 c#ffe'],
+    art: ['hall', 'tape n3', 'faceless x.5 s.8 c#3a4a52 badge1'],
     tgt: 'friendlyMinion',
     spell: (G, c) => { const m = T(G, c); E.buff(G, m, 1, 2); E.giveKw(G, m, 'taunt'); },
   });
@@ -2158,7 +2188,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     id: 'S09', name: '防暴盾手', faction: 'site', type: 'minion', rarity: 'rare', cost: 4, atk: 3, hp: 5, kw: ['taunt'],
     text: '嘲讽。每当此随从受到伤害时，你获得 2 点护甲。',
     lore: { k: '讯', t: '[09:14:50] 盾牌上的划痕不是从外面来的。重复，不是从外面来的。' },
-    art: ['lab', 'faceless x.5 s1 c#cfe', 'shield x.5 y.62 s1.1 c#8ef scratch1'],
+    art: ['lab', 'faceless x.5 s1 c#1f3a42 cap1', 'shield x.5 y.62 s1.1 c#8ef scratch1'],
     on: { damaged: (G, c) => { if (c.ev.t === c.self) E.armor(G, c.p, 2); } },
   });
   card({
@@ -2202,7 +2232,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     id: 'S14', name: '收容小队', faction: 'site', type: 'minion', rarity: 'epic', cost: 5, atk: 4, hp: 4,
     text: '战吼：收容一个攻击力小于或等于 3 的敌方随从。',
     lore: { k: '讯', t: '[12:00:00] 收容小队第二梯队已进入。……第一梯队在门口迎接了我们。他们没有变老。' },
-    art: ['hall', 'faceless x.25 s.75 c#dff', 'faceless x.5 s.85 c#dff', 'faceless x.75 s.75 c#dff', 'chains n2'],
+    art: ['hall', 'faceless x.34 s.72 c#2c4c55 hood1', 'faceless x.5 s.88 c#24434c hood1', 'faceless x.66 s.72 c#2c4c55 hood1', 'chains n2'],
     tgt: 'enemyMinion',
     tgtCond: (G, t) => E.atkOf(G, t) <= 3,
     bc: (G, c) => { const t = T(G, c); if (t) E.contain(G, c.p, t); },
@@ -2232,7 +2262,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     id: 'S17', name: '收容主管 · 镜七', faction: 'site', type: 'minion', rarity: 'legendary', cost: 7, atk: 6, hp: 6, kw: ['taunt'],
     text: '嘲讽。战吼：收容所有攻击力小于或等于 2 的敌方随从。',
     lore: { k: '档', t: '回声-4 状态更新：闻笛，确认为「走廊尽头的管理员」；岑夏，确认为「泳池里的救生员」；陆鸣，确认为「闭店广播」；禾，未找到。签发人：主管 镜七。' },
-    art: ['lab', 'monitors n12', 'faceless x.5 s1 c#eff back1'],
+    art: ['lab', 'monitors n12', 'faceless x.5 s1 c#203a44 back1'],
     bc: (G, c) => {
       const t = live(en(G, c).board.slice()).filter((m) => E.atkOf(G, m) <= 2);
       E.group(G, () => { for (const m of t) E.contain(G, c.p, m); });
@@ -2269,21 +2299,21 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     id: 'B02', name: '迷路的同事', faction: 'level', type: 'minion', rarity: 'common', cost: 2, atk: 2, hp: 3, kw: ['stealth'],
     text: '潜行。亡语：随机使一个敌方随从坠入夹层。',
     lore: { k: '档', t: '实体记录：迷路的同事。外表与站点职员无异，工牌照片为空白。会礼貌地问路。请勿回答，它问的是你回家的路。' },
-    art: ['office', 'faceless x.5 s.95 c#ccb8 badge1'],
+    art: ['office', 'faceless x.5 s.95 c#4a4232 badge1 tie1'],
     dr: (G, c) => { const t = H.pick(G, live(en(G, c).board)); if (t) E.limbo(G, t); },
   });
   card({
-    id: 'B03', name: '数灯管的人', faction: 'level', type: 'minion', rarity: 'common', cost: 3, atk: 2, hp: 4,
+    id: 'B03', name: '数灯管的人', faction: 'level', type: 'minion', rarity: 'common', cost: 3, atk: 3, hp: 4,
     text: '战吼：如果场上有场地牌，获得 +1/+1 并抽一张牌。',
     lore: { k: '记', t: '第 2 天。灯管一共有 312 根。不对，是 313 根。陆鸣说多出来的那一根在看着我们。' },
     art: ['hall', 'tubes n13 dense1', 'faceless x.5 y.82 s.55 up1'],
     bc: (G, c) => { if (G.field) { E.buff(G, c.self, 1, 1); E.draw(G, c.p, 1); } },
   });
   card({
-    id: 'B04', name: '无面清洁工', faction: 'level', type: 'minion', rarity: 'common', cost: 4, atk: 4, hp: 5,
+    id: 'B04', name: '无面清洁工', faction: 'level', type: 'minion', rarity: 'common', cost: 4, atk: 5, hp: 5,
     text: '战吼：使你的其他随从获得潜行，直到你的下个回合。',
     lore: { k: '档', t: '实体记录：无面清洁工。在灯光熄灭时清理「痕迹」，包括脚印、声音与人。它对你很客气。' },
-    art: ['hall', 'wetfloor', 'faceless x.45 s.9 c#bb9', 'mop x.62 y.6 s.9'],
+    art: ['hall', 'wetfloor', 'faceless x.45 s.9 c#5a5a3a hood1', 'mop x.62 y.6 s.9'],
     bc: (G, c) => { E.group(G, () => { for (const m of live(me(G, c).board)) if (m !== c.self) E.giveKw(G, m, 'stealth', true); }); },
   });
   card({
@@ -2297,7 +2327,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     id: 'B06', name: '切出', faction: 'level', type: 'spell', rarity: 'common', cost: 2,
     text: '将一个敌方随从移回其拥有者的手牌，其法力值消耗增加 2 点。',
     lore: { k: '档', t: '「切出」现象：以特定角度贴墙行走时，人会滑入墙的另一侧。另一侧也是走廊。另一侧也有一个你，正在贴墙行走。' },
-    art: ['hall', 'faceless x.45 s.85 half1', 'pixtear x.5 n8'],
+    art: ['hall', 'faceless x.45 s.85 c#3a3020 half1 tie1', 'pixtear x.5 n8'],
     tgt: 'enemyMinion',
     spell: (G, c) => E.bounce(G, T(G, c), 2),
   });
@@ -2310,7 +2340,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     spell: (G, c) => { E.giveKw(G, T(G, c), 'stealth'); E.draw(G, c.p, 1); },
   });
   card({
-    id: 'B08', name: '坠入夹层', faction: 'level', type: 'spell', rarity: 'rare', cost: 3,
+    id: 'B08', name: '坠入夹层', faction: 'level', type: 'spell', rarity: 'rare', cost: 2,
     text: '使一个随从坠入夹层：将其移出战场，在其拥有者的下个回合结束时回到场上。抽一张牌。',
     lore: { k: '讯', t: '[--:--:--] 地板下面还有地板。地板下面的地板下面，还有人在走路。' },
     art: ['hall', 'hole x.5 y.66 s1', 'faceless x.5 y.7 s.4 fall1'],
@@ -2390,7 +2420,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     },
   });
   card({
-    id: 'B17', num: 40, name: 'LMN-040 无面之王', faction: 'level', type: 'minion', rarity: 'legendary', cost: 7, san: 2, atk: 6, hp: 6, kw: ['stealth'],
+    id: 'B17', num: 40, name: 'LMN-040 无面之王', faction: 'level', type: 'minion', rarity: 'legendary', cost: 6, san: 2, atk: 6, hp: 6, kw: ['stealth'],
     text: '潜行。你的其他潜行随从拥有剧毒。',
     lore: { k: '档', t: 'LMN-040：所有「无面」实体都朝向同一个方向。我们沿着它们面朝的方向走了七天，找到了一把空椅子。' },
     art: ['hall', 'throne x.5 s1', 'faceless x.18 s.55 c#c9b46a', 'faceless x.82 s.55 c#c9b46a', 'faceless x.33 y.85 s.4 c#c9b46a', 'faceless x.67 y.85 s.4 c#c9b46a'],
@@ -2478,7 +2508,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     id: 'D09', name: '镜中人', faction: 'dream', type: 'minion', rarity: 'rare', cost: 4, san: 1, atk: 3, hp: 3,
     text: '战吼：选择一个随从，变成它的复制。',
     lore: { k: '讯', t: '[06:12:33] 组长，有人在跟着我们。……不，不是有人。是我们在跟着我们。' },
-    art: ['room', 'mirror x.5 s1', 'faceless x.5 y.62 s.6 c#e8d0f0'],
+    art: ['room', 'mirror x.5 s1', 'faceless x.5 y.62 s.6 c#7a5a8e'],
     tgt: 'minion',
     bc: (G, c) => { const t = T(G, c); if (t && c.self) E.transform(G, c.self, t); },
   });
@@ -2497,7 +2527,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     id: 'D11', name: '梦游者', faction: 'dream', type: 'minion', rarity: 'rare', cost: 4, atk: 3, hp: 3, fade: true,
     text: '战吼：抽一张牌。褪色。',
     lore: { k: '记', t: '第 5 天。我的笔记本自己多写了一页。字迹是我的，日期是明天的。上面写着：不要相信明天的我。' },
-    art: ['sky', { dark: 0.4 }, 'moon x.72 y.25 s.8', 'faceless x.42 s.85 c#efe0ff arms1'],
+    art: ['sky', { dark: 0.4 }, 'moon x.72 y.25 s.8', 'faceless x.42 s.85 c#6a5a8a arms1'],
     bc: (G, c) => E.draw(G, c.p, 1),
   });
   card({
@@ -2515,10 +2545,10 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     spell: (G, c) => { E.group(G, () => { for (let i = 0; i < 3; i++) E.summon(G, c.p, 'T_PLAYMATE'); }); },
   });
   card({
-    id: 'D14', name: '另一个我', faction: 'dream', type: 'minion', rarity: 'epic', cost: 5, san: 3, atk: 5, hp: 5,
+    id: 'D14', name: '另一个我', faction: 'dream', type: 'minion', rarity: 'epic', cost: 5, san: 2, atk: 5, hp: 5,
     text: '战吼：复制对手手牌中的两张牌，将其置入你的手牌。',
     lore: { k: '讯', t: '[22:22:22] 这里是禾。……这里是禾。……请问，你们那边，也有一个禾吗？' },
-    art: ['room', 'faceless x.33 s.85 c#f0d8ff', 'faceless x.67 s.85 c#f0d8ff mirror1', 'line x.5'],
+    art: ['room', 'faceless x.39 s.85 c#6a4a7e', 'faceless x.61 s.85 c#6a4a7e mirror1', 'line x.5'],
     bc: (G, c) => {
       const h = en(G, c).hand.slice();
       H.shuffle(G, h);
@@ -2593,7 +2623,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     text: '',
     whisper: '（现在几点了？你也该睡了。）',
     lore: { k: '档', t: '警告：长时间处于理智低值状态的人员，会在手中看见「不存在的卡片」。请勿使用它们。若已使用，请勿告诉任何人。' },
-    art: ['room', { dark: 0.5 }, 'faceless x.5 s.9 c#cfc4d8 eyes1', 'clock x.78 y.24 s.45'],
+    art: ['room', { dark: 0.5 }, 'faceless x.5 s.9 c#3a3448 eyes1', 'clock x.78 y.24 s.45'],
   });
   card({
     id: 'N04', name: '堆积的纸箱', faction: 'neutral', type: 'minion', rarity: 'common', cost: 4, atk: 3, hp: 5, kw: ['taunt'],
@@ -2605,12 +2635,12 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     id: 'N05', name: '手电筒保安', faction: 'neutral', type: 'minion', rarity: 'common', cost: 5, atk: 4, hp: 5,
     text: '战吼：对一个敌方随从造成 2 点伤害。',
     lore: { k: '讯', t: '[01:15:00] 保安室有人。他让我们出示证件。我们出示了。他说：「照片上的人不是你们。」' },
-    art: ['mall', 'faceless x.35 s.9 c#9aa', 'beam x.38 y.45 a-12 long1'],
+    art: ['mall', 'faceless x.42 s.95 c#1e2a3a cap1 badge1', 'beam x.44 y.45 a-12 long1'],
     tgt: 'enemyMinion',
     bc: (G, c) => { if (T(G, c)) E.damage(G, c.self ? c.self.uid : heroOf(G, c.p), c.target, 2, 'effect'); },
   });
   card({
-    id: 'N06', name: '失物招领处', faction: 'neutral', type: 'minion', rarity: 'rare', cost: 3, atk: 2, hp: 3,
+    id: 'N06', name: '失物招领处', faction: 'neutral', type: 'minion', rarity: 'rare', cost: 3, atk: 3, hp: 3,
     text: '战吼：随机将一张收容站、后室层级或梦核卡牌置入你的手牌。',
     lore: { k: '档', t: '失物招领处的登记簿上有 4 条新记录：一串钥匙、一只哨子、一台对讲机、一本没写完的日记。认领人一栏都是空白。' },
     art: ['mall', 'counter x.5', 'keys x.3 y.52 s.5', 'whistle x.45 y.52 s.45', 'radio x.6 y.5 s.5', 'notebook x.75 y.53 s.35'],
@@ -2734,7 +2764,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     id: 'X06', boss: 'broadcast', name: '请尽快离开', faction: 'neutral', type: 'minion', rarity: 'rare', cost: 2, atk: 3, hp: 1, kw: ['charge'],
     text: '冲锋。',
     lore: { k: '讯', t: '[23:59:58] 这里是陆鸣，这里是陆鸣。我在广播室。我可以把所有人都叫出去，只要我一直广播下去就行。只要我一直——' },
-    art: ['mall', 'exit x.5 y.3 s.8 red1', 'faceless x.5 y.72 s.6 run1 c#ff5a6a'],
+    art: ['mall', 'exit x.5 y.3 s.8 red1', 'faceless x.5 y.72 s.6 run1 c#8a1a2a'],
   });
 
   // =====================================================================
@@ -2939,6 +2969,16 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     },
   };
 
+  L.HEROES.boss_trainer = {
+    id: 'boss_trainer', kind: 'boss', bossKey: 'trainer', layer: 0, startDepth: 0,
+    name: '训练模拟体', short: '模拟体', title: '外勤训练', code: 'LMN-T01', klass: '训练用',
+    persona: 'balanced', hp: 30,
+    intro: '收容站用来训练新人的模拟体。它不会真的伤害你。大概不会。',
+    portrait: { seed: 404, body: 'agent', pal: ['#cfd8dc', '#3a4448', '#f4f8f8'], prop: 'seal' },
+    power: { name: '待机', cost: 99, text: '训练模拟体不会使用技能。', canUse: () => false, fx: () => {} },
+    lines: { intro: ['训练开始。'], turn: ['……'], hurt: ['记录：受到伤害。'], low: ['记录：耐久不足。'], big: ['……'], defeat: ['训练结束。干得好。'], victory: ['再来一次。'], fourth: ['……'], night: ['……'] },
+    deck: Array(20).fill('N01'),
+  };
   L.AGENTS = ['agent_shen', 'agent_tang', 'agent_man'];
   L.BOSSES = ['boss_manager', 'boss_lifeguard', 'boss_broadcast'];
 
@@ -2947,27 +2987,21 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
       id: 'pre_site', preset: true, name: '静滞协议', faction: 'site',
       desc: '收容站预组：冻结、嘲讽与收容。先让一切停下来，再决定谁留下。',
       cards: rep([
-        ['S01', 2], ['S02', 2], ['S03', 2], ['S04', 1], ['S05', 2], ['S06', 2], ['S07', 1], ['S08', 1], ['S09', 1],
-        ['S10', 2], ['S11', 1], ['S12', 1], ['S13', 1], ['S14', 2], ['S15', 2], ['S16', 1], ['S17', 1], ['N04', 1],
-        ['N05', 2], ['N02', 2],
+        ['N02', 2], ['N03', 1], ['N04', 1], ['S01', 2], ['S02', 2], ['S03', 2], ['S04', 1], ['S05', 2], ['S06', 2], ['S07', 1], ['S08', 2], ['S09', 2], ['S10', 2], ['S11', 1], ['S13', 2], ['S14', 2], ['S16', 1], ['S17', 1], ['S18', 1],
       ]),
     },
     {
       id: 'pre_level', preset: true, name: '无尽走廊', faction: 'level',
       desc: '后室层级预组：场地、潜行与剧毒。在黑暗里等待，然后从墙里出来。',
       cards: rep([
-        ['B01', 2], ['B02', 2], ['B03', 2], ['B04', 1], ['B05', 2], ['B06', 1], ['B07', 2], ['B08', 1], ['B09', 1],
-        ['B10', 1], ['B11', 1], ['B12', 1], ['B13', 2], ['B14', 1], ['B15', 2], ['B16', 1], ['B18', 1], ['N01', 2],
-        ['N07', 1], ['N09', 1], ['N02', 1], ['B17', 1],
+        ['B01', 2], ['B02', 1], ['B03', 2], ['B04', 1], ['B06', 1], ['B07', 2], ['B08', 1], ['B09', 1], ['B10', 1], ['B11', 1], ['B13', 1], ['B14', 2], ['B15', 2], ['B16', 1], ['B17', 1], ['B18', 1], ['N04', 2], ['N02', 2], ['N05', 2], ['N07', 1], ['N09', 2],
       ]),
     },
     {
       id: 'pre_dream', preset: true, name: '午后回响', faction: 'dream',
       desc: '梦核预组：复制、偷取与回响。把对手的牌变成你的回忆。',
       cards: rep([
-        ['D01', 2], ['D02', 2], ['D03', 2], ['D04', 2], ['D05', 2], ['D06', 2], ['D07', 2], ['D08', 1], ['D09', 1],
-        ['D10', 2], ['D11', 2], ['D12', 1], ['D13', 1], ['D14', 1], ['D15', 1], ['D16', 1], ['D17', 1], ['D18', 1],
-        ['N08', 1], ['N06', 1], ['N03', 1],
+        ['D01', 2], ['D04', 2], ['D05', 2], ['D06', 2], ['D07', 1], ['D08', 2], ['D10', 1], ['D11', 2], ['D12', 2], ['D13', 1], ['D14', 1], ['D17', 1], ['N02', 1], ['N04', 2], ['N05', 1], ['N06', 2], ['N07', 2], ['N08', 1], ['N09', 2],
       ]),
     },
   ];
@@ -3360,7 +3394,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
   const S = (L.Store = { get, set, isPersistent: () => persistent });
 
   S.settings = Object.assign(
-    { mute: false, vol: 0.8, crt: true, barrel: false, speed: 1, calm: false, vibrate: true, fast: false },
+    { mute: false, vol: 0.8, crt: true, barrel: false, speed: 1, calm: false, vibrate: true, fast: false, hints: true },
     get('settings', {})
   );
   S.saveSettings = () => set('settings', S.settings);
@@ -4088,6 +4122,53 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
   }
 
   // ---------------------------------------------------------------- motifs
+  // ---------------------------------------------------------------- light & volume
+  function mix(a, b, t) {
+    const pa = parseInt(a.slice(1, 7), 16), pb = parseInt(b.slice(1, 7), 16);
+    const ch = (v, sh) => (v >> sh) & 255;
+    const m = (sh) => Math.round(ch(pa, sh) * (1 - t) + ch(pb, sh) * t);
+    return '#' + [m(16), m(8), m(0)].map((v) => v.toString(16).padStart(2, '0')).join('');
+  }
+  const LIGHTS = {
+    hall: (c) => ({ x: c.room ? c.room.vx : 100, y: 4, col: '#fff4c8', rays: 1 }),
+    office: (c) => ({ x: c.room ? c.room.vx : 100, y: 4, col: '#fffbe8', rays: 1 }),
+    lab: (c) => ({ x: c.room ? c.room.vx : 100, y: 2, col: '#e9fbff', rays: 1 }),
+    pool: () => ({ x: 110, y: -8, col: '#e8ffff', rays: 1 }),
+    mall: () => ({ x: 56, y: 28, col: '#ff4d78' }),
+    sky: () => ({ x: 158, y: 18, col: '#fff1d0', rays: 1 }),
+    room: () => ({ x: 152, y: 30, col: '#ffe6f6' }),
+    kinder: () => ({ x: 134, y: 44, col: '#fff1c8', rays: 1 }),
+    void: () => ({ x: 100, y: 58, col: '#c8b8ff' }),
+    park: () => ({ x: 100, y: 96, col: '#fff8d0' }),
+    stair: () => ({ x: 100, y: 0, col: '#ffffff', rays: 1 }),
+    cell: () => ({ x: 100, y: -4, col: '#cfeee8', rays: 1 }),
+  };
+  // lit silhouette: rim light toward the key light, shaded body, masked highlight, contact shadow
+  function vol(ctx, tf, body, det, c, o) {
+    const n = (ctx.n = (ctx.n || 0) + 1);
+    const lt = ctx.light || { x: 100, y: 0, col: '#fff6d8' };
+    const dx = lt.x - o.ax, dy = lt.y - o.ay;
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len, uy = dy / len;
+    let base = c.slice(0, 7);
+    // pale subjects in bright rooms become lit silhouettes, so they read against the wall
+    const lumi = (h) => { const v = parseInt(h.slice(1, 7), 16); return (((v >> 16) & 255) * 0.3 + ((v >> 8) & 255) * 0.59 + (v & 255) * 0.11) / 255; };
+    if (base.length === 4) base = '#' + base.slice(1).split('').map((ch) => ch + ch).join('');
+    if (ctx.bright && !o.nosep && lumi(base) > 0.55) base = mix(base, '#1a2328', 0.68);
+    const hi = mix(base, lt.col, 0.55), lo = shade(base, -0.55);
+    let g = `<defs><g id="f${n}">${body}</g><linearGradient id="vg${n}" x1="${f1(0.5 + ux * 0.5)}" y1="${f1(0.5 + uy * 0.5)}" x2="${f1(0.5 - ux * 0.5)}" y2="${f1(0.5 - uy * 0.5)}"><stop offset="0" stop-color="${hi}"/><stop offset=".45" stop-color="${base}"/><stop offset="1" stop-color="${lo}"/></linearGradient><mask id="mk${n}"><use href="#f${n}" fill="#fff" stroke="#fff"/></mask></defs>`;
+    g += `<g transform="${tf}" ${o.clip ? `clip-path="url(#${o.clip})"` : ''}>`;
+    // atmospheric separation behind the subject
+    if (!o.nosep) g += `<ellipse cx="0" cy="${f1(-(o.sw || 16) * 1.7)}" rx="${f1((o.sw || 16) * 2.2)}" ry="${f1((o.sw || 16) * 2.8)}" fill="${lt.col}" opacity=".28" filter="url(#blr)"/>`;
+    if (o.ground) g += `<ellipse cx="${f1(-ux * (o.sw || 16) * 0.6)}" cy="0" rx="${f1((o.sw || 16) * 1.3)}" ry="${f1((o.sw || 16) * 0.22)}" fill="#000" opacity=".38" filter="url(#blr2)"/>`;
+    g += `<use href="#f${n}" fill="${lt.col}" stroke="${lt.col}" filter="url(#rim)" transform="translate(${f1(ux * 2)} ${f1(uy * 2)})"/>`;
+    g += `<use href="#f${n}" fill="url(#vg${n})" stroke="${base}"/>`;
+    const hl = o.hl || { cx: 0, cy: -20, rx: 26, ry: 34 };
+    g += `<g mask="url(#mk${n})"><ellipse cx="${f1(hl.cx + ux * hl.rx * 0.5)}" cy="${f1(hl.cy + uy * hl.ry * 0.5)}" rx="${hl.rx}" ry="${hl.ry}" fill="url(#hl)" opacity=".55"/></g>`;
+    g += det + `</g>`;
+    return g;
+  }
+
   const M = {
     tubes(r, o, ctx) {
       ctx.hasTubes = true;
@@ -4140,48 +4221,75 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
       const x = X(o.x || 0.5);
       return `<path d="M${x - 14} ${H} Q${x - 18} ${H - 14} ${x - 10} ${H - 20}" stroke="#3a3018" stroke-width="1.6" fill="none"/><path d="M${x + 14} ${H} Q${x + 20} ${H - 12} ${x + 10} ${H - 20}" stroke="#3a3018" stroke-width="1.6" fill="none"/>`;
     },
-    faceless(r, o) {
-      const x = X(o.x || 0.5),
-        s = (o.s || 1) * 1.0;
+    // a person with no face: anatomical bust and coat, two-tone (cloth / skin), lit and rimmed
+    faceless(r, o, ctx) {
+      const x = X(o.x || 0.5), s = o.s || 1;
       const base = Y(o.y != null ? o.y + 0.3 : 1.0);
-      const c = o.c || '#2b2618';
-      const hh = 46 * s;
-      let g = '';
+      const hh = 46 * s, k = hh / 100;
+      const cloth = o.c || '#2b2618';
+      const skin = o.skin || '#dccbb6';
       let tf = `translate(${f1(x)} ${f1(base)})`;
       if (o.fall) tf += ' rotate(35)';
       if (o.run) tf += ' skewX(-14)';
-      g += `<g transform="${tf}">`;
-      if (o.half) g += `<clipPath id="hc${Math.floor(x)}"><rect x="-60" y="${f1(-hh * 1.6)}" width="${f1(60 + r.range(0, 8))}" height="${f1(hh * 2)}"/></clipPath><g clip-path="url(#hc${Math.floor(x)})">`;
-      // shoulders/torso
-      g += `<path d="M${f1(-18 * s)} 0 Q${f1(-18 * s)} ${f1(-hh * 0.62)} ${f1(-9 * s)} ${f1(-hh * 0.7)} L${f1(9 * s)} ${f1(-hh * 0.7)} Q${f1(18 * s)} ${f1(-hh * 0.62)} ${f1(18 * s)} 0 Z" fill="${c}"/>`;
-      if (o.arms) g += `<path d="M${f1(-10 * s)} ${f1(-hh * 0.6)} L${f1(26 * s)} ${f1(-hh * 0.66)} M${f1(8 * s)} ${f1(-hh * 0.6)} L${f1(34 * s)} ${f1(-hh * 0.62)}" stroke="${c}" stroke-width="${f1(5 * s)}" stroke-linecap="round"/>`;
-      // neck + head
-      const hy = o.up ? -hh * 0.98 : -hh * 0.92;
-      g += `<rect x="${f1(-3.5 * s)}" y="${f1(-hh * 0.8)}" width="${f1(7 * s)}" height="${f1(8 * s)}" fill="${c}"/>`;
-      g += `<ellipse cx="0" cy="${f1(hy)}" rx="${f1(9.5 * s)}" ry="${f1(12 * s)}" fill="${c}" ${o.up ? 'transform="rotate(-18)"' : ''}/>`;
-      if (!o.back) {
-        // a face that is not there
-        g += `<ellipse cx="0" cy="${f1(hy + 1.5 * s)}" rx="${f1(6.5 * s)}" ry="${f1(8.5 * s)}" fill="#fff" opacity=".18"/>`;
-        if (o.eyes) g += `<circle cx="${f1(-3 * s)}" cy="${f1(hy)}" r="${f1(2.6 * s)}" fill="#fff"/><circle cx="${f1(3 * s)}" cy="${f1(hy)}" r="${f1(2.6 * s)}" fill="#fff"/><circle cx="${f1(-3 * s)}" cy="${f1(hy)}" r="${f1(0.9 * s)}" fill="#000"/><circle cx="${f1(3 * s)}" cy="${f1(hy)}" r="${f1(0.9 * s)}" fill="#000"/>`;
+      tf += ` scale(${f1(k * 100) / 100})`;
+      const v = r.int(3);
+      // coat with shoulders, flared hem, legs
+      const hem = o.half ? -2 : -14 - v * 3;
+      let coat = `<path d="M-4 -70 C-11 -69 -17 -67 -19 -61 C-21 -54 -21 -40 -20 -26 L-21 ${hem} L-7 ${hem + 2} L-6 0 L-1.5 0 L-1 ${hem + 2} L1 ${hem + 2} L1.5 0 L6 0 L7 ${hem + 2} L21 ${hem} L20 -26 C21 -40 21 -54 19 -61 C17 -67 11 -69 4 -70 Z"/>`;
+      if (o.arms) coat += `<path d="M14 -64 C24 -64 36 -63 46 -62 L46 -56 C36 -57 24 -57 15 -55 Z"/><path d="M12 -58 C22 -57 34 -55 42 -54 L42 -48 C33 -49 22 -50 12 -51 Z"/>`;
+      else coat += `<path d="M-18 -62 C-23 -50 -24 -38 -22.5 -28 L-18.5 -27 C-19 -38 -17.5 -50 -14 -59 Z"/><path d="M18 -62 C23 -50 24 -38 22.5 -28 L18.5 -27 C19 -38 17.5 -50 14 -59 Z"/>`;
+      if (o.hood) coat += `<path d="M-12 -72 C-15 -88 -11 -102 0 -103 C11 -102 15 -88 12 -72 C8 -76 -8 -76 -12 -72 Z"/>`;
+      if (o.cap) coat += `<path d="M-9.5 -92 C-9 -101 9 -101 9.5 -92 L12 -90 L-12 -90 Z"/>`;
+      // lapels, seams, buttons, belt
+      const lc = shade(cloth.slice(0, 7).length === 7 ? cloth.slice(0, 7) : '#333333', 0.35);
+      let cd = `<path d="M-6 -69 L0 -54 L6 -69" fill="none" stroke="${lc}" stroke-width="1.4" opacity=".8"/><path d="M0 -54 L0 ${hem + 2}" stroke="#000" stroke-width=".8" opacity=".35"/>`;
+      for (let i = 0; i < 3; i++) cd += `<circle cx="1.8" cy="${-48 + i * 9}" r=".9" fill="${lc}" opacity=".8"/>`;
+      cd += `<path d="M-19 -36 Q0 -33 19 -36" fill="none" stroke="#000" stroke-width="1" opacity=".25"/>`;
+      if (o.tie) cd += `<path d="M0 -66 L-2 -62 L0 -50 L2 -62 Z" fill="#7a1f24"/>`;
+      if (o.badge) cd += `<rect x="6" y="-50" width="7" height="9" rx="1" fill="#f4f1e6"/><rect x="7.2" y="-48.6" width="4.6" height="4" fill="#cfcfcf"/><path d="M9.5 -50 L6 -66" stroke="#2a5aa0" stroke-width=".8"/>`;
+      if (o.cap) cd += `<rect x="-3" y="-99" width="6" height="3" rx=".8" fill="#e8c25a"/>`;
+      // skin: skull with jaw, neck, hands
+      const hy = o.up ? -3 : 0;
+      let sk = `<g ${o.up ? 'transform="rotate(-14 0 -78)"' : ''}><path d="M0 ${-100 + hy} C7.5 ${-100 + hy} 9.5 ${-93 + hy} 9.2 ${-87 + hy} C9 ${-81 + hy} 6.5 ${-76 + hy} 0 ${-74 + hy} C-6.5 ${-76 + hy} -9 ${-81 + hy} -9.2 ${-87 + hy} C-9.5 ${-93 + hy} -7.5 ${-100 + hy} 0 ${-100 + hy} Z"/></g>`;
+      sk += `<path d="M-3.8 -76 L-4.4 -69 L4.4 -69 L3.8 -76 Z"/>`;
+      if (!o.arms) sk += `<ellipse cx="-21" cy="-25.5" rx="2.6" ry="3.6"/><ellipse cx="21" cy="-25.5" rx="2.6" ry="3.6"/>`;
+      else sk += `<ellipse cx="47.5" cy="-59" rx="3" ry="2.6"/><ellipse cx="43.5" cy="-51" rx="3" ry="2.6"/>`;
+      // the face that is not there
+      let fd = '';
+      if (o.back) fd += `<path d="M-9.4 -86 C-10 -101 10 -101 9.4 -86 C7 -80 -7 -80 -9.4 -86 Z" fill="#1c1612"/>`;
+      else {
+        fd += `<g ${o.up ? 'transform="rotate(-14 0 -78)"' : ''}>`;
+        fd += `<ellipse cx="-3.6" cy="${-87 + hy}" rx="2.7" ry="1.8" fill="#000" opacity=".28" filter="url(#rim)"/><ellipse cx="3.6" cy="${-87 + hy}" rx="2.7" ry="1.8" fill="#000" opacity=".28" filter="url(#rim)"/>`;
+        fd += `<ellipse cx="-1" cy="${-94 + hy}" rx="5" ry="2.4" fill="#fff" opacity=".22"/><path d="M0 ${-86 + hy} L0.4 ${-81 + hy}" stroke="#000" stroke-width=".6" opacity=".18"/>`;
+        if (o.eyes) fd += `<circle cx="-3.6" cy="${-87 + hy}" r="2.2" fill="#fff"/><circle cx="3.6" cy="${-87 + hy}" r="2.2" fill="#fff"/><circle cx="-3.6" cy="${-87 + hy}" r=".8" fill="#000"/><circle cx="3.6" cy="${-87 + hy}" r=".8" fill="#000"/><path d="M-6 ${-84 + hy} Q-3.6 ${-83 + hy} -1.5 ${-84 + hy} M1.5 ${-84 + hy} Q3.6 ${-83 + hy} 6 ${-84 + hy}" stroke="#5a3a3a" stroke-width=".7" fill="none"/>`;
+        if (!o.hood && !o.cap) fd += `<path d="M-9.3 -88 C-10 -102 10 -102 9.3 -88 C7.5 -95 -7.5 -95 -9.3 -88 Z" fill="${v === 1 ? '#3a2a1c' : '#1e1814'}"/>`;
+        fd += `</g>`;
       }
-      if (o.badge) g += `<rect x="${f1(4 * s)}" y="${f1(-hh * 0.5)}" width="${f1(8 * s)}" height="${f1(10 * s)}" fill="#f4f1e6"/><rect x="${f1(5.5 * s)}" y="${f1(-hh * 0.48)}" width="${f1(5 * s)}" height="${f1(5 * s)}" fill="#ddd"/>`;
-      if (o.half) g += `</g>`;
+      (ctx.figs = ctx.figs || []).push({ x, y: base - hh * (o.fall ? 0.4 : 0.72), h: hh * (o.half || o.fall ? 1.3 : 0.98) });
+      const opt = { ax: x, ay: base - hh * 0.5, sw: 19, hl: { cx: 0, cy: -62, rx: 22, ry: 30 } };
+      let clip = '';
+      if (o.half) clip = `<clipPath id="hc${Math.floor(x)}"><rect x="-60" y="-140" width="${f1(60 + r.range(0, 8))}" height="160"/></clipPath>`;
+      let g = clip + `<g ${o.half ? `clip-path="url(#hc${Math.floor(x)})"` : ''}>`;
+      g += vol(ctx, tf, coat, cd, cloth, Object.assign({ ground: !o.fall && !o.half }, opt));
+      g += vol(ctx, tf, sk, fd, skin, Object.assign({ ground: false, nosep: true }, opt, { hl: { cx: -2, cy: -92, rx: 8, ry: 9 } }));
       g += `</g>`;
       if (o.mirror) g = `<g transform="translate(${f1(2 * x)} 0) scale(-1 1)">${g}</g>`;
       return g;
     },
-    longfig(r, o) {
-      const x = X(o.x || 0.5),
-        s = o.s || 1;
+    longfig(r, o, ctx) {
+      const x = X(o.x || 0.5), s = o.s || 1;
       const base = Y(o.y != null ? o.y + 0.3 : 1.0);
       const c = o.c || '#1a1712';
-      const hh = 120 * s;
-      let g = `<g transform="translate(${f1(x)} ${f1(base)})" ${o.phase ? 'opacity=".85"' : ''}>`;
-      g += `<path d="M${f1(-3 * s)} 0 L${f1(-5 * s)} ${f1(-hh * 0.45)} L${f1(-8 * s)} ${f1(-hh * 0.8)} L${f1(8 * s)} ${f1(-hh * 0.8)} L${f1(5 * s)} ${f1(-hh * 0.45)} L${f1(3 * s)} 0 Z" fill="${c}"/>`;
-      g += `<path d="M${f1(-8 * s)} ${f1(-hh * 0.78)} Q${f1(-22 * s)} ${f1(-hh * 0.5)} ${f1(-16 * s)} ${f1(-hh * 0.12)} M${f1(8 * s)} ${f1(-hh * 0.78)} Q${f1(22 * s)} ${f1(-hh * 0.5)} ${f1(17 * s)} ${f1(-hh * 0.1)}" stroke="${c}" stroke-width="${f1(2.6 * s)}" fill="none" stroke-linecap="round"/>`;
-      g += `<ellipse cx="0" cy="${f1(-hh * 0.88)}" rx="${f1(6 * s)}" ry="${f1(9 * s)}" fill="${c}"/>`;
-      g += `</g>`;
-      return g;
+      const hh = 120 * s, k = hh / 100;
+      const tf = `translate(${f1(x)} ${f1(base)}) scale(${f1(k * 100) / 100})`;
+      // hunched, too tall, arms past the knees with long fingers
+      let body = `<path d="M-2.5 0 C-3 -18 -4.5 -34 -4 -46 C-6 -58 -7 -70 -6 -78 C-5 -82 -3 -83 0 -83 C3 -83 5 -82 6 -78 C7 -70 6 -58 4 -46 C4.5 -34 3 -18 2.5 0 L1 0 L0.4 -40 L-0.4 -40 L-1 0 Z"/>`;
+      body += `<path d="M-5.5 -78 C-10 -66 -11 -44 -9.5 -22 L-8 -22 C-8.5 -44 -7.5 -64 -4 -76 Z"/><path d="M5.5 -78 C10 -66 11 -44 9.5 -22 L8 -22 C8.5 -44 7.5 -64 4 -76 Z"/>`;
+      body += `<path d="M-9.5 -22 L-11 -14 M-9 -22 L-9.6 -13 M-8.5 -22 L-8 -14 M9.5 -22 L11 -14 M9 -22 L9.6 -13 M8.5 -22 L8 -14" stroke-width=".9" fill="none" stroke-linecap="round"/>`;
+      body += `<path d="M0 -94 C4.2 -94 5 -90 4.8 -86.5 C4.6 -83.5 2.6 -82 0 -82 C-2.6 -82 -4.6 -83.5 -4.8 -86.5 C-5 -90 -4.2 -94 0 -94 Z" transform="rotate(8 0 -88)"/>`;
+      const det = `<circle cx="-1.8" cy="-88.4" r=".75" fill="#fff6c8"/><circle cx="1.8" cy="-88" r=".75" fill="#fff6c8"/><circle cx="-1.8" cy="-88.4" r="2.2" fill="#fff6c8" opacity=".25" filter="url(#rim)"/><circle cx="1.8" cy="-88" r="2.2" fill="#fff6c8" opacity=".25" filter="url(#rim)"/>`;
+      (ctx.figs = ctx.figs || []).push({ x, y: base - hh * 0.6, h: hh * 0.95 });
+      return `<g ${o.phase ? 'opacity=".85"' : ''}>` + vol(ctx, tf, body, det, c, { ax: x, ay: base - hh * 0.5, ground: true, sw: 8, hl: { cx: 0, cy: -70, rx: 9, ry: 24 } }) + `</g>`;
     },
     ring(r, o) {
       const x = X(o.x || 0.5),
@@ -4595,13 +4703,25 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
       }
       return s;
     },
-    child(r, o) {
-      const x = X(o.x || 0.5),
-        s = (o.s || 1) * 0.9;
+    child(r, o, ctx) {
+      const x = X(o.x || 0.5), s = (o.s || 1) * 0.9;
       const base = Y(o.y != null ? o.y + 0.25 : 0.95);
-      const c = o.faded ? '#e8d8f0' : '#3a2a40';
-      if (o.sleep) return `<g transform="translate(${f1(x)} ${f1(base)}) scale(${f1(s)})"><ellipse cx="0" cy="-6" rx="28" ry="9" fill="${c}"/><circle cx="-26" cy="-12" r="9" fill="${c}"/><circle cx="-26" cy="-12" r="6" fill="#fff" opacity=".15"/></g>`;
-      return `<g transform="translate(${f1(x)} ${f1(base)}) scale(${f1(s)})" ${o.faded ? 'opacity=".75"' : ''}><path d="M-11 0 L-8 -26 L8 -26 L11 0 Z" fill="${c}"/><circle cx="0" cy="-34" r="11" fill="${c}"/><circle cx="-12" cy="-40" r="4" fill="${c}"/><circle cx="12" cy="-40" r="4" fill="${c}"/><ellipse cx="0" cy="-33" rx="7" ry="8" fill="#fff" opacity=".18"/></g>`;
+      const cloth = o.faded ? '#e8d8f0' : o.c || '#5a3a6a';
+      const skin = o.faded ? '#f4ecf6' : '#e8d4c2';
+      const tf = `translate(${f1(x)} ${f1(base)}) scale(${f1(s)})`;
+      (ctx.figs = ctx.figs || []).push({ x, y: base - (o.sleep ? 10 : 28) * s, h: (o.sleep ? 44 : 66) * s });
+      if (o.sleep) {
+        const cl = `<path d="M-22 -2 C-24 -12 -10 -16 6 -14 C20 -13 30 -10 30 -3 C30 2 -20 3 -22 -2 Z"/>`;
+        const sk = `<circle cx="-26" cy="-10" r="8.5"/><ellipse cx="-14" cy="-4" rx="3" ry="2.2"/>`;
+        const fd = `<path d="M-34 -12 C-34 -22 -18 -22 -18 -12 C-21 -17 -31 -17 -34 -12 Z" fill="#2a1c14"/><path d="M-29 -9 Q-27 -8 -25 -9" stroke="#5a3a2a" stroke-width=".7" fill="none"/>`;
+        return vol(ctx, tf, cl, '', cloth, { ax: x, ay: base - 8, ground: true, sw: 30, hl: { cx: 0, cy: -12, rx: 20, ry: 10 } }) + vol(ctx, tf, sk, fd, skin, { ax: x, ay: base - 8, ground: false, nosep: true, sw: 30, hl: { cx: -27, cy: -13, rx: 6, ry: 6 } });
+      }
+      const cl = `<path d="M-4 -27 C-8 -26 -10 -24 -11 -20 L-14 -6 L14 -6 L11 -20 C10 -24 8 -26 4 -27 Z"/><path d="M-5 -6 L-4.5 0 L-1.5 0 L-1.5 -6 Z M1.5 -6 L1.5 0 L4.5 0 L5 -6 Z"/>`;
+      const sk = `<circle cx="0" cy="-37" r="10.5"/><ellipse cx="-12" cy="-16" rx="2" ry="2.6"/><ellipse cx="12" cy="-16" rx="2" ry="2.6"/>`;
+      let fd = `<path d="M-10.8 -38 C-11.5 -51 11.5 -51 10.8 -38 C8 -44 -8 -44 -10.8 -38 Z" fill="#2a1c14"/><circle cx="-12.5" cy="-41" r="3.8" fill="#2a1c14"/><circle cx="12.5" cy="-41" r="3.8" fill="#2a1c14"/>`;
+      fd += `<ellipse cx="-3.8" cy="-35" rx="2.4" ry="1.6" fill="#000" opacity=".22" filter="url(#rim)"/><ellipse cx="3.8" cy="-35" rx="2.4" ry="1.6" fill="#000" opacity=".22" filter="url(#rim)"/>`;
+      fd += `<path d="M-8 -26 L0 -20 L8 -26" fill="none" stroke="#fff" stroke-width="1.2" opacity=".55"/>`;
+      return `<g ${o.faded ? 'opacity=".8"' : ''}>` + vol(ctx, tf, cl, '', cloth, { ax: x, ay: base - 20 * s, ground: true, sw: 14, hl: { cx: 0, cy: -18, rx: 10, ry: 12 } }) + vol(ctx, tf, sk, fd, skin, { ax: x, ay: base - 20 * s, ground: false, nosep: true, sw: 14, hl: { cx: -2, cy: -41, rx: 7, ry: 7 } }) + `</g>`;
     },
     halo(r, o) {
       const x = X(o.x || 0.5),
@@ -4794,6 +4914,10 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--cyan);
     return `<defs>
 <filter id="glw" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 <filter id="blr" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+<filter id="blr2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2"/></filter>
+<filter id="rim" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.1"/></filter>
+<filter id="ray" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3.5"/></filter>
+<radialGradient id="hl"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
 <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="${seed % 97}" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 1.4 -.55"/></filter>
 ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".018 .03" numOctaves="2" seed="${seed % 53}"/><feDisplacementMap in="SourceGraphic" scale="${f1(warp * 26)}" xChannelSelector="R" yChannelSelector="G"/></filter>` : ''}
 <radialGradient id="vig" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
@@ -4805,7 +4929,10 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
 </defs>`;
   }
 
-  function build(spec, seed) {
+  // environment motifs stay in place; subjects are brought forward for portrait (oval) windows
+  const ENV = new Set(['tubes', 'snow', 'grid', 'stars', 'bubbles', 'paper', 'pixtear', 'drips', 'moths', 'notes', 'chains', 'wetfloor', 'cubicles', 'cars', 'mats', 'tape', 'textlines', 'waves', 'monitors', 'clouds', 'sunbeam', 'wall', 'crack', 'hopscotch', 'legs', 'line', 'eyes']);
+  function build(spec, seed, opts) {
+    const zoom = (opts && opts.zoom) || 1;
     const r = U.seeded(seed);
     const ctx = {};
     const scene = spec[0];
@@ -4813,23 +4940,64 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     for (const item of spec.slice(1)) if (typeof item === 'object' && item.warp) warp = item.warp;
     // scene first (records room geometry for motifs), then items in order; overlays apply where they are listed
     const bg = (SCENES[scene] || SCENES.void)(r, ctx);
+    ctx.light = (LIGHTS[scene] || LIGHTS.void)(ctx);
+    ctx.bright = ['hall', 'lab', 'office', 'sky', 'room', 'kinder', 'pool', 'stair'].includes(scene);
+    for (const item of spec.slice(1)) if (typeof item === 'object' && item.light) Object.assign(ctx.light, item.light);
+    let dark = 0;
+    for (const item of spec.slice(1)) if (typeof item === 'object' && item.dark) dark = Math.max(dark, item.dark);
     let fg = '';
     let post = '';
     for (const item of spec.slice(1)) {
       if (typeof item === 'string') {
         const mo = parse(item);
         const fn = M[mo.m];
-        if (fn) fg += fn(r, mo.o, ctx);
+        if (!fn) continue;
+        fg += fn(r, mo.o, ctx);
+        if (!ENV.has(mo.m) && !ctx.focus) ctx.focus = { x: X(mo.o.x || 0.5), y: Y(mo.o.y || 0.52), h: Math.max(70, Math.min(140, 96 * (mo.o.s || 1))) };
       } else {
         if (item.tint) fg += `<rect width="${W}" height="${H}" fill="${item.tint}" opacity=".28" style="mix-blend-mode:multiply"/>`;
         if (item.dark) fg += `<rect width="${W}" height="${H}" fill="#050405" opacity="${item.dark}"/>`;
         if (item.bright) post += `<rect width="${W}" height="${H}" fill="#fff" opacity="${item.bright * 0.4}"/>`;
       }
     }
-    let body = `<g ${warp ? 'filter="url(#warp)"' : ''}>${bg}${fg}</g>${post}`;
+    // key light, god rays, floor haze
+    const lt = ctx.light;
+    const k = 1 - dark * 0.75;
+    let light = `<defs><radialGradient id="kl" cx="${f1(lt.x / W)}" cy="${f1(lt.y / H)}" r=".75"><stop offset="0" stop-color="${lt.col}" stop-opacity=".75"/><stop offset=".45" stop-color="${lt.col}" stop-opacity=".18"/><stop offset="1" stop-color="${lt.col}" stop-opacity="0"/></radialGradient><linearGradient id="fogg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${lt.col}" stop-opacity="0"/><stop offset="1" stop-color="${lt.col}" stop-opacity=".16"/></linearGradient></defs>`;
+    light += `<rect width="${W}" height="${H}" fill="url(#kl)" opacity="${f1(0.42 * k)}" style="mix-blend-mode:screen"/>`;
+    if (lt.rays && k > 0.4) {
+      for (let i = 0; i < 4; i++) {
+        const sp = r.range(-70, 70), w = r.range(5, 14);
+        light += `<polygon points="${f1(lt.x - 2)},${f1(lt.y)} ${f1(lt.x + 2)},${f1(lt.y)} ${f1(lt.x + sp + w)},${H} ${f1(lt.x + sp - w)},${H}" fill="${lt.col}" opacity="${f1(r.range(0.05, 0.11) * k)}" filter="url(#ray)"/>`;
+      }
+    }
+    light += `<rect y="${f1(H * 0.62)}" width="${W}" height="${f1(H * 0.38)}" fill="url(#fogg)" opacity="${f1(k * 0.7)}"/>`;
+    // lower the key of bright rooms so the subject carries the picture
+    const lowkey = ctx.bright ? `<rect width="${W}" height="${H}" fill="#120e08" opacity=".22"/>` : '';
+    let body = `<g ${warp ? 'filter="url(#warp)"' : ''}>${bg}${lowkey}${fg}${light}</g>${post}`;
     body += `<rect width="${W}" height="${H}" fill="url(#vig)"/>`;
     body += `<rect width="${W}" height="${H}" filter="url(#grain)" opacity=".2"/>`;
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W * 2}" height="${H * 2}" preserveAspectRatio="xMidYMid slice">${defs(warp, seed)}${body}</svg>`;
+    // framing: minions get a half-length portrait crop on their subject, spells a closer landscape crop
+    let vb = [0, 0, W, H];
+    const type = (opts && opts.type) || 'field';
+    if (type !== 'field') {
+      const figs = ctx.figs || [];
+      let f;
+      if (figs.length) {
+        const xs = figs.map((q) => q.x);
+        f = { x: (Math.min(...xs) + Math.max(...xs)) / 2, y: figs.reduce((a, q) => a + q.y, 0) / figs.length, h: Math.max(...figs.map((q) => q.h)), span: Math.max(...xs) - Math.min(...xs) };
+      } else f = ctx.focus || { x: 100, y: 70, h: 110 };
+      const aspect = type === 'minion' ? 0.91 : 1.27;
+      let ch = Math.max(type === 'minion' ? 60 : 78, Math.min(H, f.h * (type === 'minion' ? 1.12 : 1.25)));
+      let cw = ch * aspect;
+      if (f.span && f.span + 34 > cw) { cw = Math.min(W, f.span + 34); ch = Math.min(H, cw / aspect); }
+      if (cw > W) { cw = W; ch = W / aspect; }
+      let x0 = Math.max(0, Math.min(W - cw, f.x - cw / 2));
+      let y0 = Math.max(0, Math.min(H - ch, f.y - ch * 0.48));
+      vb = [x0, y0, cw, ch].map(f1);
+    }
+    const pw = Math.round(vb[2] * 3), ph = Math.round(vb[3] * 3);
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb.join(' ')}" width="${pw}" height="${ph}" preserveAspectRatio="xMidYMid slice">${defs(warp, seed)}${body}</svg>`;
   }
 
   // ---------------------------------------------------------------- portraits (square)
@@ -4898,7 +5066,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
   }
   Art.card = function (cid) {
     const d = L.CARDS[cid];
-    return key('c:' + cid, () => build(d.art || ['void'], U.hash(cid))).url;
+    return key('c:' + cid, () => build(d.art || ['void'], U.hash(cid), { type: d.type })).url;
   };
   Art.portrait = function (heroId) {
     return key('p:' + heroId, () => portrait(L.HEROES[heroId])).url;
@@ -4907,50 +5075,255 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     return key('back', back).url;
   };
   Art.svgOf = function (cid) {
-    return build(L.CARDS[cid].art || ['void'], U.hash(cid));
+    return build(L.CARDS[cid].art || ['void'], U.hash(cid), { type: L.CARDS[cid].type });
   };
-  // swap heavy SVG (with noise filters) for bitmaps once, in idle time
-  Art.rasterizeAll = function (onEach) {
-    if (typeof document === 'undefined') return;
-    const ids = Object.keys(L.CARDS).map((c) => 'c:' + c).concat(L.AGENTS.concat(L.BOSSES).map((h) => 'p:' + h), ['back']);
-    let i = 0;
-    const step = () => {
-      const t0 = performance.now();
-      while (i < ids.length && performance.now() - t0 < 12) {
-        const k = ids[i++];
-        if (k === 'back') Art.back();
-        else if (k[0] === 'c') Art.card(k.slice(2));
-        else Art.portrait(k.slice(2));
-        const entry = cache[k];
-        if (!entry || entry.raster) continue;
-        entry.raster = 'pending';
-        const img = new Image();
-        img.onload = () => {
-          try {
-            const isP = k[0] === 'p' || k === 'back';
-            const cw = k === 'back' ? 200 : isP ? 240 : 400,
-              ch = k === 'back' ? 280 : isP ? 240 : 280;
-            const cv = document.createElement('canvas');
-            cv.width = cw;
-            cv.height = ch;
-            cv.getContext('2d').drawImage(img, 0, 0, cw, ch);
-            cv.toBlob((b) => {
-              if (!b) return;
-              entry.url = URL.createObjectURL(b);
-              entry.raster = 'done';
-              if (onEach) onEach(k, entry.url);
-            }, 'image/png');
-          } catch (e) {
-            entry.raster = 'failed';
-          }
-        };
-        img.onerror = () => (entry.raster = 'failed');
-        img.src = toURI(entry.svg);
+  // ---------------------------------------------------------------- painterly renderer
+  // Coarse-to-fine brush strokes over the composed image (after Hertzmann): each pass only
+  // repaints where the canvas still differs from the composition, strokes follow the edges.
+  const ART_VER = 'v9';
+  Art.painted = 0;
+  function* painter(img, W2, H2, seed) {
+    const src = document.createElement('canvas');
+    src.width = W2;
+    src.height = H2;
+    const sx = src.getContext('2d', { willReadFrequently: true });
+    sx.drawImage(img, 0, 0, W2, H2);
+    const sd = sx.getImageData(0, 0, W2, H2).data;
+    const out = document.createElement('canvas');
+    out.width = W2;
+    out.height = H2;
+    const o = out.getContext('2d', { willReadFrequently: true });
+    // underpainting: the composition, softened by down/up-scaling (works without ctx.filter)
+    const tiny = document.createElement('canvas');
+    tiny.width = Math.ceil(W2 / 10);
+    tiny.height = Math.ceil(H2 / 10);
+    tiny.getContext('2d').drawImage(src, 0, 0, tiny.width, tiny.height);
+    o.imageSmoothingQuality = 'high';
+    o.drawImage(tiny, 0, 0, W2, H2);
+    yield;
+    const lum = new Float32Array(W2 * H2);
+    for (let i = 0, j = 0; i < sd.length; i += 4, j++) lum[j] = sd[i] * 0.3 + sd[i + 1] * 0.59 + sd[i + 2] * 0.11;
+    const rnd = U.seeded(seed);
+    o.lineCap = 'round';
+    const passes = [
+      { r: 13, thr: 0, len: 2.4 },
+      { r: 7.5, thr: 16, len: 2.8 },
+      { r: 4, thr: 22, len: 3.2 },
+      { r: 2.2, thr: 26, len: 3.2 },
+      { r: 1.2, thr: 30, len: 3 },
+    ];
+    for (const ps of passes) {
+      const od = o.getImageData(0, 0, W2, H2).data;
+      const step = Math.max(1, ps.r * 1.05);
+      const strokes = [];
+      for (let y = 0; y < H2; y += step)
+        for (let x = 0; x < W2; x += step) {
+          const px = Math.min(W2 - 1, Math.floor(x + rnd() * step)), py = Math.min(H2 - 1, Math.floor(y + rnd() * step));
+          const i = (py * W2 + px) * 4;
+          const err = Math.abs(sd[i] - od[i]) + Math.abs(sd[i + 1] - od[i + 1]) + Math.abs(sd[i + 2] - od[i + 2]);
+          // crisp at the focus, looser toward the edges, like a painter would
+          const dx = (px - W2 / 2) / (W2 / 2), dy = (py - H2 * 0.45) / (H2 / 2);
+          const d = Math.min(1.4, Math.hypot(dx, dy));
+          if (err < ps.thr * 3 * (0.45 + d * 0.9)) continue;
+          strokes.push(px, py);
+        }
+      // shuffle so strokes interleave naturally
+      for (let i = strokes.length / 2 - 1; i > 0; i--) {
+        const j = Math.floor(rnd() * (i + 1));
+        const ax = strokes[i * 2], ay = strokes[i * 2 + 1];
+        strokes[i * 2] = strokes[j * 2]; strokes[i * 2 + 1] = strokes[j * 2 + 1];
+        strokes[j * 2] = ax; strokes[j * 2 + 1] = ay;
       }
-      if (i < ids.length) (window.requestIdleCallback || ((f) => setTimeout(f, 30)))(step);
-    };
-    step();
+      o.lineWidth = ps.r;
+      for (let k = 0; k < strokes.length; k += 2) {
+        const x = strokes[k], y = strokes[k + 1];
+        const i = (y * W2 + x) * 4;
+        const xl = Math.max(0, x - 2), xr = Math.min(W2 - 1, x + 2), yu = Math.max(0, y - 2), yd = Math.min(H2 - 1, y + 2);
+        const gx = lum[y * W2 + xr] - lum[y * W2 + xl];
+        const gy = lum[yd * W2 + x] - lum[yu * W2 + x];
+        const mag = Math.hypot(gx, gy);
+        // along the edge where there is one, otherwise a gentle diagonal hand
+        const ang = mag > 6 ? Math.atan2(gy, gx) + Math.PI / 2 : 0.55 + (rnd() - 0.5) * 0.9;
+        const L2 = ps.r * (ps.len + rnd() * 1.6) * (mag > 30 ? 0.7 : 1);
+        // slight saturation push and value jitter, like pigment
+        const j = (rnd() - 0.5) * 22;
+        const avg = (sd[i] + sd[i + 1] + sd[i + 2]) / 3;
+        const sat = 1.22, con = 1.14;
+        const cc = (v) => Math.max(0, Math.min(255, 128 + (v - 128) * con));
+        const cr = cc(avg + (sd[i] - avg) * sat + j), cg = cc(avg + (sd[i + 1] - avg) * sat + j), cb = cc(avg + (sd[i + 2] - avg) * sat + j * 1.2);
+        o.strokeStyle = `rgba(${cr | 0},${cg | 0},${cb | 0},${(0.72 + rnd() * 0.25).toFixed(2)})`;
+        const c = Math.cos(ang) * L2 * 0.5, sn = Math.sin(ang) * L2 * 0.5;
+        o.beginPath();
+        o.moveTo(x - c, y - sn);
+        o.quadraticCurveTo(x + sn * 0.25, y - c * 0.25, x + c, y + sn);
+        o.stroke();
+        if ((k & 1023) === 0) yield;
+      }
+      yield;
+    }
+    // glazing: keep small crisp lights (eyes, signs) from the composition
+    o.globalAlpha = 0.12;
+    o.drawImage(src, 0, 0);
+    // bloom on the brightest parts
+    o.globalAlpha = 0.22;
+    o.globalCompositeOperation = 'lighter';
+    const bl = document.createElement('canvas');
+    bl.width = Math.ceil(W2 / 6);
+    bl.height = Math.ceil(H2 / 6);
+    const bx = bl.getContext('2d');
+    bx.drawImage(src, 0, 0, bl.width, bl.height);
+    const bd = bx.getImageData(0, 0, bl.width, bl.height);
+    for (let i = 0; i < bd.data.length; i += 4) {
+      const l = bd.data[i] * 0.3 + bd.data[i + 1] * 0.59 + bd.data[i + 2] * 0.11;
+      const k2 = Math.max(0, (l - 170) / 85);
+      bd.data[i] *= k2; bd.data[i + 1] *= k2; bd.data[i + 2] *= k2;
+    }
+    bx.putImageData(bd, 0, 0);
+    o.drawImage(bl, 0, 0, W2, H2);
+    o.globalCompositeOperation = 'source-over';
+    // auto-levels: stretch the 2–98% luminance range, lift midtones slightly, push saturation
+    {
+      const id = o.getImageData(0, 0, W2, H2);
+      const d = id.data;
+      const hist = new Uint32Array(256);
+      for (let i = 0; i < d.length; i += 4) hist[(d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11) | 0]++;
+      const tot = W2 * H2;
+      let acc = 0, lo = 0, hi = 255;
+      for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc > tot * 0.02) { lo = v; break; } }
+      acc = 0;
+      for (let v = 255; v >= 0; v--) { acc += hist[v]; if (acc > tot * 0.02) { hi = v; break; } }
+      const span = Math.max(40, hi - lo);
+      const lut = new Uint8ClampedArray(256);
+      for (let v = 0; v < 256; v++) lut[v] = 255 * Math.pow(Math.max(0, Math.min(1, (v - lo) / span)), 0.88);
+      for (let i = 0; i < d.length; i += 4) {
+        const r0 = lut[d[i]], g0 = lut[d[i + 1]], b0 = lut[d[i + 2]];
+        const m = (r0 + g0 + b0) / 3;
+        d[i] = m + (r0 - m) * 1.12; d[i + 1] = m + (g0 - m) * 1.12; d[i + 2] = m + (b0 - m) * 1.12;
+      }
+      o.putImageData(id, 0, 0);
+    }
+    yield;
+    // canvas tooth: sparse light speckle
+    o.globalAlpha = 0.05;
+    o.fillStyle = '#fff';
+    for (let k = 0; k < (W2 * H2) / 40; k++) o.fillRect(rnd() * W2, rnd() * H2, 1.4, 1.4);
+    o.globalAlpha = 1;
+    return out;
+  }
+
+  // IndexedDB cache of finished paintings (silently skipped where unavailable)
+  const IDB = {
+    db: null,
+    open() {
+      if (this.p) return this.p;
+      this.p = new Promise((res) => {
+        try {
+          const rq = indexedDB.open('liminal-art', 1);
+          rq.onupgradeneeded = () => rq.result.createObjectStore('art');
+          rq.onsuccess = () => { this.db = rq.result; res(this.db); };
+          rq.onerror = () => res(null);
+        } catch (e) { res(null); }
+      });
+      return this.p;
+    },
+    async get(k) {
+      const db = await this.open();
+      if (!db) return null;
+      return new Promise((res) => { try { const rq = db.transaction('art').objectStore('art').get(k); rq.onsuccess = () => res(rq.result || null); rq.onerror = () => res(null); } catch (e) { res(null); } });
+    },
+    async put(k, v) {
+      const db = await this.open();
+      if (!db) return;
+      try { db.transaction('art', 'readwrite').objectStore('art').put(v, k); } catch (e) {}
+    },
   };
+
+  function applyUrl(k, url) {
+    if (k[0] !== 'c') return;
+    const cid = k.slice(2);
+    document.querySelectorAll(`[data-cid="${cid}"] > .cf > .art, .minion[data-cid="${cid}"] > .m-art`).forEach((el) => (el.style.backgroundImage = `url("${url}")`));
+  }
+  const queue = [];
+  let running = false;
+  Art.prioritize = function (cids) {
+    for (const cid of cids.slice().reverse()) {
+      const k = 'c:' + cid;
+      const i = queue.indexOf(k);
+      if (i >= 0) { queue.splice(i, 1); queue.unshift(k); }
+    }
+  };
+  function loadImg(svg) {
+    return new Promise((res, rej) => { const img = new Image(); img.onload = () => res(img); img.onerror = rej; img.src = toURI(svg); });
+  }
+  async function work() {
+    if (running) return;
+    running = true;
+    const idle = (f) => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 120 }) : setTimeout(() => f({ timeRemaining: () => 8 }), 16));
+    while (queue.length) {
+      const k = queue.shift();
+      const entry = cache[k];
+      if (!entry || entry.raster === 'done') continue;
+      try {
+        const isCard = k[0] === 'c';
+        const ty = isCard ? L.CARDS[k.slice(2)].type : null;
+        const cw = k === 'back' ? 200 : !isCard ? 300 : ty === 'minion' ? 320 : ty === 'spell' ? 400 : 420;
+        const ch = k === 'back' ? 280 : !isCard ? 300 : ty === 'minion' ? 352 : ty === 'spell' ? 315 : 294;
+        const img = await loadImg(entry.svg);
+        let canvas;
+        if (k === 'back') {
+          canvas = document.createElement('canvas');
+          canvas.width = cw; canvas.height = ch;
+          canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
+        } else {
+          const gen = painter(img, cw, ch, U.hash(k));
+          let r;
+          await new Promise((done) => {
+            const tick = (dl) => {
+              const t0 = performance.now();
+              do { r = gen.next(); } while (!r.done && performance.now() - t0 < Math.max(4, Math.min(10, (dl && dl.timeRemaining && dl.timeRemaining()) || 8)));
+              if (r.done) done();
+              else idle(tick);
+            };
+            idle(tick);
+          });
+          canvas = r.value;
+        }
+        const blob = await new Promise((res) => canvas.toBlob(res, 'image/webp', 0.88));
+        if (!blob) throw new Error('blob');
+        entry.url = URL.createObjectURL(blob);
+        entry.raster = 'done';
+        Art.painted++;
+        applyUrl(k, entry.url);
+        IDB.put(ART_VER + k, blob);
+      } catch (e) {
+        entry.raster = 'failed';
+      }
+    }
+    running = false;
+  }
+  // paint everything once (cached across visits); newly painted art swaps into live elements
+  Art.rasterizeAll = async function () {
+    if (typeof document === 'undefined') return;
+    const ids = L.AGENTS.concat(L.BOSSES).map((h) => 'p:' + h).concat(['back'], Object.keys(L.CARDS).map((c) => 'c:' + c));
+    for (const k of ids) {
+      if (k === 'back') Art.back();
+      else if (k[0] === 'c') Art.card(k.slice(2));
+      else Art.portrait(k.slice(2));
+    }
+    // cached paintings first
+    for (const k of ids) {
+      const b = await IDB.get(ART_VER + k);
+      const entry = cache[k];
+      if (b && entry && entry.raster !== 'done') {
+        entry.url = URL.createObjectURL(b);
+        entry.raster = 'done';
+        applyUrl(k, entry.url);
+      } else if (entry && entry.raster !== 'done' && !queue.includes(k)) queue.push(k);
+    }
+    work();
+  };
+  Art.pending = () => queue.length;
+  Art._painter = painter;
 
   // faction crests (inline SVG strings)
   Art.crest = {
@@ -5629,6 +6002,186 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
   }
 })();
 
+/* ---- 58-frames.js ---- */
+/* LIMINAL · ornate card frames, gems and badges (SVG, generated once per combination) */
+(function () {
+  'use strict';
+  const L = globalThis.LMN;
+  const F = (L.Frames = {});
+  const cache = {};
+  const uri = (svg) => 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+
+  // metal = bevelled frame band; body = dark card base; paper = text panel; ribbon = name banner
+  const MAT = {
+    site: { metal: ['#f4fbfd', '#8fb0b8', '#e9f6f8', '#4d6d75', '#cfe5ea'], body: ['#24434c', '#0f2328'], paper: ['#eef7f6', '#cfe3e3'], ribbon: ['#3d6670', '#1c3940'], ink: '#10262c', glow: '#9ff3ff' },
+    level: { metal: ['#fff3c0', '#b38f2a', '#f7e08e', '#6e500e', '#e9cd6c'], body: ['#4a3a14', '#211806'], paper: ['#f3e6b8', '#dcc88a'], ribbon: ['#6e5518', '#3a2c08'], ink: '#2b2310', glow: '#f2d64b' },
+    dream: { metal: ['#fff6fd', '#d3a2d6', '#ffffff', '#9a6cb8', '#f3d6f0'], body: ['#4a2d5a', '#23142c'], paper: ['#fbf0fa', '#e8d6f0'], ribbon: ['#7a4a8e', '#41234f'], ink: '#43264f', glow: '#ffb3e6' },
+    neutral: { metal: ['#f1e3c3', '#9a7f52', '#e8d6ae', '#5a4526', '#d8c094'], body: ['#3a3226', '#18140e'], paper: ['#efe5cd', '#d9cba8'], ribbon: ['#5e4a2c', '#2e2416'], ink: '#2a2620', glow: '#efe6cf' },
+  };
+  const RAR = { common: null, rare: '#5aa8ff', epic: '#b26bff', legendary: '#ffc84a' };
+  F.MAT = MAT;
+
+  function grads(m, r) {
+    const [a, b, c, d, e] = m.metal;
+    return `<linearGradient id="mt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset=".22" stop-color="${b}"/><stop offset=".45" stop-color="${c}"/><stop offset=".7" stop-color="${d}"/><stop offset="1" stop-color="${e}"/></linearGradient>
+<linearGradient id="mt2" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="${d}"/><stop offset=".5" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>
+<linearGradient id="bd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${m.body[0]}"/><stop offset="1" stop-color="${m.body[1]}"/></linearGradient>
+<linearGradient id="pp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${m.paper[0]}"/><stop offset="1" stop-color="${m.paper[1]}"/></linearGradient>
+<linearGradient id="rb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${m.ribbon[0]}"/><stop offset=".55" stop-color="${m.ribbon[1]}"/><stop offset="1" stop-color="${m.ribbon[0]}"/></linearGradient>
+<radialGradient id="pv" cx=".5" cy=".45" r=".7"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></radialGradient>
+<filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1.6" stdDeviation="1.6" flood-color="#000" flood-opacity=".6"/></filter>
+<filter id="gl" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3"/></filter>
+<pattern id="tx" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 8 8 0" stroke="#fff" stroke-opacity=".04" stroke-width="1"/></pattern>
+${r ? `<radialGradient id="rg"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="${r}"/><stop offset="1" stop-color="${r}" stop-opacity=".2"/></radialGradient>` : ''}`;
+  }
+
+  function rivets(cx, cy, rx, ry, n) {
+    let s = '';
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2 + Math.PI / n;
+      const x = cx + Math.cos(a) * rx, y = cy + Math.sin(a) * ry;
+      s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.3" fill="url(#mt2)" stroke="#000" stroke-opacity=".5" stroke-width=".6"/><circle cx="${(x - 0.6).toFixed(1)}" cy="${(y - 0.7).toFixed(1)}" r=".8" fill="#fff" opacity=".8"/>`;
+    }
+    return s;
+  }
+
+  // window geometry per type, in the 200×280 frame space
+  const WIN = {
+    minion: { kind: 'ellipse', cx: 100, cy: 86, rx: 72, ry: 79 },
+    spell: { kind: 'rect', x: 24, y: 20, w: 152, h: 120, r: 22 },
+    field: { kind: 'poly', pts: [[20, 18], [180, 18], [166, 140], [34, 140]] },
+  };
+  F.WIN = WIN;
+
+  F.frame = function (faction, rarity, type, layer) {
+    layer = layer || 'back';
+    const k = faction + rarity + type + layer;
+    if (cache[k]) return cache[k];
+    const m = MAT[faction];
+    const r = RAR[rarity];
+    const w = WIN[type];
+    let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" width="400" height="560"><defs>${grads(m, r)}</defs>`;
+    // rarity aura
+    if (r) s += `<rect x="4" y="4" width="192" height="272" rx="18" fill="none" stroke="${r}" stroke-width="6" opacity="${rarity === 'legendary' ? 0.75 : 0.5}" filter="url(#gl)"/>`;
+    // body
+    const bodyPath = type === 'minion'
+      ? 'M24 8 H176 Q192 8 192 24 V258 Q192 272 178 272 H22 Q8 272 8 258 V24 Q8 8 24 8 Z'
+      : type === 'spell'
+      ? 'M100 6 L184 14 Q193 15 193 26 V256 Q193 272 178 272 H22 Q7 272 7 256 V26 Q7 15 16 14 Z'
+      : 'M14 8 H186 Q194 8 194 18 V262 Q194 272 184 272 H16 Q6 272 6 262 V18 Q6 8 14 8 Z';
+    s += `<path d="${bodyPath}" fill="url(#bd)"/><path d="${bodyPath}" fill="url(#tx)"/>`;
+    s += `<path d="${bodyPath}" fill="none" stroke="#000" stroke-width="9" stroke-opacity=".55"/>`;
+    s += `<path d="${bodyPath}" fill="none" stroke="url(#mt)" stroke-width="6"/>`;
+    s += `<path d="${bodyPath}" fill="none" stroke="#fff" stroke-width=".8" stroke-opacity=".5" transform="translate(-.6 -.6)"/>`;
+    // corner studs
+    for (const [x, y] of [[20, 20], [180, 20], [20, 260], [180, 260]]) s += `<path d="M${x} ${y - 4} L${x + 4} ${y} L${x} ${y + 4} L${x - 4} ${y} Z" fill="url(#mt2)" stroke="#000" stroke-opacity=".4" stroke-width=".6"/>`;
+    // text panel
+    s += `<rect x="20" y="168" width="160" height="90" rx="11" fill="#000" opacity=".45" transform="translate(0 2)"/>`;
+    s += `<rect x="20" y="168" width="160" height="90" rx="11" fill="url(#pp)" stroke="url(#mt)" stroke-width="3"/>`;
+    s += `<rect x="20" y="168" width="160" height="90" rx="11" fill="url(#pv)"/>`;
+    s += `<rect x="70" y="262" width="60" height="11" rx="3" fill="url(#mt2)" stroke="#000" stroke-opacity=".45" stroke-width=".8"/>`;
+    if (layer === 'back') { s += `</svg>`; return (cache[k] = uri(s)); }
+    // ---- front layer: everything drawn over the illustration
+    s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" width="400" height="560"><defs>${grads(m, r)}</defs>`;
+    // art window bezel (the art itself is a separate element clipped to the same shape)
+    if (w.kind === 'ellipse') {
+      s += `<ellipse cx="${w.cx}" cy="${w.cy + 2}" rx="${w.rx + 7}" ry="${w.ry + 7}" fill="#000" opacity=".55"/>`;
+      s += `<ellipse cx="${w.cx}" cy="${w.cy}" rx="${w.rx + 5}" ry="${w.ry + 5}" fill="none" stroke="url(#mt)" stroke-width="9"/>`;
+      s += `<ellipse cx="${w.cx}" cy="${w.cy}" rx="${w.rx + 0.5}" ry="${w.ry + 0.5}" fill="none" stroke="#000" stroke-width="2" stroke-opacity=".7"/>`;
+      s += `<ellipse cx="${w.cx}" cy="${w.cy}" rx="${w.rx + 9}" ry="${w.ry + 9}" fill="none" stroke="#fff" stroke-width=".7" stroke-opacity=".45"/>`;
+      s += rivets(w.cx, w.cy, w.rx + 5, w.ry + 5, 10);
+    } else if (w.kind === 'rect') {
+      s += `<rect x="${w.x - 7}" y="${w.y - 5}" width="${w.w + 14}" height="${w.h + 14}" rx="${w.r + 6}" fill="#000" opacity=".55"/>`;
+      s += `<rect x="${w.x - 5}" y="${w.y - 5}" width="${w.w + 10}" height="${w.h + 10}" rx="${w.r + 5}" fill="none" stroke="url(#mt)" stroke-width="9"/>`;
+      s += `<rect x="${w.x}" y="${w.y}" width="${w.w}" height="${w.h}" rx="${w.r}" fill="none" stroke="#000" stroke-width="2" stroke-opacity=".7"/>`;
+      for (const [x, y] of [[w.x + 4, w.y + 4], [w.x + w.w - 4, w.y + 4], [w.x + 4, w.y + w.h - 4], [w.x + w.w - 4, w.y + w.h - 4]]) s += `<circle cx="${x}" cy="${y}" r="3" fill="url(#mt2)" stroke="#000" stroke-opacity=".5" stroke-width=".6"/>`;
+      // a spell's pointed crest
+      s += `<path d="M86 10 L100 0 L114 10 L100 18 Z" fill="url(#mt2)" stroke="#000" stroke-opacity=".5" stroke-width=".8"/><circle cx="100" cy="9" r="3" fill="${m.glow}"/>`;
+    } else {
+      const p = w.pts.map((q) => q.join(',')).join(' ');
+      s += `<polygon points="${p}" fill="none" stroke="#000" stroke-width="14" stroke-opacity=".55" stroke-linejoin="round"/>`;
+      s += `<polygon points="${p}" fill="none" stroke="url(#mt)" stroke-width="9" stroke-linejoin="round"/>`;
+      s += `<polygon points="${p}" fill="none" stroke="#000" stroke-width="2" stroke-opacity=".7"/>`;
+      s += `<rect x="70" y="134" width="60" height="12" rx="3" fill="url(#mt2)" stroke="#000" stroke-opacity=".5"/><text x="100" y="143" font-family="monospace" font-weight="700" font-size="8" text-anchor="middle" fill="#2b2310" letter-spacing="2">LOCATION</text>`;
+    }
+    // name ribbon with folded tails
+    const ry = type === 'minion' ? 150 : 146;
+    s += `<path d="M4 ${ry + 6} L18 ${ry + 2} L18 ${ry + 22} L4 ${ry + 20} L10 ${ry + 13} Z" fill="${m.ribbon[1]}" stroke="url(#mt)" stroke-width="1.5"/>`;
+    s += `<path d="M196 ${ry + 6} L182 ${ry + 2} L182 ${ry + 22} L196 ${ry + 20} L190 ${ry + 13} Z" fill="${m.ribbon[1]}" stroke="url(#mt)" stroke-width="1.5"/>`;
+    s += `<path d="M14 ${ry + 4} Q100 ${ry - 16} 186 ${ry + 4} L186 ${ry + 24} Q100 ${ry + 4} 14 ${ry + 24} Z" fill="url(#rb)" stroke="url(#mt)" stroke-width="2.4" filter="url(#sh)"/>`;
+    s += `<path d="M18 ${ry + 7} Q100 ${ry - 12} 182 ${ry + 7}" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="1"/>`;
+    // rarity gem on the ribbon
+    if (r) s += `<g transform="translate(100 ${ry + 16})"><path d="M0 -7 L6 0 L0 7 L-6 0 Z" fill="url(#rg)" stroke="#000" stroke-opacity=".6" stroke-width=".8"/><path d="M0 -7 L6 0 L0 0 Z" fill="#fff" opacity=".45"/></g>`;
+    else s += `<g transform="translate(100 ${ry + 16})"><path d="M0 -6 L5 0 L0 6 L-5 0 Z" fill="#cfc8b8" stroke="#000" stroke-opacity=".6" stroke-width=".8"/></g>`;
+    // legendary crest: a winged seal with an open eye
+    if (rarity === 'legendary') {
+      s += `<g transform="translate(100 6)" filter="url(#sh)">`;
+      s += `<path d="M-46 14 Q-30 -6 -8 4 Q-22 2 -30 14 Q-38 10 -46 14 Z" fill="url(#mt)" stroke="#5a3e00" stroke-width="1"/>`;
+      s += `<path d="M46 14 Q30 -6 8 4 Q22 2 30 14 Q38 10 46 14 Z" fill="url(#mt)" stroke="#5a3e00" stroke-width="1"/>`;
+      s += `<path d="M-14 12 Q0 -14 14 12 Z" fill="url(#mt2)" stroke="#5a3e00" stroke-width="1"/>`;
+      s += `<path d="M-8 6 Q0 -1 8 6 Q0 13 -8 6 Z" fill="#fff8dc"/><circle cx="0" cy="6" r="2.6" fill="${m.glow}"/><circle cx="0" cy="6" r="1.1" fill="#111"/></g>`;
+    } else if (rarity === 'epic') {
+      s += `<g transform="translate(100 5)"><path d="M-16 8 L0 -4 L16 8 L0 4 Z" fill="url(#mt)" stroke="#000" stroke-opacity=".5"/><circle cx="0" cy="3" r="2.4" fill="${r}"/></g>`;
+    }
+    s += `</svg>`;
+    return (cache[k] = uri(s));
+  };
+
+  // ---------------------------------------------------------------- gems & badges
+  F.gem = function (kind) {
+    const k = 'g:' + kind;
+    if (cache[k]) return cache[k];
+    let s = '';
+    if (kind === 'mana') {
+      // faceted hexagonal crystal
+      const pts = [];
+      for (let i = 0; i < 6; i++) { const a = -Math.PI / 2 + (i * Math.PI) / 3; pts.push([50 + Math.cos(a) * 46, 50 + Math.sin(a) * 46]); }
+      const shades = ['#b9e6ff', '#7cc4ff', '#3d8fe0', '#1d5fae', '#2a74c8', '#8ed0ff'];
+      s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="c" cx=".35" cy=".3"><stop offset="0" stop-color="#e8f7ff"/><stop offset="1" stop-color="#2a74c8"/></radialGradient></defs>`;
+      s += `<polygon points="${pts.map((p) => p.join(',')).join(' ')}" fill="#0b2442" transform="translate(0 3)" opacity=".6"/>`;
+      for (let i = 0; i < 6; i++) { const a = pts[i], b = pts[(i + 1) % 6]; s += `<polygon points="50,50 ${a.join(',')} ${b.join(',')}" fill="${shades[i]}"/>`; }
+      s += `<polygon points="${pts.map((p) => [50 + (p[0] - 50) * 0.5, 50 + (p[1] - 50) * 0.5].join(',')).join(' ')}" fill="url(#c)" opacity=".9"/>`;
+      s += `<polygon points="${pts.map((p) => p.join(',')).join(' ')}" fill="none" stroke="#0b2442" stroke-width="3"/><polygon points="${pts.map((p) => p.join(',')).join(' ')}" fill="none" stroke="#dff3ff" stroke-width="1" opacity=".7"/></svg>`;
+    } else if (kind === 'san') {
+      s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 92"><polygon points="50,4 96,88 4,88" fill="#1a0b33" transform="translate(0 3)" opacity=".6"/><polygon points="50,4 50,62 4,88" fill="#d7b8ff"/><polygon points="50,4 96,88 50,62" fill="#8a56e0"/><polygon points="4,88 96,88 50,62" fill="#5a2fb0"/><polygon points="50,30 70,72 30,72" fill="none" stroke="#fff" stroke-width="3" opacity=".75"/><polygon points="50,4 96,88 4,88" fill="none" stroke="#1a0b33" stroke-width="3"/></svg>`;
+    } else if (kind === 'atk') {
+      s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="a" cx=".38" cy=".32"><stop offset="0" stop-color="#fff1b0"/><stop offset=".55" stop-color="#e2a024"/><stop offset="1" stop-color="#7a4600"/></radialGradient></defs><circle cx="50" cy="53" r="45" fill="#2a1600" opacity=".6"/><circle cx="50" cy="50" r="45" fill="url(#a)" stroke="#3e2200" stroke-width="4"/>` +
+        `<path d="M70 18 L80 28 L42 66 L34 58 Z" fill="#fff6d8" opacity=".55"/><path d="M30 60 L40 70 L28 82 L18 72 Z" fill="#5a3000" opacity=".5"/><circle cx="50" cy="50" r="41" fill="none" stroke="#fff4c0" stroke-width="1.6" opacity=".6"/></svg>`;
+    } else if (kind === 'hp') {
+      s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 110"><defs><radialGradient id="h" cx=".38" cy=".4"><stop offset="0" stop-color="#ffb3b3"/><stop offset=".55" stop-color="#d42c3a"/><stop offset="1" stop-color="#5a0008"/></radialGradient></defs><path d="M50 8 C62 30 92 50 92 72 A42 34 0 0 1 8 72 C8 50 38 30 50 8 Z" fill="#300004" transform="translate(0 3)" opacity=".6"/><path d="M50 8 C62 30 92 50 92 72 A42 34 0 0 1 8 72 C8 50 38 30 50 8 Z" fill="url(#h)" stroke="#3a0004" stroke-width="4"/><path d="M34 52 C38 40 44 32 48 26" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45" fill="none"/></svg>`;
+    } else if (kind === 'armor') {
+      s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 110"><defs><linearGradient id="r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#9aa8ae"/><stop offset="1" stop-color="#4a575c"/></linearGradient></defs><path d="M50 6 L92 18 L86 66 Q78 92 50 104 Q22 92 14 66 L8 18 Z" fill="url(#r)" stroke="#1c2426" stroke-width="4"/><path d="M50 16 L80 25 L76 64 Q70 84 50 94" fill="none" stroke="#fff" stroke-width="2" opacity=".5"/></svg>`;
+    }
+    return (cache[k] = uri(s));
+  };
+
+  // oval token bezel for board minions
+  F.bezel = function (faction, rarity) {
+    const k = 'z:' + faction + rarity;
+    if (cache[k]) return cache[k];
+    const m = MAT[faction];
+    const r = RAR[rarity];
+    let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 150" width="260" height="300"><defs>${grads(m, r)}</defs>`;
+    if (r) s += `<ellipse cx="65" cy="72" rx="62" ry="70" fill="none" stroke="${r}" stroke-width="5" opacity=".6" filter="url(#gl)"/>`;
+    s += `<ellipse cx="65" cy="74" rx="58" ry="66" fill="none" stroke="#000" stroke-width="11" stroke-opacity=".55"/>`;
+    s += `<ellipse cx="65" cy="72" rx="57" ry="65" fill="none" stroke="url(#mt)" stroke-width="8"/>`;
+    s += `<ellipse cx="65" cy="72" rx="52.5" ry="60.5" fill="none" stroke="#000" stroke-width="1.6" stroke-opacity=".7"/>`;
+    s += rivets(65, 72, 57, 65, 8);
+    if (rarity === 'legendary') s += `<g transform="translate(65 6)"><path d="M-30 12 Q-18 -4 -4 4 Q-14 4 -20 12 Z M30 12 Q18 -4 4 4 Q14 4 20 12 Z" fill="url(#mt)" stroke="#5a3e00"/><path d="M-9 10 Q0 -8 9 10 Z" fill="url(#mt2)" stroke="#5a3e00"/><circle cx="0" cy="6" r="2.2" fill="${m.glow}"/></g>`;
+    s += `</svg>`;
+    return (cache[k] = uri(s));
+  };
+
+  // curved name on the ribbon
+  F.nameSVG = function (name, type, faction) {
+    const len = Array.from(name).length;
+    const size = len <= 5 ? 15 : len <= 7 ? 13.5 : len <= 9 ? 11.5 : len <= 12 ? 9.6 : 8.4;
+    const y = 24;
+    const id = 'np' + Math.random().toString(36).slice(2, 8);
+    return `<svg viewBox="0 0 200 40" preserveAspectRatio="none"><defs><path id="${id}" d="M16 ${y} Q100 ${y - 19} 184 ${y}"/></defs><text font-family="'Noto Serif SC','Songti SC',serif" font-weight="900" font-size="${size}" fill="#fff8e6" stroke="#0a0604" stroke-width="3.2" paint-order="stroke" stroke-linejoin="round" text-anchor="middle" letter-spacing=".5"><textPath href="#${id}" startOffset="50%">${L.CV.esc(name)}</textPath></text></svg>`;
+  };
+})();
+
 /* ---- 60-cardview.js ---- */
 /* LIMINAL · DOM card faces, minion tokens, rules text (keywords, fading, fakes) */
 (function () {
@@ -5738,14 +6291,16 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     const typeLine = TYPE[d.type] + ' · ' + L.FACTIONS[d.faction].name + (san ? ' · ⟁异常' : '');
     const whisper = d.whisper && opts.big ? `<span class="whisper">${esc(d.whisper)}</span>` : '';
     el.innerHTML =
-      `<div class="cf"><div class="art"></div><div class="tape"></div><div class="stamp">绝密</div><div class="ftag">FIELD</div>` +
-      `<div class="nm"><span class="${nameClass(name)}">${esc(name)}</span></div><div class="rg"></div>` +
+      `<div class="cf"><div class="art"></div><div class="fr"></div>` +
+      `<div class="nm">${L.Frames.nameSVG(name, d.type, d.faction)}</div>` +
       `<div class="tl">${CV.sym(esc(typeLine))}</div>` +
       `<div class="tx"><div class="crest">${L.Art.crest[d.faction]}</div><p>${CV.textHTML(text, inst.fade, (inst.uid || 7) * 31 + 3)}${whisper}</p></div>` +
       `<div class="code">${d.code}</div></div>` +
       `<div class="gem"><b>${cost}</b></div><div class="sanc"><b>${san}</b></div>` +
       (d.type === 'minion' ? `<div class="st atk"><b>${d.atk}</b></div><div class="st hp"><b>${d.hp}</b></div>` : '') +
       `<div class="brc">突破 ${inst.breach || 0}</div>`;
+    el.querySelector('.cf').style.backgroundImage = `url("${L.Frames.frame(d.faction, d.rarity, d.type, 'back')}")`;
+    el.querySelector('.fr').style.backgroundImage = `url("${L.Frames.frame(d.faction, d.rarity, d.type, 'front')}")`;
     el.querySelector('.art').style.backgroundImage = `url("${L.Art.card(cid)}")`;
     CV.updateCard(el, inst, true);
     return el;
@@ -5784,8 +6339,9 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     el.className = `minion f-${d.faction} r-${d.rarity}`;
     el.dataset.uid = m.uid;
     el.dataset.cid = m.cid;
-    el.innerHTML = `<div class="m-art"></div><div class="m-st atk"><b></b></div><div class="m-st hp"><b></b></div><div class="m-ic"></div>`;
+    el.innerHTML = `<div class="m-art"></div><div class="m-bz"></div><div class="m-st atk"><b></b></div><div class="m-st hp"><b></b></div><div class="m-ic"></div>`;
     el.querySelector('.m-art').style.backgroundImage = `url("${L.Art.card(m.cid)}")`;
+    el.querySelector('.m-bz').style.backgroundImage = `url("${L.Frames.bezel(d.faction, d.rarity)}")`;
     CV.updateMinion(el, m);
     return el;
   };
@@ -5795,6 +6351,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
       const d = L.CARDS[m.cid];
       el.className = `minion f-${d.faction} r-${d.rarity}`;
       el.querySelector('.m-art').style.backgroundImage = `url("${L.Art.card(m.cid)}")`;
+      el.querySelector('.m-bz').style.backgroundImage = `url("${L.Frames.bezel(d.faction, d.rarity)}")`;
     }
     const a = el.querySelector('.m-st.atk b'),
       h = el.querySelector('.m-st.hp b');
@@ -5872,6 +6429,10 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
   let idleTimer = null;
   let logLines = [];
   let preview = null;
+  let lastTurnSeen = -1;
+  let aiStep = 0;
+  let hintTimer = null;
+  UI.cfg = () => cfg;
 
   UI.isMyTurn = () => !!G && G.active === ME && !G.over;
   UI.state = () => G;
@@ -5930,6 +6491,10 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
         { hero: boss.id, deck: boss.deck, ai: true, name: boss.short },
       ],
     });
+    if (c.setup) c.setup(G);
+    lastTurnSeen = -1;
+    aiStep = 0;
+    L.Art.prioritize(deck.concat(boss.deck));
     minEls.clear();
     handEls.clear();
     dying.clear();
@@ -5959,6 +6524,12 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     busy = true;
     (async () => {
       await sleep(400);
+      if (c.tutorial) {
+        E.begin(G);
+        await drain();
+        afterAction();
+        return;
+      }
       const hour = new Date().getHours();
       const lines = boss.lines.intro.slice();
       if (hour >= 23 || hour < 5) lines.push(boss.lines.night[0]);
@@ -5967,7 +6538,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
         await sleep(1500);
       }
       E.mulligan(G, AI_PID, L.AI.mulligan(G, AI_PID));
-      if (!L.Store.progress.briefed) await briefing();
+      if (!L.Store.progress.briefed && !L.Store.progress.trained) await briefing();
       await mulligan();
       E.begin(G);
       await drain();
@@ -6134,7 +6705,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     const n = list.length;
     const W = els.hand.clientWidth || 1;
     const cw = els.hand.querySelector('.card') ? els.hand.querySelector('.card').offsetWidth : W * 0.23;
-    const usable = W * 0.96 - cw;
+    const usable = W * 0.9 - cw;
     const step = n > 1 ? Math.min(cw * 0.8, usable / (n - 1)) : 0;
     list.forEach((c, i) => {
       const el = handEls.get(c.uid);
@@ -6252,6 +6823,8 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     }
   }
   function setSel(s) {
+    if (L.Tutorial && L.Tutorial.clearHint) L.Tutorial.clearHint();
+    if (!s) hideAim();
     sel = s;
     layoutHand();
     updateInteractivity();
@@ -6584,6 +7157,12 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
 
   async function doAction(a) {
     if (busy || !UI.isMyTurn()) return;
+    if (cfg.gate && !cfg.gate(a, G)) {
+      A.play('error');
+      setSel(null);
+      render(E.snapshot(G));
+      return;
+    }
     const s = sel;
     setSel(null);
     // fake cards with a target: pretend, then play without effect
@@ -6600,9 +7179,11 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     }
     await drain();
     afterAction();
+    if (cfg.after) cfg.after(a, G);
   }
   async function endMyTurn() {
     if (busy) return;
+    if (cfg.gate && !cfg.gate({ t: 'end' }, G)) { A.play('error'); return; }
     busy = true;
     E.endTurn(G, ME);
     await drain();
@@ -6613,7 +7194,27 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     busy = false;
     render(E.snapshot(G));
     if (G.over) return finish();
+    if (G.active === ME && G.turn !== lastTurnSeen) {
+      lastTurnSeen = G.turn;
+      if (cfg.onTurn) { cfg.onTurn(G); render(E.snapshot(G)); }
+    }
     armIdle();
+    armHint();
+  }
+  // gentle in-match hints for new players: after a pause, point at the next sensible thing
+  function armHint() {
+    clearTimeout(hintTimer);
+    if (cfg.tutorial || !L.Store.settings.hints || !UI.isMyTurn()) return;
+    hintTimer = setTimeout(() => {
+      if (!UI.isMyTurn() || busy || sel || !L.Tutorial) return;
+      const p = G.players[ME];
+      const card = p.hand.find((c) => E.canPlay(G, ME, c.uid) && !c.fake);
+      const atk = p.board.find((m) => E.canAttack(G, m.uid));
+      if (card) L.Tutorial.hint(`#hand .card[data-uid="${card.uid}"]`, '这张牌现在就能打出：轻触它，再轻触战场或目标。');
+      else if (atk) L.Tutorial.hint(`#boardP .minion[data-uid="${atk.uid}"]`, '发光的随从可以攻击：轻触它，再轻触敌人。');
+      else if (E.canHeroPower(G, ME)) L.Tutorial.hint('#hpP', '还剩法力，可以用英雄技能。');
+      else L.Tutorial.hint('#endTurn', '没什么可做的了，结束回合吧。');
+    }, 9000);
   }
   function armIdle() {
     clearTimeout(idleTimer);
@@ -6630,7 +7231,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     const boss = L.HEROES[cfg.boss];
     await sleep(450);
     for (let i = 0; i < 40 && !G.over && G.active === AI_PID; i++) {
-      const a = await L.AIW.decide(G, AI_PID, boss.persona, aiMemo);
+      const a = cfg.script ? cfg.script(G, aiStep++) : await L.AIW.decide(G, AI_PID, boss.persona, aiMemo);
       if (!G || G.over) break;
       if (a.t === 'end') break;
       if (a.t === 'atk') {
@@ -7411,6 +8012,13 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
   // ------------------------------------------------------------------ end of match
   function finish() {
     clearTimeout(idleTimer);
+    clearTimeout(hintTimer);
+    if (cfg.onFinish) {
+      A.heartbeat(false);
+      els.vign.classList.remove('low');
+      els.sanv.classList.remove('on');
+      return cfg.onFinish(G.winner === ME, G);
+    }
     A.heartbeat(false);
     els.vign.classList.remove('low');
     els.sanv.classList.remove('on');
@@ -7440,6 +8048,8 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
   };
   UI.leave = function () {
     clearTimeout(idleTimer);
+    clearTimeout(hintTimer);
+    if (L.Tutorial) L.Tutorial.stop();
     A.heartbeat(false);
     els.vign.classList.remove('low');
     els.sanv.classList.remove('on');
@@ -7472,6 +8082,260 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     },
     skip: (v) => (skipAnim = v),
   };
+})();
+
+/* ---- 68-tutorial.js ---- */
+/* LIMINAL · 外勤训练: a scripted, coached first match + in-match hints */
+(function () {
+  'use strict';
+  const L = globalThis.LMN;
+  const E = L.E;
+  const T = (L.Tutorial = {});
+  const $ = (id) => document.getElementById(id);
+  const ME = 0, FOE = 1;
+
+  // ------------------------------------------------------------------ coach overlay
+  let coach = null, spot = null, bub = null, finger = null, raf = 0;
+  let cur = null; // { target, pointer:[from,to], dim, text, button }
+  function ensure() {
+    if (coach) return;
+    coach = document.createElement('div');
+    coach.id = 'coach';
+    coach.innerHTML = `<div class="spot"></div><div class="finger"></div><div class="cbub"><p></p><button class="btn">继续</button></div>`;
+    document.getElementById('app').appendChild(coach);
+    spot = coach.querySelector('.spot');
+    bub = coach.querySelector('.cbub');
+    finger = coach.querySelector('.finger');
+  }
+  const elOf = (t) => (typeof t === 'function' ? t() : t ? document.querySelector(t) : null);
+  function place() {
+    if (!cur) return;
+    const el = elOf(cur.target);
+    const vw = window.innerWidth, vh = window.innerHeight;
+    if (el) {
+      const r = el.getBoundingClientRect();
+      const pad = cur.pad == null ? 8 : cur.pad;
+      spot.style.display = 'block';
+      spot.style.left = r.left - pad + 'px';
+      spot.style.top = r.top - pad + 'px';
+      spot.style.width = r.width + pad * 2 + 'px';
+      spot.style.height = r.height + pad * 2 + 'px';
+      // bubble above when the target sits low, else below
+      const bh = bub.offsetHeight, bw = bub.offsetWidth;
+      let top = r.top + r.height / 2 > vh * 0.5 ? r.top - pad - bh - 16 : r.bottom + pad + 16;
+      top = Math.max(10, Math.min(vh - bh - 10, top));
+      let left = r.left + r.width / 2 - bw / 2;
+      left = Math.max(10, Math.min(vw - bw - 10, left));
+      bub.style.left = left + 'px';
+      bub.style.top = top + 'px';
+    } else {
+      spot.style.display = 'none';
+      bub.style.left = Math.max(10, vw / 2 - bub.offsetWidth / 2) + 'px';
+      bub.style.top = vh * 0.4 + 'px';
+    }
+    if (cur.pointer) {
+      const a = elOf(cur.pointer[0]), b = elOf(cur.pointer[1]);
+      if (a && b) {
+        const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+        finger.style.display = 'block';
+        finger.style.setProperty('--fx', ra.left + ra.width / 2 + 'px');
+        finger.style.setProperty('--fy', ra.top + ra.height / 2 + 'px');
+        finger.style.setProperty('--tx', rb.left + rb.width / 2 + 'px');
+        finger.style.setProperty('--ty', rb.top + rb.height / 2 + 'px');
+      } else finger.style.display = 'none';
+    } else finger.style.display = 'none';
+    raf = requestAnimationFrame(place);
+  }
+  function show(o) {
+    ensure();
+    cur = o;
+    coach.className = (o.dim ? 'dim ' : '') + (o.hint ? 'hint' : '');
+    coach.style.display = 'block';
+    bub.querySelector('p').innerHTML = o.text;
+    const btn = bub.querySelector('button');
+    btn.hidden = !o.button;
+    btn.onclick = (e) => { e.stopPropagation(); L.Audio.play('click'); o.button && o.button(); };
+    bub.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 220 });
+    cancelAnimationFrame(raf);
+    place();
+  }
+  function hide() {
+    cur = null;
+    cancelAnimationFrame(raf);
+    if (coach) coach.style.display = 'none';
+  }
+  function nudge() {
+    if (!bub || !cur) return;
+    bub.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-8px)' }, { transform: 'translateX(8px)' }, { transform: 'translateX(0)' }], { duration: 260 });
+  }
+
+  // ------------------------------------------------------------------ in-match hints
+  let hintT = null;
+  T.hint = function (target, text) {
+    if (running) return;
+    show({ target, text, hint: true });
+    clearTimeout(hintT);
+    hintT = setTimeout(() => T.clearHint(), 6500);
+  };
+  T.clearHint = function () {
+    if (running || !cur || !cur.hint) return;
+    clearTimeout(hintT);
+    hide();
+  };
+
+  // ------------------------------------------------------------------ the training match
+  let running = false;
+  let steps = [];
+  let si = 0;
+  let passed = -1;
+  const handCard = (cid) => () => document.querySelector(`#hand .card[data-cid="${cid}"]`);
+  const myMinion = (cid) => () => document.querySelector(`#boardP .minion[data-cid="${cid}"]`);
+  const foeMinion = (cid) => () => document.querySelector(`#boardE .minion${cid ? `[data-cid="${cid}"]` : ''}`);
+  const cidOf = (G, a) => {
+    if (a.t === 'play') { const c = G.players[ME].hand.find((x) => x.uid === a.uid); return c && c.cid; }
+    if (a.t === 'atk') { const m = E.char(G, a.a); return m && m.cid; }
+    return null;
+  };
+  const targetCid = (G, uid) => { const t = E.char(G, uid); return t ? (t.isHero ? 'HERO' + t.pid : t.cid) : null; };
+
+  function info(target, text, extra) { return Object.assign({ mode: 'info', target, text }, extra); }
+  function act(target, text, allow, extra) { return Object.assign({ mode: 'act', target, text, allow }, extra); }
+
+  const PLAN = {
+    1: {
+      setup(G) { const p = G.players[ME]; p.maxMana = p.mana = 3; p.hand = ['S04', 'N02'].map((c) => E.mkCard(G, c)); },
+      steps: () => [
+        info('#heroP', '这是你：外勤特工<b>沈砚</b>。头像右下角是生命值，降到 0，你就会被留在夹层里。'),
+        info('#heroE', '这是对手：<b>训练模拟体</b>。把它的生命值打到 0，你就赢了。'),
+        info('#hbP .meter.mm', '<b>法力水晶</b>：每回合 +1，最多 10 个。卡牌左上角的蓝宝石是它的费用。这一回合你有 3 点法力。'),
+        act(handCard('S04'), '把<b>隔离门</b>拖到战场上。<br>也可以先轻触它，再轻触战场。', (a, G) => a.t === 'play' && cidOf(G, a) === 'S04', { pointer: [handCard('S04'), '#boardP'] }),
+        info(myMinion('S04'), '它有<b>嘲讽</b>（身后黄黑相间的盾）：敌人必须先攻击它。<br>刚上场的随从要等到<b>下回合</b>才能攻击。'),
+        act('#endTurn', '法力用完了。轻触<b>结束回合</b>，轮到对手。', (a) => a.t === 'end'),
+      ],
+    },
+    2: {
+      setup(G) { const p = G.players[ME]; p.maxMana = p.mana = 2; p.hand = ['N02'].map((c) => E.mkCard(G, c)); },
+      steps: () => [
+        info(foeMinion('N01'), '对手放下了一只<b>日光灯飞虫</b>。随从左下角是<b>攻击力</b>，右下角是<b>生命值</b>。'),
+        act(myMinion('S04'), '你的隔离门在<b>发绿光</b>，说明它可以攻击了。<br>轻触它，再轻触飞虫；也可以直接从它拖向飞虫。', (a, G) => a.t === 'atk' && cidOf(G, a) === 'S04' && targetCid(G, a.target) === 'N01', { pointer: [myMinion('S04'), foeMinion('N01')] }),
+        info(myMinion('S04'), '攻击时双方<b>互相</b>造成伤害：飞虫被消灭，隔离门也掉了 2 点生命。'),
+        act('#hpP', '右侧圆形按钮是<b>英雄技能</b>：每回合一次，2 点法力。<br>沈砚的「深呼吸」会获得护甲并恢复理智。轻触它。', (a) => a.t === 'hp'),
+        act('#endTurn', '结束回合。', (a) => a.t === 'end'),
+      ],
+    },
+    3: {
+      setup(G) { const p = G.players[ME]; p.maxMana = p.mana = 5; p.hand = ['N03', 'N02'].map((c) => E.mkCard(G, c)); },
+      steps: () => [
+        info(foeMinion('N04'), '对手放下了<b>堆积的纸箱</b>，它也有嘲讽：它倒下之前，你的随从只能攻击它。'),
+        act(handCard('N03'), '<b>失眠者</b>的费用宝石下面多了一个紫色的 <i class="sym"></i>：它是<b>异常牌</b>，除了 3 点法力，还要付 1 点<b>理智</b>，换来比同费更强的身体。打出它。', (a, G) => a.t === 'play' && cidOf(G, a) === 'N03', { pointer: [handCard('N03'), '#boardP'] }),
+        info('#hbP .meter.sm', '<b>理智</b>少了 1 点。理智每回合恢复 1 点；降到 3 以下，你的手里会混进<b>不存在的牌</b>；降到 0，每回合开始都会受伤。'),
+        info('.depth', '花掉的理智让梦往下沉，看中间的<b>梦深</b>。涨到刻度线时，整局对战会沉到下一层，规则随之改变，而且<b>回不去</b>。'),
+        act('#endTurn', '这回合先到这里。结束回合。', (a) => a.t === 'end' || a.t === 'hp'),
+      ],
+    },
+    4: {
+      setup(G) { const p = G.players[ME]; p.maxMana = p.mana = 8; p.hand = ['N08', 'S11'].map((c) => E.mkCard(G, c)); G.depth = Math.max(G.depth, 9); G.players[FOE].hp = 6; },
+      steps: () => [
+        info('.depth', '梦深快到第一道刻度了。模拟体的耐久也只剩 6 点。'),
+        act(handCard('N08'), '打出<b>下沉之钟</b>：它的战吼让梦深 +4。看看会发生什么。', (a, G) => a.t === 'play' && cidOf(G, a) === 'N08', { pointer: [handCard('N08'), '#boardP'] }),
+        info('.depth', '欢迎来到<b>第 1 层 · 无人泳池</b>：所有治疗翻倍，随从攻击后有一半几率漂到相邻位置。每一层都会改写规则，对双方同时生效。'),
+        act(handCard('S11'), '<b>收容程序</b>能把一个敌方随从收进你的牌库。收容那个纸箱：先轻触这张牌，再轻触纸箱。', (a, G) => a.t === 'play' && cidOf(G, a) === 'S11' && targetCid(G, a.target) === 'N04', { pointer: [handCard('S11'), foeMinion('N04')] }),
+        info('#deckP', '纸箱进了你的牌库顶部，带着<b>突破倒计时</b>。3 回合内抽到并打出它，它就为你而战；拖得太久，它会突破回对手场上。'),
+        act('#heroE', '挡路的嘲讽没了。用你的随从<b>攻击对手英雄</b>，完成训练！', (a, G) => a.t === 'atk' && targetCid(G, a.target) === 'HERO1', { pointer: [myMinion('N03'), '#heroE'], repeat: true }),
+      ],
+    },
+  };
+
+  function goto(i) {
+    si = i;
+    const st = steps[si];
+    if (!st) { hide(); return; }
+    show({
+      target: st.target,
+      text: st.text,
+      dim: true,
+      pointer: st.pointer,
+      button: st.mode === 'info' ? () => goto(si + 1) : null,
+    });
+  }
+
+  T.start = function () {
+    running = true;
+    L.Store.progress.briefed = true;
+    L.Store.saveProgress();
+    L.UI.start({
+      agent: 'agent_shen',
+      deck: Array(30).fill('N02'),
+      boss: 'boss_trainer',
+      tutorial: true,
+      first: 0,
+      seed: 20261126,
+      setup(G) {
+        G.drift = 0;
+        G.players[FOE].hand = [];
+        G.players[ME].hand = [];
+      },
+      onTurn(G) {
+        const t = (G.turn + 1) / 2;
+        const plan = PLAN[t];
+        if (!plan) return;
+        plan.setup(G);
+        steps = plan.steps();
+        setTimeout(() => goto(0), 350);
+      },
+      gate(a, G) {
+        const st = steps[si];
+        if (!st || st.mode === 'info' || !st.allow(a, G)) { nudge(); return false; }
+        if (a.t === 'end') hide();
+        passed = si; // judged before the action changes the board
+        return true;
+      },
+      after(a, G) {
+        const st = steps[si];
+        if (st && st.mode === 'act' && !st.repeat && passed === si && !G.over) { passed = -1; goto(si + 1); }
+      },
+      script(G, step) {
+        const foe = G.players[FOE];
+        foe.mana = 10;
+        const plays = { 2: 'N01', 4: 'N04' };
+        const cid = plays[G.turn];
+        if (cid && !foe.board.some((m) => m.cid === cid) && !foe._played) {
+          foe._played = true;
+          const ci = E.mkCard(G, cid);
+          foe.hand.push(ci);
+          return { t: 'play', uid: ci.uid, target: null };
+        }
+        foe._played = false;
+        return { t: 'end' };
+      },
+      onFinish(win) {
+        running = false;
+        hide();
+        L.Store.progress.trained = true;
+        L.Store.saveProgress();
+        setTimeout(() => {
+          const ov = $('endov');
+          ov.className = 'ov dim on win';
+          ov.innerHTML = `<div class="sub">LMN-T01 · 外勤训练</div><div class="big">训练完成</div>
+            <div class="quote">「你学会了出牌、攻击、英雄技能、理智、梦深与收容。<br>真正的三位守门人在更深的地方等你。」</div>
+            <div class="kwl" style="width:calc(var(--u)*84);text-align:left">
+              <div><b>小提示</b>新手提示默认开启：对局中你停下来的时候，会有人指给你下一步可以做什么。可以在设置里关掉。</div>
+              <div><b>推荐</b>第一次下沉，试试<b>沈砚 + 静滞协议</b>，对手选<b>管理员</b>。</div>
+            </div>
+            <div class="btns"><button class="btn" id="tGo">开始第一次下沉</button><button class="btn ghost" id="tAgain">再练一次</button><button class="btn ghost" id="tHome">返回标题</button></div>`;
+          $('tGo').onclick = () => { ov.classList.remove('on'); L.UI.leave(); L.Store.selected = { agent: 'agent_shen', deck: 'pre_site', boss: 'boss_manager' }; L.Store.saveSelected(); L.Menus.show('setup'); };
+          $('tAgain').onclick = () => { ov.classList.remove('on'); L.UI.leave(); T.start(); };
+          $('tHome').onclick = () => { ov.classList.remove('on'); L.UI.leave(); L.Menus.show('title'); };
+          L.Audio.play('win');
+        }, 900);
+      },
+    });
+  };
+  T.stop = function () {
+    running = false;
+    hide();
+  };
+  T.running = () => running;
 })();
 
 /* ---- 70-layers.js ---- */
@@ -7646,6 +8510,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
         A.play('click');
         const go = b.dataset.go;
         if (go === 'settings') return M.settings();
+        if (go === 'tutorial') { A.init(); return L.Tutorial.start(); }
         M.show(go);
       })
     );
@@ -7665,6 +8530,10 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
       L.Layers.set(0);
       $('tapHint').hidden = true;
       $('titleMenu').hidden = false;
+      const tb = $('goTut');
+      // newcomers see the training first and marked as recommended; veterans get it as a quiet option
+      if (!S.progress.trained) tb.innerHTML = '外勤训练<span class="rec">推荐</span>';
+      else { tb.className = 'btn ghost'; tb.parentNode.appendChild(tb); }
       $('titleFoot').textContent = S.isPersistent() ? '档案将保存在本机' : '无法写入本机存储 · 档案只保存在本次会话';
       if (!S.progress.firstSeen) { S.progress.firstSeen = Date.now(); S.saveProgress(); }
     };
@@ -8031,6 +8900,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
       ${row('fast', '快速动画', '缩短对局中的演出时间')}
       ${row('calm', '减少动效', '关闭震屏、闪烁与大部分粒子')}
       ${row('vibrate', '触感振动', '受到伤害时振动（如设备支持）')}
+      ${row('hints', '新手提示', '对局中停顿时，提示下一步可以做什么')}
       <div class="set-row"><span>存储<small>${S.isPersistent() ? '档案与卡组保存在本机浏览器中' : '本机存储不可用，只在本次会话中保留'}</small></span></div>
       <div class="set-row"><span>重置进度<small>清除已收容的守门人与档案记录（不影响卡组）</small></span><button class="chip" id="resetProg">重置</button></div>`;
     p.querySelectorAll('.toggle').forEach((t) =>
@@ -8172,6 +9042,8 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
 
   function boot() {
     size();
+    const root = document.documentElement.style;
+    for (const k of ['mana', 'san', 'atk', 'hp', 'armor']) root.setProperty('--gem-' + k, `url("${L.Frames.gem(k)}")`);
     window.addEventListener('resize', size);
     window.addEventListener('orientationchange', () => setTimeout(size, 200));
     L.FX.init();

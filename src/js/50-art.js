@@ -227,6 +227,53 @@
   }
 
   // ---------------------------------------------------------------- motifs
+  // ---------------------------------------------------------------- light & volume
+  function mix(a, b, t) {
+    const pa = parseInt(a.slice(1, 7), 16), pb = parseInt(b.slice(1, 7), 16);
+    const ch = (v, sh) => (v >> sh) & 255;
+    const m = (sh) => Math.round(ch(pa, sh) * (1 - t) + ch(pb, sh) * t);
+    return '#' + [m(16), m(8), m(0)].map((v) => v.toString(16).padStart(2, '0')).join('');
+  }
+  const LIGHTS = {
+    hall: (c) => ({ x: c.room ? c.room.vx : 100, y: 4, col: '#fff4c8', rays: 1 }),
+    office: (c) => ({ x: c.room ? c.room.vx : 100, y: 4, col: '#fffbe8', rays: 1 }),
+    lab: (c) => ({ x: c.room ? c.room.vx : 100, y: 2, col: '#e9fbff', rays: 1 }),
+    pool: () => ({ x: 110, y: -8, col: '#e8ffff', rays: 1 }),
+    mall: () => ({ x: 56, y: 28, col: '#ff4d78' }),
+    sky: () => ({ x: 158, y: 18, col: '#fff1d0', rays: 1 }),
+    room: () => ({ x: 152, y: 30, col: '#ffe6f6' }),
+    kinder: () => ({ x: 134, y: 44, col: '#fff1c8', rays: 1 }),
+    void: () => ({ x: 100, y: 58, col: '#c8b8ff' }),
+    park: () => ({ x: 100, y: 96, col: '#fff8d0' }),
+    stair: () => ({ x: 100, y: 0, col: '#ffffff', rays: 1 }),
+    cell: () => ({ x: 100, y: -4, col: '#cfeee8', rays: 1 }),
+  };
+  // lit silhouette: rim light toward the key light, shaded body, masked highlight, contact shadow
+  function vol(ctx, tf, body, det, c, o) {
+    const n = (ctx.n = (ctx.n || 0) + 1);
+    const lt = ctx.light || { x: 100, y: 0, col: '#fff6d8' };
+    const dx = lt.x - o.ax, dy = lt.y - o.ay;
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len, uy = dy / len;
+    let base = c.slice(0, 7);
+    // pale subjects in bright rooms become lit silhouettes, so they read against the wall
+    const lumi = (h) => { const v = parseInt(h.slice(1, 7), 16); return (((v >> 16) & 255) * 0.3 + ((v >> 8) & 255) * 0.59 + (v & 255) * 0.11) / 255; };
+    if (base.length === 4) base = '#' + base.slice(1).split('').map((ch) => ch + ch).join('');
+    if (ctx.bright && !o.nosep && lumi(base) > 0.55) base = mix(base, '#1a2328', 0.68);
+    const hi = mix(base, lt.col, 0.55), lo = shade(base, -0.55);
+    let g = `<defs><g id="f${n}">${body}</g><linearGradient id="vg${n}" x1="${f1(0.5 + ux * 0.5)}" y1="${f1(0.5 + uy * 0.5)}" x2="${f1(0.5 - ux * 0.5)}" y2="${f1(0.5 - uy * 0.5)}"><stop offset="0" stop-color="${hi}"/><stop offset=".45" stop-color="${base}"/><stop offset="1" stop-color="${lo}"/></linearGradient><mask id="mk${n}"><use href="#f${n}" fill="#fff" stroke="#fff"/></mask></defs>`;
+    g += `<g transform="${tf}" ${o.clip ? `clip-path="url(#${o.clip})"` : ''}>`;
+    // atmospheric separation behind the subject
+    if (!o.nosep) g += `<ellipse cx="0" cy="${f1(-(o.sw || 16) * 1.7)}" rx="${f1((o.sw || 16) * 2.2)}" ry="${f1((o.sw || 16) * 2.8)}" fill="${lt.col}" opacity=".28" filter="url(#blr)"/>`;
+    if (o.ground) g += `<ellipse cx="${f1(-ux * (o.sw || 16) * 0.6)}" cy="0" rx="${f1((o.sw || 16) * 1.3)}" ry="${f1((o.sw || 16) * 0.22)}" fill="#000" opacity=".38" filter="url(#blr2)"/>`;
+    g += `<use href="#f${n}" fill="${lt.col}" stroke="${lt.col}" filter="url(#rim)" transform="translate(${f1(ux * 2)} ${f1(uy * 2)})"/>`;
+    g += `<use href="#f${n}" fill="url(#vg${n})" stroke="${base}"/>`;
+    const hl = o.hl || { cx: 0, cy: -20, rx: 26, ry: 34 };
+    g += `<g mask="url(#mk${n})"><ellipse cx="${f1(hl.cx + ux * hl.rx * 0.5)}" cy="${f1(hl.cy + uy * hl.ry * 0.5)}" rx="${hl.rx}" ry="${hl.ry}" fill="url(#hl)" opacity=".55"/></g>`;
+    g += det + `</g>`;
+    return g;
+  }
+
   const M = {
     tubes(r, o, ctx) {
       ctx.hasTubes = true;
@@ -279,48 +326,75 @@
       const x = X(o.x || 0.5);
       return `<path d="M${x - 14} ${H} Q${x - 18} ${H - 14} ${x - 10} ${H - 20}" stroke="#3a3018" stroke-width="1.6" fill="none"/><path d="M${x + 14} ${H} Q${x + 20} ${H - 12} ${x + 10} ${H - 20}" stroke="#3a3018" stroke-width="1.6" fill="none"/>`;
     },
-    faceless(r, o) {
-      const x = X(o.x || 0.5),
-        s = (o.s || 1) * 1.0;
+    // a person with no face: anatomical bust and coat, two-tone (cloth / skin), lit and rimmed
+    faceless(r, o, ctx) {
+      const x = X(o.x || 0.5), s = o.s || 1;
       const base = Y(o.y != null ? o.y + 0.3 : 1.0);
-      const c = o.c || '#2b2618';
-      const hh = 46 * s;
-      let g = '';
+      const hh = 46 * s, k = hh / 100;
+      const cloth = o.c || '#2b2618';
+      const skin = o.skin || '#dccbb6';
       let tf = `translate(${f1(x)} ${f1(base)})`;
       if (o.fall) tf += ' rotate(35)';
       if (o.run) tf += ' skewX(-14)';
-      g += `<g transform="${tf}">`;
-      if (o.half) g += `<clipPath id="hc${Math.floor(x)}"><rect x="-60" y="${f1(-hh * 1.6)}" width="${f1(60 + r.range(0, 8))}" height="${f1(hh * 2)}"/></clipPath><g clip-path="url(#hc${Math.floor(x)})">`;
-      // shoulders/torso
-      g += `<path d="M${f1(-18 * s)} 0 Q${f1(-18 * s)} ${f1(-hh * 0.62)} ${f1(-9 * s)} ${f1(-hh * 0.7)} L${f1(9 * s)} ${f1(-hh * 0.7)} Q${f1(18 * s)} ${f1(-hh * 0.62)} ${f1(18 * s)} 0 Z" fill="${c}"/>`;
-      if (o.arms) g += `<path d="M${f1(-10 * s)} ${f1(-hh * 0.6)} L${f1(26 * s)} ${f1(-hh * 0.66)} M${f1(8 * s)} ${f1(-hh * 0.6)} L${f1(34 * s)} ${f1(-hh * 0.62)}" stroke="${c}" stroke-width="${f1(5 * s)}" stroke-linecap="round"/>`;
-      // neck + head
-      const hy = o.up ? -hh * 0.98 : -hh * 0.92;
-      g += `<rect x="${f1(-3.5 * s)}" y="${f1(-hh * 0.8)}" width="${f1(7 * s)}" height="${f1(8 * s)}" fill="${c}"/>`;
-      g += `<ellipse cx="0" cy="${f1(hy)}" rx="${f1(9.5 * s)}" ry="${f1(12 * s)}" fill="${c}" ${o.up ? 'transform="rotate(-18)"' : ''}/>`;
-      if (!o.back) {
-        // a face that is not there
-        g += `<ellipse cx="0" cy="${f1(hy + 1.5 * s)}" rx="${f1(6.5 * s)}" ry="${f1(8.5 * s)}" fill="#fff" opacity=".18"/>`;
-        if (o.eyes) g += `<circle cx="${f1(-3 * s)}" cy="${f1(hy)}" r="${f1(2.6 * s)}" fill="#fff"/><circle cx="${f1(3 * s)}" cy="${f1(hy)}" r="${f1(2.6 * s)}" fill="#fff"/><circle cx="${f1(-3 * s)}" cy="${f1(hy)}" r="${f1(0.9 * s)}" fill="#000"/><circle cx="${f1(3 * s)}" cy="${f1(hy)}" r="${f1(0.9 * s)}" fill="#000"/>`;
+      tf += ` scale(${f1(k * 100) / 100})`;
+      const v = r.int(3);
+      // coat with shoulders, flared hem, legs
+      const hem = o.half ? -2 : -14 - v * 3;
+      let coat = `<path d="M-4 -70 C-11 -69 -17 -67 -19 -61 C-21 -54 -21 -40 -20 -26 L-21 ${hem} L-7 ${hem + 2} L-6 0 L-1.5 0 L-1 ${hem + 2} L1 ${hem + 2} L1.5 0 L6 0 L7 ${hem + 2} L21 ${hem} L20 -26 C21 -40 21 -54 19 -61 C17 -67 11 -69 4 -70 Z"/>`;
+      if (o.arms) coat += `<path d="M14 -64 C24 -64 36 -63 46 -62 L46 -56 C36 -57 24 -57 15 -55 Z"/><path d="M12 -58 C22 -57 34 -55 42 -54 L42 -48 C33 -49 22 -50 12 -51 Z"/>`;
+      else coat += `<path d="M-18 -62 C-23 -50 -24 -38 -22.5 -28 L-18.5 -27 C-19 -38 -17.5 -50 -14 -59 Z"/><path d="M18 -62 C23 -50 24 -38 22.5 -28 L18.5 -27 C19 -38 17.5 -50 14 -59 Z"/>`;
+      if (o.hood) coat += `<path d="M-12 -72 C-15 -88 -11 -102 0 -103 C11 -102 15 -88 12 -72 C8 -76 -8 -76 -12 -72 Z"/>`;
+      if (o.cap) coat += `<path d="M-9.5 -92 C-9 -101 9 -101 9.5 -92 L12 -90 L-12 -90 Z"/>`;
+      // lapels, seams, buttons, belt
+      const lc = shade(cloth.slice(0, 7).length === 7 ? cloth.slice(0, 7) : '#333333', 0.35);
+      let cd = `<path d="M-6 -69 L0 -54 L6 -69" fill="none" stroke="${lc}" stroke-width="1.4" opacity=".8"/><path d="M0 -54 L0 ${hem + 2}" stroke="#000" stroke-width=".8" opacity=".35"/>`;
+      for (let i = 0; i < 3; i++) cd += `<circle cx="1.8" cy="${-48 + i * 9}" r=".9" fill="${lc}" opacity=".8"/>`;
+      cd += `<path d="M-19 -36 Q0 -33 19 -36" fill="none" stroke="#000" stroke-width="1" opacity=".25"/>`;
+      if (o.tie) cd += `<path d="M0 -66 L-2 -62 L0 -50 L2 -62 Z" fill="#7a1f24"/>`;
+      if (o.badge) cd += `<rect x="6" y="-50" width="7" height="9" rx="1" fill="#f4f1e6"/><rect x="7.2" y="-48.6" width="4.6" height="4" fill="#cfcfcf"/><path d="M9.5 -50 L6 -66" stroke="#2a5aa0" stroke-width=".8"/>`;
+      if (o.cap) cd += `<rect x="-3" y="-99" width="6" height="3" rx=".8" fill="#e8c25a"/>`;
+      // skin: skull with jaw, neck, hands
+      const hy = o.up ? -3 : 0;
+      let sk = `<g ${o.up ? 'transform="rotate(-14 0 -78)"' : ''}><path d="M0 ${-100 + hy} C7.5 ${-100 + hy} 9.5 ${-93 + hy} 9.2 ${-87 + hy} C9 ${-81 + hy} 6.5 ${-76 + hy} 0 ${-74 + hy} C-6.5 ${-76 + hy} -9 ${-81 + hy} -9.2 ${-87 + hy} C-9.5 ${-93 + hy} -7.5 ${-100 + hy} 0 ${-100 + hy} Z"/></g>`;
+      sk += `<path d="M-3.8 -76 L-4.4 -69 L4.4 -69 L3.8 -76 Z"/>`;
+      if (!o.arms) sk += `<ellipse cx="-21" cy="-25.5" rx="2.6" ry="3.6"/><ellipse cx="21" cy="-25.5" rx="2.6" ry="3.6"/>`;
+      else sk += `<ellipse cx="47.5" cy="-59" rx="3" ry="2.6"/><ellipse cx="43.5" cy="-51" rx="3" ry="2.6"/>`;
+      // the face that is not there
+      let fd = '';
+      if (o.back) fd += `<path d="M-9.4 -86 C-10 -101 10 -101 9.4 -86 C7 -80 -7 -80 -9.4 -86 Z" fill="#1c1612"/>`;
+      else {
+        fd += `<g ${o.up ? 'transform="rotate(-14 0 -78)"' : ''}>`;
+        fd += `<ellipse cx="-3.6" cy="${-87 + hy}" rx="2.7" ry="1.8" fill="#000" opacity=".28" filter="url(#rim)"/><ellipse cx="3.6" cy="${-87 + hy}" rx="2.7" ry="1.8" fill="#000" opacity=".28" filter="url(#rim)"/>`;
+        fd += `<ellipse cx="-1" cy="${-94 + hy}" rx="5" ry="2.4" fill="#fff" opacity=".22"/><path d="M0 ${-86 + hy} L0.4 ${-81 + hy}" stroke="#000" stroke-width=".6" opacity=".18"/>`;
+        if (o.eyes) fd += `<circle cx="-3.6" cy="${-87 + hy}" r="2.2" fill="#fff"/><circle cx="3.6" cy="${-87 + hy}" r="2.2" fill="#fff"/><circle cx="-3.6" cy="${-87 + hy}" r=".8" fill="#000"/><circle cx="3.6" cy="${-87 + hy}" r=".8" fill="#000"/><path d="M-6 ${-84 + hy} Q-3.6 ${-83 + hy} -1.5 ${-84 + hy} M1.5 ${-84 + hy} Q3.6 ${-83 + hy} 6 ${-84 + hy}" stroke="#5a3a3a" stroke-width=".7" fill="none"/>`;
+        if (!o.hood && !o.cap) fd += `<path d="M-9.3 -88 C-10 -102 10 -102 9.3 -88 C7.5 -95 -7.5 -95 -9.3 -88 Z" fill="${v === 1 ? '#3a2a1c' : '#1e1814'}"/>`;
+        fd += `</g>`;
       }
-      if (o.badge) g += `<rect x="${f1(4 * s)}" y="${f1(-hh * 0.5)}" width="${f1(8 * s)}" height="${f1(10 * s)}" fill="#f4f1e6"/><rect x="${f1(5.5 * s)}" y="${f1(-hh * 0.48)}" width="${f1(5 * s)}" height="${f1(5 * s)}" fill="#ddd"/>`;
-      if (o.half) g += `</g>`;
+      (ctx.figs = ctx.figs || []).push({ x, y: base - hh * (o.fall ? 0.4 : 0.72), h: hh * (o.half || o.fall ? 1.3 : 0.98) });
+      const opt = { ax: x, ay: base - hh * 0.5, sw: 19, hl: { cx: 0, cy: -62, rx: 22, ry: 30 } };
+      let clip = '';
+      if (o.half) clip = `<clipPath id="hc${Math.floor(x)}"><rect x="-60" y="-140" width="${f1(60 + r.range(0, 8))}" height="160"/></clipPath>`;
+      let g = clip + `<g ${o.half ? `clip-path="url(#hc${Math.floor(x)})"` : ''}>`;
+      g += vol(ctx, tf, coat, cd, cloth, Object.assign({ ground: !o.fall && !o.half }, opt));
+      g += vol(ctx, tf, sk, fd, skin, Object.assign({ ground: false, nosep: true }, opt, { hl: { cx: -2, cy: -92, rx: 8, ry: 9 } }));
       g += `</g>`;
       if (o.mirror) g = `<g transform="translate(${f1(2 * x)} 0) scale(-1 1)">${g}</g>`;
       return g;
     },
-    longfig(r, o) {
-      const x = X(o.x || 0.5),
-        s = o.s || 1;
+    longfig(r, o, ctx) {
+      const x = X(o.x || 0.5), s = o.s || 1;
       const base = Y(o.y != null ? o.y + 0.3 : 1.0);
       const c = o.c || '#1a1712';
-      const hh = 120 * s;
-      let g = `<g transform="translate(${f1(x)} ${f1(base)})" ${o.phase ? 'opacity=".85"' : ''}>`;
-      g += `<path d="M${f1(-3 * s)} 0 L${f1(-5 * s)} ${f1(-hh * 0.45)} L${f1(-8 * s)} ${f1(-hh * 0.8)} L${f1(8 * s)} ${f1(-hh * 0.8)} L${f1(5 * s)} ${f1(-hh * 0.45)} L${f1(3 * s)} 0 Z" fill="${c}"/>`;
-      g += `<path d="M${f1(-8 * s)} ${f1(-hh * 0.78)} Q${f1(-22 * s)} ${f1(-hh * 0.5)} ${f1(-16 * s)} ${f1(-hh * 0.12)} M${f1(8 * s)} ${f1(-hh * 0.78)} Q${f1(22 * s)} ${f1(-hh * 0.5)} ${f1(17 * s)} ${f1(-hh * 0.1)}" stroke="${c}" stroke-width="${f1(2.6 * s)}" fill="none" stroke-linecap="round"/>`;
-      g += `<ellipse cx="0" cy="${f1(-hh * 0.88)}" rx="${f1(6 * s)}" ry="${f1(9 * s)}" fill="${c}"/>`;
-      g += `</g>`;
-      return g;
+      const hh = 120 * s, k = hh / 100;
+      const tf = `translate(${f1(x)} ${f1(base)}) scale(${f1(k * 100) / 100})`;
+      // hunched, too tall, arms past the knees with long fingers
+      let body = `<path d="M-2.5 0 C-3 -18 -4.5 -34 -4 -46 C-6 -58 -7 -70 -6 -78 C-5 -82 -3 -83 0 -83 C3 -83 5 -82 6 -78 C7 -70 6 -58 4 -46 C4.5 -34 3 -18 2.5 0 L1 0 L0.4 -40 L-0.4 -40 L-1 0 Z"/>`;
+      body += `<path d="M-5.5 -78 C-10 -66 -11 -44 -9.5 -22 L-8 -22 C-8.5 -44 -7.5 -64 -4 -76 Z"/><path d="M5.5 -78 C10 -66 11 -44 9.5 -22 L8 -22 C8.5 -44 7.5 -64 4 -76 Z"/>`;
+      body += `<path d="M-9.5 -22 L-11 -14 M-9 -22 L-9.6 -13 M-8.5 -22 L-8 -14 M9.5 -22 L11 -14 M9 -22 L9.6 -13 M8.5 -22 L8 -14" stroke-width=".9" fill="none" stroke-linecap="round"/>`;
+      body += `<path d="M0 -94 C4.2 -94 5 -90 4.8 -86.5 C4.6 -83.5 2.6 -82 0 -82 C-2.6 -82 -4.6 -83.5 -4.8 -86.5 C-5 -90 -4.2 -94 0 -94 Z" transform="rotate(8 0 -88)"/>`;
+      const det = `<circle cx="-1.8" cy="-88.4" r=".75" fill="#fff6c8"/><circle cx="1.8" cy="-88" r=".75" fill="#fff6c8"/><circle cx="-1.8" cy="-88.4" r="2.2" fill="#fff6c8" opacity=".25" filter="url(#rim)"/><circle cx="1.8" cy="-88" r="2.2" fill="#fff6c8" opacity=".25" filter="url(#rim)"/>`;
+      (ctx.figs = ctx.figs || []).push({ x, y: base - hh * 0.6, h: hh * 0.95 });
+      return `<g ${o.phase ? 'opacity=".85"' : ''}>` + vol(ctx, tf, body, det, c, { ax: x, ay: base - hh * 0.5, ground: true, sw: 8, hl: { cx: 0, cy: -70, rx: 9, ry: 24 } }) + `</g>`;
     },
     ring(r, o) {
       const x = X(o.x || 0.5),
@@ -734,13 +808,25 @@
       }
       return s;
     },
-    child(r, o) {
-      const x = X(o.x || 0.5),
-        s = (o.s || 1) * 0.9;
+    child(r, o, ctx) {
+      const x = X(o.x || 0.5), s = (o.s || 1) * 0.9;
       const base = Y(o.y != null ? o.y + 0.25 : 0.95);
-      const c = o.faded ? '#e8d8f0' : '#3a2a40';
-      if (o.sleep) return `<g transform="translate(${f1(x)} ${f1(base)}) scale(${f1(s)})"><ellipse cx="0" cy="-6" rx="28" ry="9" fill="${c}"/><circle cx="-26" cy="-12" r="9" fill="${c}"/><circle cx="-26" cy="-12" r="6" fill="#fff" opacity=".15"/></g>`;
-      return `<g transform="translate(${f1(x)} ${f1(base)}) scale(${f1(s)})" ${o.faded ? 'opacity=".75"' : ''}><path d="M-11 0 L-8 -26 L8 -26 L11 0 Z" fill="${c}"/><circle cx="0" cy="-34" r="11" fill="${c}"/><circle cx="-12" cy="-40" r="4" fill="${c}"/><circle cx="12" cy="-40" r="4" fill="${c}"/><ellipse cx="0" cy="-33" rx="7" ry="8" fill="#fff" opacity=".18"/></g>`;
+      const cloth = o.faded ? '#e8d8f0' : o.c || '#5a3a6a';
+      const skin = o.faded ? '#f4ecf6' : '#e8d4c2';
+      const tf = `translate(${f1(x)} ${f1(base)}) scale(${f1(s)})`;
+      (ctx.figs = ctx.figs || []).push({ x, y: base - (o.sleep ? 10 : 28) * s, h: (o.sleep ? 44 : 66) * s });
+      if (o.sleep) {
+        const cl = `<path d="M-22 -2 C-24 -12 -10 -16 6 -14 C20 -13 30 -10 30 -3 C30 2 -20 3 -22 -2 Z"/>`;
+        const sk = `<circle cx="-26" cy="-10" r="8.5"/><ellipse cx="-14" cy="-4" rx="3" ry="2.2"/>`;
+        const fd = `<path d="M-34 -12 C-34 -22 -18 -22 -18 -12 C-21 -17 -31 -17 -34 -12 Z" fill="#2a1c14"/><path d="M-29 -9 Q-27 -8 -25 -9" stroke="#5a3a2a" stroke-width=".7" fill="none"/>`;
+        return vol(ctx, tf, cl, '', cloth, { ax: x, ay: base - 8, ground: true, sw: 30, hl: { cx: 0, cy: -12, rx: 20, ry: 10 } }) + vol(ctx, tf, sk, fd, skin, { ax: x, ay: base - 8, ground: false, nosep: true, sw: 30, hl: { cx: -27, cy: -13, rx: 6, ry: 6 } });
+      }
+      const cl = `<path d="M-4 -27 C-8 -26 -10 -24 -11 -20 L-14 -6 L14 -6 L11 -20 C10 -24 8 -26 4 -27 Z"/><path d="M-5 -6 L-4.5 0 L-1.5 0 L-1.5 -6 Z M1.5 -6 L1.5 0 L4.5 0 L5 -6 Z"/>`;
+      const sk = `<circle cx="0" cy="-37" r="10.5"/><ellipse cx="-12" cy="-16" rx="2" ry="2.6"/><ellipse cx="12" cy="-16" rx="2" ry="2.6"/>`;
+      let fd = `<path d="M-10.8 -38 C-11.5 -51 11.5 -51 10.8 -38 C8 -44 -8 -44 -10.8 -38 Z" fill="#2a1c14"/><circle cx="-12.5" cy="-41" r="3.8" fill="#2a1c14"/><circle cx="12.5" cy="-41" r="3.8" fill="#2a1c14"/>`;
+      fd += `<ellipse cx="-3.8" cy="-35" rx="2.4" ry="1.6" fill="#000" opacity=".22" filter="url(#rim)"/><ellipse cx="3.8" cy="-35" rx="2.4" ry="1.6" fill="#000" opacity=".22" filter="url(#rim)"/>`;
+      fd += `<path d="M-8 -26 L0 -20 L8 -26" fill="none" stroke="#fff" stroke-width="1.2" opacity=".55"/>`;
+      return `<g ${o.faded ? 'opacity=".8"' : ''}>` + vol(ctx, tf, cl, '', cloth, { ax: x, ay: base - 20 * s, ground: true, sw: 14, hl: { cx: 0, cy: -18, rx: 10, ry: 12 } }) + vol(ctx, tf, sk, fd, skin, { ax: x, ay: base - 20 * s, ground: false, nosep: true, sw: 14, hl: { cx: -2, cy: -41, rx: 7, ry: 7 } }) + `</g>`;
     },
     halo(r, o) {
       const x = X(o.x || 0.5),
@@ -933,6 +1019,10 @@
     return `<defs>
 <filter id="glw" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 <filter id="blr" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+<filter id="blr2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2"/></filter>
+<filter id="rim" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.1"/></filter>
+<filter id="ray" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3.5"/></filter>
+<radialGradient id="hl"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
 <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="${seed % 97}" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 1.4 -.55"/></filter>
 ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".018 .03" numOctaves="2" seed="${seed % 53}"/><feDisplacementMap in="SourceGraphic" scale="${f1(warp * 26)}" xChannelSelector="R" yChannelSelector="G"/></filter>` : ''}
 <radialGradient id="vig" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
@@ -944,7 +1034,10 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
 </defs>`;
   }
 
-  function build(spec, seed) {
+  // environment motifs stay in place; subjects are brought forward for portrait (oval) windows
+  const ENV = new Set(['tubes', 'snow', 'grid', 'stars', 'bubbles', 'paper', 'pixtear', 'drips', 'moths', 'notes', 'chains', 'wetfloor', 'cubicles', 'cars', 'mats', 'tape', 'textlines', 'waves', 'monitors', 'clouds', 'sunbeam', 'wall', 'crack', 'hopscotch', 'legs', 'line', 'eyes']);
+  function build(spec, seed, opts) {
+    const zoom = (opts && opts.zoom) || 1;
     const r = U.seeded(seed);
     const ctx = {};
     const scene = spec[0];
@@ -952,23 +1045,64 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     for (const item of spec.slice(1)) if (typeof item === 'object' && item.warp) warp = item.warp;
     // scene first (records room geometry for motifs), then items in order; overlays apply where they are listed
     const bg = (SCENES[scene] || SCENES.void)(r, ctx);
+    ctx.light = (LIGHTS[scene] || LIGHTS.void)(ctx);
+    ctx.bright = ['hall', 'lab', 'office', 'sky', 'room', 'kinder', 'pool', 'stair'].includes(scene);
+    for (const item of spec.slice(1)) if (typeof item === 'object' && item.light) Object.assign(ctx.light, item.light);
+    let dark = 0;
+    for (const item of spec.slice(1)) if (typeof item === 'object' && item.dark) dark = Math.max(dark, item.dark);
     let fg = '';
     let post = '';
     for (const item of spec.slice(1)) {
       if (typeof item === 'string') {
         const mo = parse(item);
         const fn = M[mo.m];
-        if (fn) fg += fn(r, mo.o, ctx);
+        if (!fn) continue;
+        fg += fn(r, mo.o, ctx);
+        if (!ENV.has(mo.m) && !ctx.focus) ctx.focus = { x: X(mo.o.x || 0.5), y: Y(mo.o.y || 0.52), h: Math.max(70, Math.min(140, 96 * (mo.o.s || 1))) };
       } else {
         if (item.tint) fg += `<rect width="${W}" height="${H}" fill="${item.tint}" opacity=".28" style="mix-blend-mode:multiply"/>`;
         if (item.dark) fg += `<rect width="${W}" height="${H}" fill="#050405" opacity="${item.dark}"/>`;
         if (item.bright) post += `<rect width="${W}" height="${H}" fill="#fff" opacity="${item.bright * 0.4}"/>`;
       }
     }
-    let body = `<g ${warp ? 'filter="url(#warp)"' : ''}>${bg}${fg}</g>${post}`;
+    // key light, god rays, floor haze
+    const lt = ctx.light;
+    const k = 1 - dark * 0.75;
+    let light = `<defs><radialGradient id="kl" cx="${f1(lt.x / W)}" cy="${f1(lt.y / H)}" r=".75"><stop offset="0" stop-color="${lt.col}" stop-opacity=".75"/><stop offset=".45" stop-color="${lt.col}" stop-opacity=".18"/><stop offset="1" stop-color="${lt.col}" stop-opacity="0"/></radialGradient><linearGradient id="fogg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${lt.col}" stop-opacity="0"/><stop offset="1" stop-color="${lt.col}" stop-opacity=".16"/></linearGradient></defs>`;
+    light += `<rect width="${W}" height="${H}" fill="url(#kl)" opacity="${f1(0.42 * k)}" style="mix-blend-mode:screen"/>`;
+    if (lt.rays && k > 0.4) {
+      for (let i = 0; i < 4; i++) {
+        const sp = r.range(-70, 70), w = r.range(5, 14);
+        light += `<polygon points="${f1(lt.x - 2)},${f1(lt.y)} ${f1(lt.x + 2)},${f1(lt.y)} ${f1(lt.x + sp + w)},${H} ${f1(lt.x + sp - w)},${H}" fill="${lt.col}" opacity="${f1(r.range(0.05, 0.11) * k)}" filter="url(#ray)"/>`;
+      }
+    }
+    light += `<rect y="${f1(H * 0.62)}" width="${W}" height="${f1(H * 0.38)}" fill="url(#fogg)" opacity="${f1(k * 0.7)}"/>`;
+    // lower the key of bright rooms so the subject carries the picture
+    const lowkey = ctx.bright ? `<rect width="${W}" height="${H}" fill="#120e08" opacity=".22"/>` : '';
+    let body = `<g ${warp ? 'filter="url(#warp)"' : ''}>${bg}${lowkey}${fg}${light}</g>${post}`;
     body += `<rect width="${W}" height="${H}" fill="url(#vig)"/>`;
     body += `<rect width="${W}" height="${H}" filter="url(#grain)" opacity=".2"/>`;
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W * 2}" height="${H * 2}" preserveAspectRatio="xMidYMid slice">${defs(warp, seed)}${body}</svg>`;
+    // framing: minions get a half-length portrait crop on their subject, spells a closer landscape crop
+    let vb = [0, 0, W, H];
+    const type = (opts && opts.type) || 'field';
+    if (type !== 'field') {
+      const figs = ctx.figs || [];
+      let f;
+      if (figs.length) {
+        const xs = figs.map((q) => q.x);
+        f = { x: (Math.min(...xs) + Math.max(...xs)) / 2, y: figs.reduce((a, q) => a + q.y, 0) / figs.length, h: Math.max(...figs.map((q) => q.h)), span: Math.max(...xs) - Math.min(...xs) };
+      } else f = ctx.focus || { x: 100, y: 70, h: 110 };
+      const aspect = type === 'minion' ? 0.91 : 1.27;
+      let ch = Math.max(type === 'minion' ? 60 : 78, Math.min(H, f.h * (type === 'minion' ? 1.12 : 1.25)));
+      let cw = ch * aspect;
+      if (f.span && f.span + 34 > cw) { cw = Math.min(W, f.span + 34); ch = Math.min(H, cw / aspect); }
+      if (cw > W) { cw = W; ch = W / aspect; }
+      let x0 = Math.max(0, Math.min(W - cw, f.x - cw / 2));
+      let y0 = Math.max(0, Math.min(H - ch, f.y - ch * 0.48));
+      vb = [x0, y0, cw, ch].map(f1);
+    }
+    const pw = Math.round(vb[2] * 3), ph = Math.round(vb[3] * 3);
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb.join(' ')}" width="${pw}" height="${ph}" preserveAspectRatio="xMidYMid slice">${defs(warp, seed)}${body}</svg>`;
   }
 
   // ---------------------------------------------------------------- portraits (square)
@@ -1037,7 +1171,7 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
   }
   Art.card = function (cid) {
     const d = L.CARDS[cid];
-    return key('c:' + cid, () => build(d.art || ['void'], U.hash(cid))).url;
+    return key('c:' + cid, () => build(d.art || ['void'], U.hash(cid), { type: d.type })).url;
   };
   Art.portrait = function (heroId) {
     return key('p:' + heroId, () => portrait(L.HEROES[heroId])).url;
@@ -1046,50 +1180,255 @@ ${warp ? `<filter id="warp" x="-5%" y="-5%" width="110%" height="110%"><feTurbul
     return key('back', back).url;
   };
   Art.svgOf = function (cid) {
-    return build(L.CARDS[cid].art || ['void'], U.hash(cid));
+    return build(L.CARDS[cid].art || ['void'], U.hash(cid), { type: L.CARDS[cid].type });
   };
-  // swap heavy SVG (with noise filters) for bitmaps once, in idle time
-  Art.rasterizeAll = function (onEach) {
-    if (typeof document === 'undefined') return;
-    const ids = Object.keys(L.CARDS).map((c) => 'c:' + c).concat(L.AGENTS.concat(L.BOSSES).map((h) => 'p:' + h), ['back']);
-    let i = 0;
-    const step = () => {
-      const t0 = performance.now();
-      while (i < ids.length && performance.now() - t0 < 12) {
-        const k = ids[i++];
-        if (k === 'back') Art.back();
-        else if (k[0] === 'c') Art.card(k.slice(2));
-        else Art.portrait(k.slice(2));
-        const entry = cache[k];
-        if (!entry || entry.raster) continue;
-        entry.raster = 'pending';
-        const img = new Image();
-        img.onload = () => {
-          try {
-            const isP = k[0] === 'p' || k === 'back';
-            const cw = k === 'back' ? 200 : isP ? 240 : 400,
-              ch = k === 'back' ? 280 : isP ? 240 : 280;
-            const cv = document.createElement('canvas');
-            cv.width = cw;
-            cv.height = ch;
-            cv.getContext('2d').drawImage(img, 0, 0, cw, ch);
-            cv.toBlob((b) => {
-              if (!b) return;
-              entry.url = URL.createObjectURL(b);
-              entry.raster = 'done';
-              if (onEach) onEach(k, entry.url);
-            }, 'image/png');
-          } catch (e) {
-            entry.raster = 'failed';
-          }
-        };
-        img.onerror = () => (entry.raster = 'failed');
-        img.src = toURI(entry.svg);
+  // ---------------------------------------------------------------- painterly renderer
+  // Coarse-to-fine brush strokes over the composed image (after Hertzmann): each pass only
+  // repaints where the canvas still differs from the composition, strokes follow the edges.
+  const ART_VER = 'v9';
+  Art.painted = 0;
+  function* painter(img, W2, H2, seed) {
+    const src = document.createElement('canvas');
+    src.width = W2;
+    src.height = H2;
+    const sx = src.getContext('2d', { willReadFrequently: true });
+    sx.drawImage(img, 0, 0, W2, H2);
+    const sd = sx.getImageData(0, 0, W2, H2).data;
+    const out = document.createElement('canvas');
+    out.width = W2;
+    out.height = H2;
+    const o = out.getContext('2d', { willReadFrequently: true });
+    // underpainting: the composition, softened by down/up-scaling (works without ctx.filter)
+    const tiny = document.createElement('canvas');
+    tiny.width = Math.ceil(W2 / 10);
+    tiny.height = Math.ceil(H2 / 10);
+    tiny.getContext('2d').drawImage(src, 0, 0, tiny.width, tiny.height);
+    o.imageSmoothingQuality = 'high';
+    o.drawImage(tiny, 0, 0, W2, H2);
+    yield;
+    const lum = new Float32Array(W2 * H2);
+    for (let i = 0, j = 0; i < sd.length; i += 4, j++) lum[j] = sd[i] * 0.3 + sd[i + 1] * 0.59 + sd[i + 2] * 0.11;
+    const rnd = U.seeded(seed);
+    o.lineCap = 'round';
+    const passes = [
+      { r: 13, thr: 0, len: 2.4 },
+      { r: 7.5, thr: 16, len: 2.8 },
+      { r: 4, thr: 22, len: 3.2 },
+      { r: 2.2, thr: 26, len: 3.2 },
+      { r: 1.2, thr: 30, len: 3 },
+    ];
+    for (const ps of passes) {
+      const od = o.getImageData(0, 0, W2, H2).data;
+      const step = Math.max(1, ps.r * 1.05);
+      const strokes = [];
+      for (let y = 0; y < H2; y += step)
+        for (let x = 0; x < W2; x += step) {
+          const px = Math.min(W2 - 1, Math.floor(x + rnd() * step)), py = Math.min(H2 - 1, Math.floor(y + rnd() * step));
+          const i = (py * W2 + px) * 4;
+          const err = Math.abs(sd[i] - od[i]) + Math.abs(sd[i + 1] - od[i + 1]) + Math.abs(sd[i + 2] - od[i + 2]);
+          // crisp at the focus, looser toward the edges, like a painter would
+          const dx = (px - W2 / 2) / (W2 / 2), dy = (py - H2 * 0.45) / (H2 / 2);
+          const d = Math.min(1.4, Math.hypot(dx, dy));
+          if (err < ps.thr * 3 * (0.45 + d * 0.9)) continue;
+          strokes.push(px, py);
+        }
+      // shuffle so strokes interleave naturally
+      for (let i = strokes.length / 2 - 1; i > 0; i--) {
+        const j = Math.floor(rnd() * (i + 1));
+        const ax = strokes[i * 2], ay = strokes[i * 2 + 1];
+        strokes[i * 2] = strokes[j * 2]; strokes[i * 2 + 1] = strokes[j * 2 + 1];
+        strokes[j * 2] = ax; strokes[j * 2 + 1] = ay;
       }
-      if (i < ids.length) (window.requestIdleCallback || ((f) => setTimeout(f, 30)))(step);
-    };
-    step();
+      o.lineWidth = ps.r;
+      for (let k = 0; k < strokes.length; k += 2) {
+        const x = strokes[k], y = strokes[k + 1];
+        const i = (y * W2 + x) * 4;
+        const xl = Math.max(0, x - 2), xr = Math.min(W2 - 1, x + 2), yu = Math.max(0, y - 2), yd = Math.min(H2 - 1, y + 2);
+        const gx = lum[y * W2 + xr] - lum[y * W2 + xl];
+        const gy = lum[yd * W2 + x] - lum[yu * W2 + x];
+        const mag = Math.hypot(gx, gy);
+        // along the edge where there is one, otherwise a gentle diagonal hand
+        const ang = mag > 6 ? Math.atan2(gy, gx) + Math.PI / 2 : 0.55 + (rnd() - 0.5) * 0.9;
+        const L2 = ps.r * (ps.len + rnd() * 1.6) * (mag > 30 ? 0.7 : 1);
+        // slight saturation push and value jitter, like pigment
+        const j = (rnd() - 0.5) * 22;
+        const avg = (sd[i] + sd[i + 1] + sd[i + 2]) / 3;
+        const sat = 1.22, con = 1.14;
+        const cc = (v) => Math.max(0, Math.min(255, 128 + (v - 128) * con));
+        const cr = cc(avg + (sd[i] - avg) * sat + j), cg = cc(avg + (sd[i + 1] - avg) * sat + j), cb = cc(avg + (sd[i + 2] - avg) * sat + j * 1.2);
+        o.strokeStyle = `rgba(${cr | 0},${cg | 0},${cb | 0},${(0.72 + rnd() * 0.25).toFixed(2)})`;
+        const c = Math.cos(ang) * L2 * 0.5, sn = Math.sin(ang) * L2 * 0.5;
+        o.beginPath();
+        o.moveTo(x - c, y - sn);
+        o.quadraticCurveTo(x + sn * 0.25, y - c * 0.25, x + c, y + sn);
+        o.stroke();
+        if ((k & 1023) === 0) yield;
+      }
+      yield;
+    }
+    // glazing: keep small crisp lights (eyes, signs) from the composition
+    o.globalAlpha = 0.12;
+    o.drawImage(src, 0, 0);
+    // bloom on the brightest parts
+    o.globalAlpha = 0.22;
+    o.globalCompositeOperation = 'lighter';
+    const bl = document.createElement('canvas');
+    bl.width = Math.ceil(W2 / 6);
+    bl.height = Math.ceil(H2 / 6);
+    const bx = bl.getContext('2d');
+    bx.drawImage(src, 0, 0, bl.width, bl.height);
+    const bd = bx.getImageData(0, 0, bl.width, bl.height);
+    for (let i = 0; i < bd.data.length; i += 4) {
+      const l = bd.data[i] * 0.3 + bd.data[i + 1] * 0.59 + bd.data[i + 2] * 0.11;
+      const k2 = Math.max(0, (l - 170) / 85);
+      bd.data[i] *= k2; bd.data[i + 1] *= k2; bd.data[i + 2] *= k2;
+    }
+    bx.putImageData(bd, 0, 0);
+    o.drawImage(bl, 0, 0, W2, H2);
+    o.globalCompositeOperation = 'source-over';
+    // auto-levels: stretch the 2–98% luminance range, lift midtones slightly, push saturation
+    {
+      const id = o.getImageData(0, 0, W2, H2);
+      const d = id.data;
+      const hist = new Uint32Array(256);
+      for (let i = 0; i < d.length; i += 4) hist[(d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11) | 0]++;
+      const tot = W2 * H2;
+      let acc = 0, lo = 0, hi = 255;
+      for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc > tot * 0.02) { lo = v; break; } }
+      acc = 0;
+      for (let v = 255; v >= 0; v--) { acc += hist[v]; if (acc > tot * 0.02) { hi = v; break; } }
+      const span = Math.max(40, hi - lo);
+      const lut = new Uint8ClampedArray(256);
+      for (let v = 0; v < 256; v++) lut[v] = 255 * Math.pow(Math.max(0, Math.min(1, (v - lo) / span)), 0.88);
+      for (let i = 0; i < d.length; i += 4) {
+        const r0 = lut[d[i]], g0 = lut[d[i + 1]], b0 = lut[d[i + 2]];
+        const m = (r0 + g0 + b0) / 3;
+        d[i] = m + (r0 - m) * 1.12; d[i + 1] = m + (g0 - m) * 1.12; d[i + 2] = m + (b0 - m) * 1.12;
+      }
+      o.putImageData(id, 0, 0);
+    }
+    yield;
+    // canvas tooth: sparse light speckle
+    o.globalAlpha = 0.05;
+    o.fillStyle = '#fff';
+    for (let k = 0; k < (W2 * H2) / 40; k++) o.fillRect(rnd() * W2, rnd() * H2, 1.4, 1.4);
+    o.globalAlpha = 1;
+    return out;
+  }
+
+  // IndexedDB cache of finished paintings (silently skipped where unavailable)
+  const IDB = {
+    db: null,
+    open() {
+      if (this.p) return this.p;
+      this.p = new Promise((res) => {
+        try {
+          const rq = indexedDB.open('liminal-art', 1);
+          rq.onupgradeneeded = () => rq.result.createObjectStore('art');
+          rq.onsuccess = () => { this.db = rq.result; res(this.db); };
+          rq.onerror = () => res(null);
+        } catch (e) { res(null); }
+      });
+      return this.p;
+    },
+    async get(k) {
+      const db = await this.open();
+      if (!db) return null;
+      return new Promise((res) => { try { const rq = db.transaction('art').objectStore('art').get(k); rq.onsuccess = () => res(rq.result || null); rq.onerror = () => res(null); } catch (e) { res(null); } });
+    },
+    async put(k, v) {
+      const db = await this.open();
+      if (!db) return;
+      try { db.transaction('art', 'readwrite').objectStore('art').put(v, k); } catch (e) {}
+    },
   };
+
+  function applyUrl(k, url) {
+    if (k[0] !== 'c') return;
+    const cid = k.slice(2);
+    document.querySelectorAll(`[data-cid="${cid}"] > .cf > .art, .minion[data-cid="${cid}"] > .m-art`).forEach((el) => (el.style.backgroundImage = `url("${url}")`));
+  }
+  const queue = [];
+  let running = false;
+  Art.prioritize = function (cids) {
+    for (const cid of cids.slice().reverse()) {
+      const k = 'c:' + cid;
+      const i = queue.indexOf(k);
+      if (i >= 0) { queue.splice(i, 1); queue.unshift(k); }
+    }
+  };
+  function loadImg(svg) {
+    return new Promise((res, rej) => { const img = new Image(); img.onload = () => res(img); img.onerror = rej; img.src = toURI(svg); });
+  }
+  async function work() {
+    if (running) return;
+    running = true;
+    const idle = (f) => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 120 }) : setTimeout(() => f({ timeRemaining: () => 8 }), 16));
+    while (queue.length) {
+      const k = queue.shift();
+      const entry = cache[k];
+      if (!entry || entry.raster === 'done') continue;
+      try {
+        const isCard = k[0] === 'c';
+        const ty = isCard ? L.CARDS[k.slice(2)].type : null;
+        const cw = k === 'back' ? 200 : !isCard ? 300 : ty === 'minion' ? 320 : ty === 'spell' ? 400 : 420;
+        const ch = k === 'back' ? 280 : !isCard ? 300 : ty === 'minion' ? 352 : ty === 'spell' ? 315 : 294;
+        const img = await loadImg(entry.svg);
+        let canvas;
+        if (k === 'back') {
+          canvas = document.createElement('canvas');
+          canvas.width = cw; canvas.height = ch;
+          canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
+        } else {
+          const gen = painter(img, cw, ch, U.hash(k));
+          let r;
+          await new Promise((done) => {
+            const tick = (dl) => {
+              const t0 = performance.now();
+              do { r = gen.next(); } while (!r.done && performance.now() - t0 < Math.max(4, Math.min(10, (dl && dl.timeRemaining && dl.timeRemaining()) || 8)));
+              if (r.done) done();
+              else idle(tick);
+            };
+            idle(tick);
+          });
+          canvas = r.value;
+        }
+        const blob = await new Promise((res) => canvas.toBlob(res, 'image/webp', 0.88));
+        if (!blob) throw new Error('blob');
+        entry.url = URL.createObjectURL(blob);
+        entry.raster = 'done';
+        Art.painted++;
+        applyUrl(k, entry.url);
+        IDB.put(ART_VER + k, blob);
+      } catch (e) {
+        entry.raster = 'failed';
+      }
+    }
+    running = false;
+  }
+  // paint everything once (cached across visits); newly painted art swaps into live elements
+  Art.rasterizeAll = async function () {
+    if (typeof document === 'undefined') return;
+    const ids = L.AGENTS.concat(L.BOSSES).map((h) => 'p:' + h).concat(['back'], Object.keys(L.CARDS).map((c) => 'c:' + c));
+    for (const k of ids) {
+      if (k === 'back') Art.back();
+      else if (k[0] === 'c') Art.card(k.slice(2));
+      else Art.portrait(k.slice(2));
+    }
+    // cached paintings first
+    for (const k of ids) {
+      const b = await IDB.get(ART_VER + k);
+      const entry = cache[k];
+      if (b && entry && entry.raster !== 'done') {
+        entry.url = URL.createObjectURL(b);
+        entry.raster = 'done';
+        applyUrl(k, entry.url);
+      } else if (entry && entry.raster !== 'done' && !queue.includes(k)) queue.push(k);
+    }
+    work();
+  };
+  Art.pending = () => queue.length;
+  Art._painter = painter;
 
   // faction crests (inline SVG strings)
   Art.crest = {
