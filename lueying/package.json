@@ -1,0 +1,20 @@
+{
+  "name": "lueying",
+  "version": "1.0.0",
+  "description": "掠影 · M1 可玩切片",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test tests/",
+    "build": "node tools/build.mjs",
+    "smoke": "node tools/smoke.mjs",
+    "dev": "node tools/serve.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "esbuild": "^0.24.2",
+    "three": "^0.160.0"
+  },
+  "type": "module"
+}
