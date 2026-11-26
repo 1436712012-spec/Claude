@@ -126,10 +126,35 @@ button { font-family: var(--font); }
 .t-power input { writing-mode: vertical-lr; direction: rtl; height: 130px; width: 26px; }
 .t-right { position: absolute; right: 14px; bottom: 210px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
 .t-cmds { display: flex; gap: 6px; }
-.t-cmds button { width: 40px; height: 40px; }
+.t-cmds button { width: 46px; height: 40px; border-radius: 6px !important; font-size: 11px !important; }
 .t-actions { display: grid; grid-template-columns: repeat(4, 50px); gap: 6px; }
 .t-actions button { width: 50px; height: 50px; }
 .t-fire { width: 86px !important; height: 86px; font-size: 14px !important; border-color: var(--amber) !important; }
+
+/* 触屏布局：小地图与僚机移到右上，武器栏在顶部，按钮区在右下 */
+body.touch .hud-top { top: 8px; width: 96vw; }
+body.touch .objective { font-size: 11px; }
+body.touch .hud-bottom { top: 66px; bottom: auto; }
+body.touch .wslot { width: 66px; padding: 3px 5px 5px; font-size: 10px; }
+body.touch .wslot .wname { font-size: 11px; }
+body.touch .hud-right { top: 118px; right: 10px; bottom: auto; }
+body.touch #minimap { width: 112px; height: 112px; }
+body.touch .wing-panel { width: 150px; font-size: 10px; }
+body.touch .orders { display: none; }
+body.touch .hud-left { left: 12px; bottom: 14px; width: min(260px, 60vw); }
+body.touch .gauge-block .big { font-size: 17px; }
+body.touch .radio { font-size: 12px; }
+body.touch .barks { bottom: 46%; }
+body.touch .t-avatars { top: 118px; }
+body.touch .t-right { bottom: 18px; right: 10px; }
+@media (orientation: landscape) {
+  body.touch .hud-right { top: 64px; }
+  body.touch .t-avatars { top: 64px; }
+  body.touch .hud-bottom { top: 40px; }
+  body.touch .t-right { bottom: 12px; }
+  body.touch .t-actions { grid-template-columns: repeat(4, 46px); }
+  body.touch .t-actions button { width: 46px; height: 46px; }
+}
 
 /* ---------- 菜单 ---------- */
 #screens { position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; }

@@ -236,12 +236,13 @@ function toggleMap() {
 
 // ---------- 触屏 ----------
 function buildTouch() {
+  document.body.classList.add('touch');
   touchRoot.classList.remove('hidden');
   touchRoot.innerHTML = `
     <div class="t-avatars"><button data-sel="all">全队</button><button data-sel="echo">回声</button><button data-sel="glimmer">微光</button><button data-sel="bedrock">磐石</button><button data-p="pause">❚❚</button></div>
     <div class="t-power"><input type="range" min="10" max="100" value="70" id="tPower" orient="vertical"><span>场功率</span></div>
     <div class="t-right">
-      <div class="t-cmds"><button data-c="0">1</button><button data-c="1">2</button><button data-c="2">3</button><button data-c="3">4</button></div>
+      <div class="t-cmds"><button data-c="0">跟随</button><button data-c="1">待命</button><button data-c="2">诱敌</button><button data-c="3">扫描</button></div>
       <div class="t-actions">
         <button data-p="silence">静默</button><button data-p="pulse">脉冲</button><button data-p="alt">高度</button>
         <button data-h="boost">加速</button><button data-p="jump">跃升</button><button data-p="weaponNext">武器</button>
@@ -366,6 +367,14 @@ function loop(now) {
     if (S.endT <= 0) { S.mode = 'results'; S.input.releaseLock(); hudRoot.classList.add('hidden'); touchRoot.classList.add('hidden'); S.screens.results(w); }
   }
   autoQuality(dt);
+  if (S.input.isTouch) {
+    const key = w.orderSet().join();
+    if (key !== S.touchOrders) {
+      S.touchOrders = key;
+      const short = { follow: '跟随', hold: '待命', distract: '诱敌', scan: '扫描', focus: '集火', flank: '包抄', cover: '掩护', regroup: '归队' };
+      touchRoot.querySelectorAll('[data-c]').forEach((b) => { b.textContent = short[w.orderSet()[+b.dataset.c]]; });
+    }
+  }
 }
 
 function autoQuality(dt) {

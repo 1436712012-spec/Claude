@@ -50,6 +50,24 @@ export class GameRenderer {
     this.envNight = -1;
     this._env();
     this.post = makeComposer(r, this.scene, this.camera, this.q);
+    // 雷达扫过的范围：地面上一道淡淡的扫描扇区
+    {
+      const len = 720, half = THREE.MathUtils.degToRad(2.5);
+      const g = new THREE.BufferGeometry();
+      const pos = [0, 0, 0, -Math.sin(-half) * len, 0, -Math.cos(-half) * len, -Math.sin(half) * len, 0, -Math.cos(half) * len];
+      g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      g.setAttribute('aT', new THREE.Float32BufferAttribute([0, 1, 1], 1));
+      const m = new THREE.ShaderMaterial({
+        transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+        uniforms: { uA: { value: 1 } },
+        vertexShader: 'attribute float aT; varying float vT; void main(){ vT = aT; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+        fragmentShader: 'varying float vT; uniform float uA; void main(){ float a = (1.0 - smoothstep(0.05, 1.0, vT)) * 0.16 * uA; gl_FragColor = vec4(vec3(0.9, 0.28, 0.23) * a, a); }',
+      });
+      this.radarSweep = new THREE.Mesh(g, m);
+      this.radarSweep.position.set(world.radar.pos.x, MAP.plateauH + 0.25, world.radar.pos.z);
+      this.radarSweep.renderOrder = 4;
+      this.scene.add(this.radarSweep);
+    }
     this.shake = { x: 0, y: 0, t: 0, kick: 0 };
     this.fov = SHIP.fovBase;
     this.damageFlash = 0;
@@ -101,7 +119,7 @@ export class GameRenderer {
   _vfov(hfov) {
     const a = this.camera.aspect;
     const v = 2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(hfov) / 2) / a);
-    return Math.min(THREE.MathUtils.radToDeg(v), 74);
+    return Math.min(THREE.MathUtils.radToDeg(v), a < 1 ? 60 : 74);
   }
 
   onEvents(events) {
@@ -240,7 +258,9 @@ export class GameRenderer {
 
   _compoundDynamics(dt) {
     const w = this.w, C = this.compound, t = w.time;
-    if (w.radar.alive && !(w.radar.offline > 0) && !(w.radar.disabled > 0) && w.power.on) C.radar.rotation.y = w.radar.angle;
+    const radarOn = w.radar.alive && !(w.radar.offline > 0) && !(w.radar.disabled > 0) && w.power.on;
+    if (radarOn) { C.radar.rotation.y = w.radar.angle; this.radarSweep.rotation.y = w.radar.angle; }
+    this.radarSweep.visible = radarOn;
     C.beacon.visible = Math.sin(t * 3) > 0.2 && w.power.on;
     if (C.core.visible) {
       const k = 3 + Math.sin(t * 2.4) * 1.2 + (w.mission.core.holding ? 6 * w.mission.core.progress : 0);

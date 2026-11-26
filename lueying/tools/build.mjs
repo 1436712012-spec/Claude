@@ -26,3 +26,19 @@ if (!html.includes(tag)) throw new Error('entry script tag not found');
 html = html.replace(tag, () => `<script type="module">\n${js}\n</script>`);
 fs.writeFileSync(path.join(out, 'index.html'), html);
 console.log(`dist/index.html  ${(html.length / 1024).toFixed(0)} KB`);
+
+// 发布版（claude.ai Artifact）：平台会包上 doctype/head/body 骨架，这里只保留页面内容
+let art = html
+  .replace(/<!doctype html>\s*/i, '')
+  .replace(/<html[^>]*>\s*/i, '')
+  .replace(/<\/html>\s*/i, '')
+  .replace(/<head>\s*/i, '')
+  .replace(/<\/head>\s*/i, '')
+  .replace(/<body>\s*/i, '')
+  .replace(/<\/body>\s*/i, '')
+  .replace(/<meta charset="utf-8">\s*/i, '')
+  .replace(/<meta name="viewport"[^>]*>\s*/i, '')
+  .replace(/<meta name="description"[^>]*>\s*/i, '')
+  .replace(/<title>[^<]*<\/title>/, '<title>掠影</title>');
+fs.writeFileSync(path.join(out, 'lueying.html'), art);
+console.log(`dist/lueying.html  ${(art.length / 1024).toFixed(0)} KB (artifact)`);
