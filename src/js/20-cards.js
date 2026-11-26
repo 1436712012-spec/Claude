@@ -159,7 +159,7 @@
     id: 'S16', name: '不眠哨兵', faction: 'site', type: 'minion', rarity: 'epic', cost: 4, san: 2, atk: 4, hp: 6, kw: ['taunt'],
     text: '嘲讽。每当一个敌方随从攻击后，冻结它。',
     lore: { k: '档', t: '实体记录：不眠哨兵。它原本是站点的一名夜班员，已经 4,000 个小时没有合眼，也不打算合眼。' },
-    art: ['lab', 'longfig x.5 s1.2 c#dff', 'eyes n7 x.5 y.3 r.4', { warp: 0.25 }],
+    art: ['lab', 'longfig x.5 s1.2 c#5f8f98', 'eyes n7 x.5 y.3 r.4', { warp: 0.1 }],
     on: {
       afterAttack: (G, c) => {
         const a = c.ev.a;
@@ -279,7 +279,7 @@
     id: 'B11', name: '熄灯的停车场', faction: 'level', type: 'field', rarity: 'epic', cost: 3, san: 1,
     text: '场地：在每个回合结束时，对所有没有潜行的随从造成 1 点伤害。',
     lore: { k: '记', t: '第 9 天。停车场里停满了车，每一辆的车灯都对着我们，每一辆都没有发动机。我们在车与车之间睡了一晚。' },
-    art: ['park', 'cars n4', { dark: 0.4 }],
+    art: ['park', { dark: 0.35 }, 'cars n4'],
     on: {
       turnEnd: (G, c) => {
         const t = E.allMinions(G).filter((m) => m.hp > 0 && !m.dead && !m.kw.stealth);
@@ -434,7 +434,7 @@
     id: 'D11', name: '梦游者', faction: 'dream', type: 'minion', rarity: 'rare', cost: 4, atk: 3, hp: 3, fade: true,
     text: '战吼：抽一张牌。褪色。',
     lore: { k: '记', t: '第 5 天。我的笔记本自己多写了一页。字迹是我的，日期是明天的。上面写着：不要相信明天的我。' },
-    art: ['sky', 'moon x.72 y.25 s.8', 'faceless x.42 s.85 c#f6e6ff arms1', { dark: 0.35 }],
+    art: ['sky', { dark: 0.4 }, 'moon x.72 y.25 s.8', 'faceless x.42 s.85 c#efe0ff arms1'],
     bc: (G, c) => E.draw(G, c.p, 1),
   });
   card({
@@ -529,7 +529,7 @@
     id: 'N03', name: '失眠者', faction: 'neutral', type: 'minion', rarity: 'common', cost: 3, san: 1, atk: 4, hp: 4,
     text: '',
     lore: { k: '档', t: '警告：长时间处于理智低值状态的人员，会在手中看见「不存在的卡片」。请勿使用它们。若已使用，请勿告诉任何人。' },
-    art: ['room', { dark: 0.55 }, 'faceless x.5 s.9 c#ddd eyes1', 'clock x.78 y.24 s.45'],
+    art: ['room', { dark: 0.5 }, 'faceless x.5 s.9 c#cfc4d8 eyes1', 'clock x.78 y.24 s.45'],
   });
   card({
     id: 'N04', name: '堆积的纸箱', faction: 'neutral', type: 'minion', rarity: 'common', cost: 4, atk: 3, hp: 5, kw: ['taunt'],

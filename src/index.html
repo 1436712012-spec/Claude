@@ -1,0 +1,161 @@
+<!--HEAD-->
+<title>夹层 LIMINAL</title>
+<meta name="description" content="一款关于下沉梦境的卡牌对战。收容站、后室层级与梦核。">
+<meta name="theme-color" content="#070607">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&amp;family=VT323&amp;display=swap">
+<style>
+/*CSS*/
+</style>
+<!--/HEAD-->
+<div id="app" data-layer="0">
+  <div id="scene">
+    <div class="sc sc0 on"></div>
+    <div class="sc sc1"></div>
+    <div class="sc sc2">
+      <span class="neon flick" style="left:6%;top:9%;font-size:4.2vh">营业中</span>
+      <span class="neon c flick2" style="right:7%;top:16%;font-size:3vh;font-family:var(--f-mono)">EXIT →</span>
+      <span class="neon m" style="left:10%;top:31%;font-size:2.6vh">全场五折 · 今夜不打烊</span>
+      <span class="neon flick2" style="right:9%;top:46%;font-size:3.4vh">闭店</span>
+      <span class="neon c" style="left:5%;bottom:14%;font-size:2.4vh;font-family:var(--f-mono)">B∞ PARKING</span>
+    </div>
+  </div>
+  <canvas id="fxBack"></canvas>
+  <div class="side left" id="sideL"><h4>记录 · LOG</h4><div class="log" id="log"></div></div>
+  <div class="side right" id="sideR"></div>
+
+  <div id="stage">
+    <!-- title -->
+    <section class="screen on" id="screen-title">
+      <div class="menu-wrap">
+        <div class="tv"><div class="scr"><canvas id="tvc"></canvas>
+          <div class="logo"><div class="zh">夹层</div><div class="en">LIMINAL</div><div class="tag">收容机构 · 外勤档案 · LMN-000</div></div></div>
+          <div class="knobs">CH-00 ◐ ◑</div></div>
+        <div class="tap-hint" id="tapHint">轻触以进入夹层</div>
+        <div class="mlist" id="titleMenu" hidden>
+          <button class="btn" data-go="setup">开始下沉</button>
+          <button class="btn ghost" data-go="deck">卡组构筑</button>
+          <button class="btn ghost" data-go="archive">档案</button>
+          <button class="btn ghost" data-go="settings">设置</button>
+        </div>
+        <div class="mfoot" id="titleFoot">请勿在走廊中奔跑 · 请勿注视墙缝</div>
+      </div>
+    </section>
+
+    <!-- match setup -->
+    <section class="screen" id="screen-setup">
+      <div class="menu-wrap">
+        <div class="hdr"><button class="back" data-go="title" aria-label="返回">‹</button><h2>外勤派遣</h2></div>
+        <div class="sec">01 · 选择特工</div>
+        <div class="choices" id="agentPick"></div>
+        <div class="detail" id="agentDetail"></div>
+        <div class="sec">02 · 选择卡组</div>
+        <div class="decklist" id="deckPick"></div>
+        <div class="sec">03 · 选择守门人</div>
+        <div class="choices" id="bossPick"></div>
+        <div class="detail" id="bossDetail"></div>
+        <button class="btn" id="goMatch">进入夹层</button>
+      </div>
+    </section>
+
+    <!-- deck builder -->
+    <section class="screen" id="screen-deck">
+      <div class="menu-wrap">
+        <div class="hdr"><button class="back" id="deckBack" aria-label="返回">‹</button><h2>卡组构筑</h2></div>
+        <div class="decklist" id="deckManager"></div>
+        <div id="builder" hidden>
+          <div class="filters" id="fFaction"></div>
+          <div class="filters" id="fCost" style="margin-top:calc(var(--u)*1.6)"></div>
+          <div class="filters" id="fRarity" style="margin-top:calc(var(--u)*1.6)"></div>
+          <div class="grid" id="cardGrid" style="margin-top:calc(var(--u)*4)"></div>
+        </div>
+      </div>
+      <div class="dock" id="dock" hidden>
+        <div class="top"><input id="deckName" maxlength="12" aria-label="卡组名称"><span class="dcount" id="dCount">0/30</span></div>
+        <div class="top"><div class="curve" id="curve"></div><span style="flex:1"></span>
+          <button class="chip" id="dToggle">清单</button><button class="chip" id="dSave">保存</button></div>
+        <div class="dlist" id="dList"></div>
+      </div>
+    </section>
+
+    <!-- archive -->
+    <section class="screen" id="screen-archive">
+      <div class="menu-wrap">
+        <div class="hdr"><button class="back" data-go="title" aria-label="返回">‹</button><h2>档案</h2></div>
+        <div class="detail" id="archiveHead"></div>
+        <div class="filters" id="archiveFilter"></div>
+        <div class="alist" id="archiveList"></div>
+      </div>
+    </section>
+
+    <!-- the match -->
+    <section class="screen" id="screen-game">
+      <div class="hb enemy" id="hbE">
+        <div class="hero" id="heroE"><div class="pt"></div><div class="arm"><b>0</b></div><div class="hpb"><b>30</b></div></div>
+        <div class="hinfo">
+          <div class="hname"><b id="nameE"></b><i id="codeE"></i></div>
+          <div class="meter sm"><span class="lbl" id="sanLblE">理智</span><div class="pips" id="sanE"></div></div>
+          <div class="meter mm"><span class="lbl" id="manaLblE">法力</span><div class="pips" id="manaE"></div></div>
+        </div>
+        <div class="hside"><div class="ehand" id="ehand"></div><span class="deckc" id="deckE"></span></div>
+        <button class="hp-btn" id="hpE" aria-label="对手英雄技能"><span class="c"><b>2</b></span><span class="ic"></span></button>
+      </div>
+      <div class="board enemy" id="boardE"></div>
+      <div class="mid">
+        <button class="field" id="field" aria-label="场地"><span>场地</span></button>
+        <div class="depth">
+          <div class="dl"><b id="layerName">第 0 层 · 黄墙走廊</b><i id="depthNum">梦深 000</i></div>
+          <div class="track" id="track"><div class="fill" id="trackFill"></div><div class="tick" id="tick1"></div><div class="tick" id="tick2"></div><div class="mk" id="trackMk"></div></div>
+        </div>
+        <button class="endturn wait" id="endTurn">对手回合</button>
+      </div>
+      <div class="board player" id="boardP"></div>
+      <div class="hb player" id="hbP">
+        <div class="hero" id="heroP"><div class="pt"></div><div class="arm"><b>0</b></div><div class="hpb"><b>30</b></div></div>
+        <div class="hinfo">
+          <div class="hname"><b id="nameP"></b><i id="codeP"></i></div>
+          <div class="meter sm"><span class="lbl" id="sanLblP">理智</span><div class="pips" id="sanP"></div></div>
+          <div class="meter mm"><span class="lbl" id="manaLblP">法力</span><div class="pips" id="manaP"></div></div>
+        </div>
+        <div class="hside"><button class="menu-btn" id="gameMenu" aria-label="菜单"><span></span></button><span class="deckc" id="deckP"></span></div>
+        <button class="hp-btn" id="hpP" aria-label="英雄技能"><span class="c"><b>2</b></span><span class="ic"></span></button>
+      </div>
+      <div class="hand" id="hand"></div>
+      <svg id="aim"><defs><marker id="ah" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#ff5a3a"/></marker></defs><path id="aimPath" d="" fill="none" stroke="#ff5a3a" stroke-width="6" stroke-dasharray="2 10" stroke-linecap="round" marker-end="url(#ah)"/></svg>
+    </section>
+  </div>
+
+  <canvas id="fxFront"></canvas>
+  <div id="vign"></div>
+  <div id="sanv"></div>
+  <div id="domfx"></div>
+
+  <div id="overlays">
+    <div class="ov dim" id="inspect" role="dialog" aria-label="卡牌详情"></div>
+    <div class="ov dim" id="mull" role="dialog" aria-label="换牌"></div>
+    <div class="ov" id="legend"></div>
+    <div class="ov dim" id="pause" role="dialog" aria-label="菜单"><div class="panel" id="pausePanel"></div></div>
+    <div class="ov dim" id="settings" role="dialog" aria-label="设置"><div class="panel" id="settingsPanel"></div></div>
+    <div class="ov dim" id="endov" role="dialog" aria-label="结算"></div>
+  </div>
+  <div id="layerT"><canvas id="ltc"></canvas><div class="flash"></div><div class="osd">▶ PLAY</div><div class="title"><div class="n"></div><div class="t"></div><div class="r"></div></div><div class="skip">轻触跳过 ▸▸</div></div>
+  <div id="crt"></div>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="chroma" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r"/>
+      <feOffset in="r" dx="5" dy="0" result="r2"/>
+      <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" result="gb"/>
+      <feOffset in="gb" dx="-4" dy="1" result="gb2"/>
+      <feBlend in="r2" in2="gb2" mode="screen"/>
+    </filter>
+    <filter id="barrel" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feImage id="barrelMap" preserveAspectRatio="none" result="map"/>
+      <feDisplacementMap in="SourceGraphic" in2="map" scale="22" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </svg>
+</div>
+<script>
+/*JS*/
+</script>
