@@ -2,38 +2,25 @@
 
 最后更新：2026-11-26
 
-## 项目 A：《缓冲 BUFFERING》（梦核 / 怪核 / 池核 · 后室 × SCP · 2D 冒险）— 当前主项目
+## 当前主项目：《霓虹重装 NEON IRONCLAD》（2D 横版坦克射击，战斗爽 + 画面特效炫技）
 
 ### 已完成
-- [x] 20 问需求收集与解码
-- [x] 作品计划书：docs/backrooms/PLAN.md（概念、守则、六层级、规则怪谈式战斗、理智系统、程序生成与求解器、渲染与音频、炫技清单、里程碑、合规、风险）
+- [x] 方向确认：回到坦克游戏，重做规划
+- [x] 作品计划书 V2：docs/TANK_PLAN_V2.md（手感栈、特效清单 V1–V12、WebGL2 HDR 管线、关卡、里程碑 M0–M9）
 
 ### 进行中
-- [ ] 等待主人确认 PLAN.md 第 22 节的 6 项决策
+- [ ] 等待主人确认 TANK_PLAN_V2.md 第 10 节的 5 项决策
 
-### 待完成（按里程碑，详见 PLAN.md 第 17 节）
-- [ ] M0 底座：工程、固定步长循环、RNG、构建脚本
-- [ ] M1 磁带渲染器与手感
-- [ ] M2 战斗核心与 L0 垂直切片
-- [ ] M3 理智与感知层
-- [ ] M4 世界图、求解器、死亡坠落
-- [ ] M5 枢纽与 NPC
-- [ ] M6 遥控器与 L2
-- [ ] M7 池厅
-- [ ] M8 LX、LΩ、叙事
-- [ ] M9 音频与自动播放
-- [ ] M10 打磨与发布
+### 待完成（详见计划书第 7 节）
+- [ ] M0 底座 → M1 手感实验室 → M2 光与辉光 → M3 GPU 粒子
+- [ ] M4 敌人与第一关（垂直切片）→ M5 武器与连杀 → M6 第 2–3 关
+- [ ] M7 第 4–5 关与 Boss → M8 成长与音乐 → M9 打磨与发布
 
 ### 下一步具体行动
-主人确认决策后，从 M0 开始：创建 backrooms/index.html、src/core/loop.js、src/core/rng.js、tools/build.mjs。
-实现前须先逐条核对被引用的 SCP / 后室条目的原文、作者与许可证（PLAN.md 第 19 节）。
+主人确认后，从 M0 开始：创建 tank/index.html、src/core/loop.js、src/gfx/gl.js、src/gfx/batch.js、tools/build.mjs。
 
 ---
 
-## 项目 B：《守夜炮 Nightwatch Flak》（坦克打飞机）— 已暂停
-
-### 已完成
-- [x] 游戏整体规划：docs/GAME_PLAN.md
-
-### 待完成
-- [ ] 等主人决定平台 / 视角 / 首期范围后，从 M0 开始
+## 已搁置的项目
+- 《缓冲 BUFFERING》（后室 × SCP 2D 冒险）：docs/backrooms/PLAN.md，主人已选择转向坦克游戏，保留不动。
+- 《守夜炮》旧规划：docs/GAME_PLAN.md，已被 TANK_PLAN_V2.md 取代。
