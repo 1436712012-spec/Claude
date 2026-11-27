@@ -18,8 +18,8 @@ if (params.has('fx')) settings.fx = +params.get('fx');
 const renderer = new Renderer(glCanvas);
 const input = new Input(window);
 const isTouch = input.touch.enabled;
-if (settings.autoFire === null || settings.autoFire === undefined) settings.autoFire = isTouch;
-if (params.has('auto')) settings.autoFire = params.get('auto') !== '0';
+if (!settings.ctrl) settings.ctrl = settings.autoFire ? 'auto' : (isTouch ? 'auto' : 'manual');
+if (params.has('auto')) settings.ctrl = params.get('auto') === '0' ? 'manual' : params.get('auto') === 'assist' ? 'assist' : 'auto';
 const audio = new AudioEngine(settings);
 const game = new Game(renderer, audio, settings, input);
 const hud = new Hud(hudCanvas);
@@ -87,7 +87,7 @@ addEventListener('keydown', (e) => {
     if (k !== undefined) game.choose(k);
     return;
   }
-  if (e.code === 'KeyT' && !e.repeat && game.state !== 'title') { settings.autoFire = !settings.autoFire; saveSettings(settings); game.fx.text(game.tank.x, game.tank.y + 150, settings.autoFire ? '全自动开火' : '手动开火', '#7af0ff', 22, 1.2); return; }
+  if (e.code === 'KeyT' && !e.repeat && game.state !== 'title') { const o = ['manual', 'assist', 'auto']; settings.ctrl = o[(o.indexOf(settings.ctrl) + 1) % 3]; saveSettings(settings); game.fx.text(game.tank.x, game.tank.y + 150, { manual: '手动瞄准 · 手动开火', assist: '自动瞄准 · 手动开火', auto: '全自动' }[settings.ctrl], '#7af0ff', 22, 1.2); return; }
   if (e.code === 'Escape' || e.code === 'KeyP') { setPaused(game.state === 'play'); return; }
   if (game.state === 'title' && !e.repeat && e.code !== 'F12') begin();
   else if ((game.state === 'over' && game.overT > 1.5) || game.state === 'win') { if (e.code === 'Enter' || e.code === 'Space') begin(); }

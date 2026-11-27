@@ -1507,13 +1507,13 @@ class Input {
   }
   get left() { return this.axis < -0.2; }
   get right() { return this.axis > 0.2; }
-  get fire() { return this.virtual ? this.virtual.fire : this.auto ? this.auto.fire : this.lmb; }
-  get mg() { return this.virtual ? this.virtual.mg : this.auto ? this.auto.mg : this.rmb || this.held('KeyF'); }
+  get fire() { return this.virtual ? this.virtual.fire : (this.auto && !this.auto.aimOnly) ? this.auto.fire : (this.lmb || !!this.touchFire); }
+  get mg() { return this.virtual ? this.virtual.mg : (this.auto && !this.auto.aimOnly) ? this.auto.mg : (this.rmb || this.held('KeyF') || !!this.touchFire); }
   get jump() { return this.virtual ? this.virtual.jump : this.pressed('Space') || this.pressed('KeyW'); }
   get missile() { return this.virtual ? this.virtual.missile : this.pressed('KeyQ'); }
   get overdrive() { return this.virtual ? this.virtual.overdrive : this.pressed('KeyE'); }
-  get aimX() { return this.virtual ? this.virtual.aimX : this.auto ? this.auto.aimX : this.mx; }
-  get aimY() { return this.virtual ? this.virtual.aimY : this.auto ? this.auto.aimY : this.my; }
+  get aimX() { return this.virtual ? this.virtual.aimX : this.auto ? this.auto.aimX : (this.touch.aim.active ? this.touch.aim.x : this.mx); }
+  get aimY() { return this.virtual ? this.virtual.aimY : this.auto ? this.auto.aimY : (this.touch.aim.active ? this.touch.aim.y - this.touch.aim.off : this.my); }
   endFrame() {
     this.edge.clear(); this.anyPress = false;
     if (this.virtual) { this.virtual.jump = this.virtual.missile = this.virtual.overdrive = false; }
@@ -2072,7 +2072,7 @@ class Tank {
         fx.dust(this.x - Math.sign(this.vx) * 46 * SC, this.y + 2, 1, 8, 40);
       }
     } else {
-      this.vy -= 980 * dt; this.y += this.vy * dt;
+      this.vy -= 1000 * dt; this.y += this.vy * dt;
       this.thrustT -= dt;
       if (this.thrustT > 0) {
         for (const lx of [-28, 28]) {
@@ -2091,7 +2091,7 @@ class Tank {
       }
     }
     if (inp.jump && !this.air) {
-      this.air = true; this.vy = 360; this.thrustT = 0.4;
+      this.air = true; this.vy = 690; this.thrustT = 0.7;
       fx.dust(this.x, this.y + 2, 20, 50, 220);
       fx.addTrauma(0.1);
       w.sfx('jump', this.x, {});
@@ -2858,8 +2858,20 @@ function enemyBullet(w, e, tx, ty, speed = 540) {
   const mx = e.x + e.dir * 26, my = e.y - 2;
   const dx = tx - mx, dy = ty - my, l = Math.hypot(dx, dy) || 1;
   const a = Math.atan2(dy, dx) + (Math.random() - 0.5) * 0.05;
-  w.ebullets.push({ x: mx, y: my, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, life: 2.2 });
+  w.ebullets.push({ x: mx, y: my, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, life: 4 });
   w.fx.glow(mx, my, 10, 0.05, [1, 0.5, 0.25], 3);
+}
+/** danmaku: aimed fan or full ring of slow, big, clearly visible bullets */
+function barrage(w, e, ring) {
+  const t = w.tank, n = ring ? 14 : 7, base = ring ? Math.random() * 6.28 : Math.atan2(t.y + 36 - e.y, t.x - e.x);
+  for (let i = 0; i < n; i++) {
+    const a = ring ? base + i / n * 6.283 : base + (i - (n - 1) / 2) * 0.17;
+    const sp = ring ? 230 : 300;
+    w.ebullets.push({ x: e.x, y: e.y - 6, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 5, big: true });
+  }
+  w.fx.glow(e.x, e.y, 36, 0.14, [1, 0.25, 0.45], 3);
+  w.fx.ring(e.x, e.y, 6, 60, 3, 0.3, [1, 0.3, 0.5], 2);
+  w.sfx('ebullet', e.x, {});
 }
 
 function updateEnemies(w, dt) {
@@ -2879,6 +2891,8 @@ function updateEnemies(w, dt) {
       e.y = e.y0 + Math.sin(e.t * 0.9 + e.phase) * 9;
       e.rot = damp(e.rot, Math.cos(e.t * 0.9 + e.phase) * 0.03 * e.dir, 4, edt);
       e.bombCd -= edt;
+      e.fireCd = (e.fireCd ?? 2.5) - edt;
+      if (e.fireCd <= 0 && Math.abs(e.x - tank.x) < 800 && tank.y < e.y) { barrage(w, e, w.wave.n >= 3 && Math.random() < 0.4); e.fireCd = 3.2 - Math.min(1.4, w.wave.n * 0.18); }
       if (e.bombs > 0 && e.bombCd <= 0) {
         const gh = T.heightAt(e.x), fall = Math.sqrt(2 * Math.max(40, e.y - gh - 30) / BOMB_G);
         const ix = e.x + e.vx * 0.9 * fall;
@@ -2917,7 +2931,7 @@ function updateScout(w, e, dt) {
   }
   if (e.phase2 === 'attack') {
     e.fireCd -= dt;
-    if (e.fireCd <= 0 && e.burst === 0 && Math.abs(toTank) < 520 && Math.sign(toTank) === e.dir) { e.burst = 3; e.burstCd = 0; e.fireCd = rr(1.0, 1.5); }
+    if (e.fireCd <= 0 && e.burst === 0 && Math.abs(toTank) < 520 && Math.sign(toTank) === e.dir) { e.burst = 5; e.burstCd = 0; e.fireCd = rr(1.0, 1.5); }
     if (e.burst > 0) {
       e.burstCd -= dt;
       if (e.burstCd <= 0) {
@@ -3080,6 +3094,7 @@ function drawEnemies(w, L0, LA) {
     else drawDiver(w, e, L0, LA);
   }
   for (const b of w.bombs) {
+    LA.glowDot(b.x, b.y, 12, 22, [1, 0.2, 0.2, 1], 1.0);
     L0.rbox(b.x, b.y, 11, 4.4, b.rot, 4, [0.16, 0.14, 0.22, 1], 3, 0, 0);
     L0.rbox(b.x + Math.cos(b.rot) * 10, b.y + Math.sin(b.rot) * 10, 3.5, 3.6, b.rot, 2, C.red, 2, 0.8, 0);
     L0.rbox(b.x - Math.cos(b.rot) * 10, b.y - Math.sin(b.rot) * 10, 2.5, 6, b.rot, 1, [0.12, 0.1, 0.18, 1], 1.5, 0, 0);
@@ -3087,8 +3102,14 @@ function drawEnemies(w, L0, LA) {
   }
   for (const b of w.ebullets) {
     const a = Math.atan2(b.vy, b.vx);
-    LA.glowLine(b.x - Math.cos(a) * 24, b.y - Math.sin(a) * 24, b.x, b.y, 1.5, 4, C.enemyBullet, 2.8);
-    LA.glowDot(b.x, b.y, 2, 4, [1, 0.8, 0.6, 1], 3);
+    if (b.big) {
+      LA.glowDot(b.x, b.y, 6, 12, [1, 0.15, 0.4, 1], 2.6);
+      LA.glowDot(b.x, b.y, 3.2, 3, [1, 0.9, 0.9, 1], 4);
+      LA.push(b.x, b.y, 9, 1.2, 0, 0, SH.RING, 2, 1, 0.3, 0.5, 1, 2.2, 3, 0, 0);
+    } else {
+      LA.glowLine(b.x - Math.cos(a) * 30, b.y - Math.sin(a) * 30, b.x, b.y, 2.2, 6, C.enemyBullet, 3.4);
+      LA.glowDot(b.x, b.y, 3.2, 6, [1, 0.85, 0.6, 1], 4);
+    }
   }
 }
 
@@ -4111,7 +4132,7 @@ const { SH } = __M[4];
 
 const { WORLD_W, TOWN_X, WAVES } = __M[21];
 
-const B = [1, 2, 3, 3, 4, 5, 5, 6], S = [2, 3, 3, 4, 4, 6, 6, 8], D = [0, 0, 2, 2, 3, 4, 5, 6];
+const B = [2, 3, 4, 5, 6, 7, 8, 10], S = [3, 5, 6, 7, 9, 10, 12, 14], D = [0, 1, 3, 4, 5, 6, 8, 10];
 const NAMES = ['黄昏', '暮色', '入夜', '深夜', '午夜', '夜半', '拂晓前', '黎明'];
 
 class Game {
@@ -4305,14 +4326,19 @@ class Game {
 
     if (this.bot) this.bot.update(this, dt);
     // full-auto: cannon + MG are driven by the gunner; a finger / recent mouse move overrides the aim point
-    this.autoOn = !this.bot && this.set.autoFire;
-    if (this.autoOn && this.state === 'play') {
+    const ctrl = this.bot ? 'bot' : this.set.ctrl;
+    this.ctrl = ctrl; this.autoOn = ctrl === 'auto';
+    inp.touchFire = !!(inp.touch && inp.touch.enabled && inp.touch.aim.active && ctrl !== 'auto' && ctrl !== 'bot');
+    if ((ctrl === 'auto' || ctrl === 'assist') && this.state === 'play') {
+      // assist = auto-aim only (you fire); auto = auto-aim + auto-fire. A finger / recent mouse move overrides the aim in auto mode.
       let manual = null;
       const ta = inp.touch && inp.touch.aim;
-      if (ta && ta.active) manual = cam.screenToWorld(ta.x, ta.y - ta.off);
-      else if (!inp.touch?.enabled && performance.now() - inp.mouseT < 1800) manual = cam.screenToWorld(inp.mx, inp.my);
+      if (ctrl === 'auto') {
+        if (ta && ta.active) manual = cam.screenToWorld(ta.x, ta.y - ta.off);
+        else if (!inp.touch?.enabled && performance.now() - inp.mouseT < 1800) manual = cam.screenToWorld(inp.mx, inp.my);
+      }
       this.gunner.update(this, dt, manual);
-      inp.auto = this.gunner.out;
+      inp.auto = ctrl === 'assist' ? { ...this.gunner.out, aimOnly: true } : this.gunner.out;
     } else inp.auto = null;
 
     // wind
@@ -4361,7 +4387,7 @@ class Game {
     const tx = t.x + lead + (t.vx * 0.35);
     const hw = cam.halfW;
     cam.x = clamp(damp(cam.x, tx, 6, dt), hw, this.terrain.W - hw);
-    cam.y = damp(cam.y, t.y * 0.8 + this.terrain.heightAt(t.x) * 0.2 + 165, 3, dt);
+    cam.y = damp(cam.y, t.y * 0.8 + this.terrain.heightAt(t.x) * 0.2 + 200, 3, dt);
 
     // sky
     let target;
@@ -4385,7 +4411,7 @@ class Game {
   draw(realDt) {
     const fx = this.fx, cam = this.camera, r = this.r;
     const zoom = 1 + fx.zoomPunch * 0.04;
-    cam.halfH = 390 / zoom;
+    cam.halfH = 470 / zoom;
     cam.halfW = cam.halfH * (cam.cssW / cam.cssH);
     const shake = fx.shakeOffset();
     const sky = computeSky(this.skyPhase);
@@ -4818,7 +4844,7 @@ class Hud {
       this.glowText(d.glyph, x + sz / 2, y + sz / 2 + 1, 21, col, 'center', 800, 8);
       for (let k = 0; k < st.lv; k++) { ctx.fillStyle = col; ctx.fillRect(x + sz / 2 - st.lv * 4 + k * 8 + 1, y + sz + 4, 6, 2.4); }
     });
-    if (g.autoOn) this.glowText('全自动开火', W / 2, y - 12, 12, '#7af0ff', 'center', 700, 6, 3);
+    if (g.ctrl === 'auto' || g.ctrl === 'assist') this.glowText(g.ctrl === 'auto' ? '全自动' : '自动瞄准', W / 2, y - 12, 12, '#7af0ff', 'center', 700, 6, 3);
   }
 
   /** three-card weapon pick (start of run and after every wave) */
@@ -5299,7 +5325,7 @@ return { AudioEngine, NullAudio };
 // ---- ui/settings.js
 __M[25] = (() => {
 const KEY = 'nightwatch-flak-settings-v1';
-const DEFAULTS = { autoFire: null, fx: 1, shake: 1, bloom: 1, rays: 1, reduceFlash: false, numbers: true, volume: 0.8, music: 0.5, quality: 'auto' };
+const DEFAULTS = { ctrl: null, fx: 1, shake: 1, bloom: 1, rays: 1, reduceFlash: false, numbers: true, volume: 0.8, music: 0.5, quality: 'auto' };
 
 function loadSettings() {
   const s = { ...DEFAULTS };
@@ -5335,7 +5361,7 @@ function buildPanel(settings, onChange, onResume) {
     }
     rows.append(row);
   };
-  add('全自动开火 (T)', 'autoFire', 'check');
+  add('瞄准 / 开火 (T)', 'ctrl', 'select', { options: [['manual', '手动瞄准 · 手动开火'], ['assist', '自动瞄准 · 手动开火'], ['auto', '全自动']] });
   add('特效强度', 'fx', 'range', { min: 0.25, max: 1.5 });
   add('屏幕震动', 'shake', 'range', { min: 0, max: 1.5 });
   add('辉光强度', 'bloom', 'range', { min: 0, max: 1.5 });
@@ -5377,8 +5403,8 @@ if (params.has('fx')) settings.fx = +params.get('fx');
 const renderer = new Renderer(glCanvas);
 const input = new Input(window);
 const isTouch = input.touch.enabled;
-if (settings.autoFire === null || settings.autoFire === undefined) settings.autoFire = isTouch;
-if (params.has('auto')) settings.autoFire = params.get('auto') !== '0';
+if (!settings.ctrl) settings.ctrl = settings.autoFire ? 'auto' : (isTouch ? 'auto' : 'manual');
+if (params.has('auto')) settings.ctrl = params.get('auto') === '0' ? 'manual' : params.get('auto') === 'assist' ? 'assist' : 'auto';
 const audio = new AudioEngine(settings);
 const game = new Game(renderer, audio, settings, input);
 const hud = new Hud(hudCanvas);
@@ -5446,7 +5472,7 @@ addEventListener('keydown', (e) => {
     if (k !== undefined) game.choose(k);
     return;
   }
-  if (e.code === 'KeyT' && !e.repeat && game.state !== 'title') { settings.autoFire = !settings.autoFire; saveSettings(settings); game.fx.text(game.tank.x, game.tank.y + 150, settings.autoFire ? '全自动开火' : '手动开火', '#7af0ff', 22, 1.2); return; }
+  if (e.code === 'KeyT' && !e.repeat && game.state !== 'title') { const o = ['manual', 'assist', 'auto']; settings.ctrl = o[(o.indexOf(settings.ctrl) + 1) % 3]; saveSettings(settings); game.fx.text(game.tank.x, game.tank.y + 150, { manual: '手动瞄准 · 手动开火', assist: '自动瞄准 · 手动开火', auto: '全自动' }[settings.ctrl], '#7af0ff', 22, 1.2); return; }
   if (e.code === 'Escape' || e.code === 'KeyP') { setPaused(game.state === 'play'); return; }
   if (game.state === 'title' && !e.repeat && e.code !== 'F12') begin();
   else if ((game.state === 'over' && game.overT > 1.5) || game.state === 'win') { if (e.code === 'Enter' || e.code === 'Space') begin(); }

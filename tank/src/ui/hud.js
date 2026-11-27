@@ -347,7 +347,7 @@ export class Hud {
       this.glowText(d.glyph, x + sz / 2, y + sz / 2 + 1, 21, col, 'center', 800, 8);
       for (let k = 0; k < st.lv; k++) { ctx.fillStyle = col; ctx.fillRect(x + sz / 2 - st.lv * 4 + k * 8 + 1, y + sz + 4, 6, 2.4); }
     });
-    if (g.autoOn) this.glowText('全自动开火', W / 2, y - 12, 12, '#7af0ff', 'center', 700, 6, 3);
+    if (g.ctrl === 'auto' || g.ctrl === 'assist') this.glowText(g.ctrl === 'auto' ? '全自动' : '自动瞄准', W / 2, y - 12, 12, '#7af0ff', 'center', 700, 6, 3);
   }
 
   /** three-card weapon pick (start of run and after every wave) */

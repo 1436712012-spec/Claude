@@ -83,7 +83,7 @@ export class Tank {
         fx.dust(this.x - Math.sign(this.vx) * 46 * SC, this.y + 2, 1, 8, 40);
       }
     } else {
-      this.vy -= 980 * dt; this.y += this.vy * dt;
+      this.vy -= 1000 * dt; this.y += this.vy * dt;
       this.thrustT -= dt;
       if (this.thrustT > 0) {
         for (const lx of [-28, 28]) {
@@ -102,7 +102,7 @@ export class Tank {
       }
     }
     if (inp.jump && !this.air) {
-      this.air = true; this.vy = 360; this.thrustT = 0.4;
+      this.air = true; this.vy = 690; this.thrustT = 0.7;
       fx.dust(this.x, this.y + 2, 20, 50, 220);
       fx.addTrauma(0.1);
       w.sfx('jump', this.x, {});

@@ -15,7 +15,7 @@ import { SH } from '../gfx/shapes.js';
 
 import { WORLD_W, TOWN_X, WAVES } from '../data/consts.js';
 export { WORLD_W, TOWN_X, WAVES };
-const B = [1, 2, 3, 3, 4, 5, 5, 6], S = [2, 3, 3, 4, 4, 6, 6, 8], D = [0, 0, 2, 2, 3, 4, 5, 6];
+const B = [2, 3, 4, 5, 6, 7, 8, 10], S = [3, 5, 6, 7, 9, 10, 12, 14], D = [0, 1, 3, 4, 5, 6, 8, 10];
 const NAMES = ['黄昏', '暮色', '入夜', '深夜', '午夜', '夜半', '拂晓前', '黎明'];
 
 export class Game {
@@ -209,14 +209,19 @@ export class Game {
 
     if (this.bot) this.bot.update(this, dt);
     // full-auto: cannon + MG are driven by the gunner; a finger / recent mouse move overrides the aim point
-    this.autoOn = !this.bot && this.set.autoFire;
-    if (this.autoOn && this.state === 'play') {
+    const ctrl = this.bot ? 'bot' : this.set.ctrl;
+    this.ctrl = ctrl; this.autoOn = ctrl === 'auto';
+    inp.touchFire = !!(inp.touch && inp.touch.enabled && inp.touch.aim.active && ctrl !== 'auto' && ctrl !== 'bot');
+    if ((ctrl === 'auto' || ctrl === 'assist') && this.state === 'play') {
+      // assist = auto-aim only (you fire); auto = auto-aim + auto-fire. A finger / recent mouse move overrides the aim in auto mode.
       let manual = null;
       const ta = inp.touch && inp.touch.aim;
-      if (ta && ta.active) manual = cam.screenToWorld(ta.x, ta.y - ta.off);
-      else if (!inp.touch?.enabled && performance.now() - inp.mouseT < 1800) manual = cam.screenToWorld(inp.mx, inp.my);
+      if (ctrl === 'auto') {
+        if (ta && ta.active) manual = cam.screenToWorld(ta.x, ta.y - ta.off);
+        else if (!inp.touch?.enabled && performance.now() - inp.mouseT < 1800) manual = cam.screenToWorld(inp.mx, inp.my);
+      }
       this.gunner.update(this, dt, manual);
-      inp.auto = this.gunner.out;
+      inp.auto = ctrl === 'assist' ? { ...this.gunner.out, aimOnly: true } : this.gunner.out;
     } else inp.auto = null;
 
     // wind
@@ -265,7 +270,7 @@ export class Game {
     const tx = t.x + lead + (t.vx * 0.35);
     const hw = cam.halfW;
     cam.x = clamp(damp(cam.x, tx, 6, dt), hw, this.terrain.W - hw);
-    cam.y = damp(cam.y, t.y * 0.8 + this.terrain.heightAt(t.x) * 0.2 + 165, 3, dt);
+    cam.y = damp(cam.y, t.y * 0.8 + this.terrain.heightAt(t.x) * 0.2 + 200, 3, dt);
 
     // sky
     let target;
@@ -289,7 +294,7 @@ export class Game {
   draw(realDt) {
     const fx = this.fx, cam = this.camera, r = this.r;
     const zoom = 1 + fx.zoomPunch * 0.04;
-    cam.halfH = 390 / zoom;
+    cam.halfH = 470 / zoom;
     cam.halfW = cam.halfH * (cam.cssW / cam.cssH);
     const shake = fx.shakeOffset();
     const sky = computeSky(this.skyPhase);

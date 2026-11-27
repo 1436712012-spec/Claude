@@ -9,7 +9,7 @@ const pg = await b.newPage({ viewport: { width: 1280, height: 720 } });
 const errs = []; pg.on('pageerror', (e) => errs.push(e.message)); pg.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
 await pg.goto(`http://127.0.0.1:${port}/?autostart=1&noadapt=1&dpr=1`);
 await pg.waitForFunction(() => window.__game);
-await pg.evaluate(() => { window.__game.stopBot(); window.__game.game.state = 'play'; window.__game.advance(3.2); window.__game.game.banner = null; window.__game.spawnTest(); window.__game.game.wave.state = 'idle'; window.__game.advance(0.25); });
+await pg.evaluate(() => { window.__game.stopBot(); window.__game.game.state = 'play'; window.__game.advance(3.2); window.__game.game.banner = null; window.__game.spawnTest(); window.__game.game.wave.state = 'idle'; window.__game.game.tank.hp = 9999; window.__game.advance(3.4); window.__freeze = true; });
 await pg.waitForTimeout(300);
 await pg.screenshot({ path: out + '.png' });
 console.log(errs.length ? errs.join('\n') : 'ok');

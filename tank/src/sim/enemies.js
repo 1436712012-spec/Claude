@@ -44,8 +44,20 @@ function enemyBullet(w, e, tx, ty, speed = 540) {
   const mx = e.x + e.dir * 26, my = e.y - 2;
   const dx = tx - mx, dy = ty - my, l = Math.hypot(dx, dy) || 1;
   const a = Math.atan2(dy, dx) + (Math.random() - 0.5) * 0.05;
-  w.ebullets.push({ x: mx, y: my, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, life: 2.2 });
+  w.ebullets.push({ x: mx, y: my, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, life: 4 });
   w.fx.glow(mx, my, 10, 0.05, [1, 0.5, 0.25], 3);
+}
+/** danmaku: aimed fan or full ring of slow, big, clearly visible bullets */
+function barrage(w, e, ring) {
+  const t = w.tank, n = ring ? 14 : 7, base = ring ? Math.random() * 6.28 : Math.atan2(t.y + 36 - e.y, t.x - e.x);
+  for (let i = 0; i < n; i++) {
+    const a = ring ? base + i / n * 6.283 : base + (i - (n - 1) / 2) * 0.17;
+    const sp = ring ? 230 : 300;
+    w.ebullets.push({ x: e.x, y: e.y - 6, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 5, big: true });
+  }
+  w.fx.glow(e.x, e.y, 36, 0.14, [1, 0.25, 0.45], 3);
+  w.fx.ring(e.x, e.y, 6, 60, 3, 0.3, [1, 0.3, 0.5], 2);
+  w.sfx('ebullet', e.x, {});
 }
 
 export function updateEnemies(w, dt) {
@@ -65,6 +77,8 @@ export function updateEnemies(w, dt) {
       e.y = e.y0 + Math.sin(e.t * 0.9 + e.phase) * 9;
       e.rot = damp(e.rot, Math.cos(e.t * 0.9 + e.phase) * 0.03 * e.dir, 4, edt);
       e.bombCd -= edt;
+      e.fireCd = (e.fireCd ?? 2.5) - edt;
+      if (e.fireCd <= 0 && Math.abs(e.x - tank.x) < 800 && tank.y < e.y) { barrage(w, e, w.wave.n >= 3 && Math.random() < 0.4); e.fireCd = 3.2 - Math.min(1.4, w.wave.n * 0.18); }
       if (e.bombs > 0 && e.bombCd <= 0) {
         const gh = T.heightAt(e.x), fall = Math.sqrt(2 * Math.max(40, e.y - gh - 30) / BOMB_G);
         const ix = e.x + e.vx * 0.9 * fall;
@@ -103,7 +117,7 @@ function updateScout(w, e, dt) {
   }
   if (e.phase2 === 'attack') {
     e.fireCd -= dt;
-    if (e.fireCd <= 0 && e.burst === 0 && Math.abs(toTank) < 520 && Math.sign(toTank) === e.dir) { e.burst = 3; e.burstCd = 0; e.fireCd = rr(1.0, 1.5); }
+    if (e.fireCd <= 0 && e.burst === 0 && Math.abs(toTank) < 520 && Math.sign(toTank) === e.dir) { e.burst = 5; e.burstCd = 0; e.fireCd = rr(1.0, 1.5); }
     if (e.burst > 0) {
       e.burstCd -= dt;
       if (e.burstCd <= 0) {
@@ -266,6 +280,7 @@ export function drawEnemies(w, L0, LA) {
     else drawDiver(w, e, L0, LA);
   }
   for (const b of w.bombs) {
+    LA.glowDot(b.x, b.y, 12, 22, [1, 0.2, 0.2, 1], 1.0);
     L0.rbox(b.x, b.y, 11, 4.4, b.rot, 4, [0.16, 0.14, 0.22, 1], 3, 0, 0);
     L0.rbox(b.x + Math.cos(b.rot) * 10, b.y + Math.sin(b.rot) * 10, 3.5, 3.6, b.rot, 2, C.red, 2, 0.8, 0);
     L0.rbox(b.x - Math.cos(b.rot) * 10, b.y - Math.sin(b.rot) * 10, 2.5, 6, b.rot, 1, [0.12, 0.1, 0.18, 1], 1.5, 0, 0);
@@ -273,8 +288,14 @@ export function drawEnemies(w, L0, LA) {
   }
   for (const b of w.ebullets) {
     const a = Math.atan2(b.vy, b.vx);
-    LA.glowLine(b.x - Math.cos(a) * 24, b.y - Math.sin(a) * 24, b.x, b.y, 1.5, 4, C.enemyBullet, 2.8);
-    LA.glowDot(b.x, b.y, 2, 4, [1, 0.8, 0.6, 1], 3);
+    if (b.big) {
+      LA.glowDot(b.x, b.y, 6, 12, [1, 0.15, 0.4, 1], 2.6);
+      LA.glowDot(b.x, b.y, 3.2, 3, [1, 0.9, 0.9, 1], 4);
+      LA.push(b.x, b.y, 9, 1.2, 0, 0, SH.RING, 2, 1, 0.3, 0.5, 1, 2.2, 3, 0, 0);
+    } else {
+      LA.glowLine(b.x - Math.cos(a) * 30, b.y - Math.sin(a) * 30, b.x, b.y, 2.2, 6, C.enemyBullet, 3.4);
+      LA.glowDot(b.x, b.y, 3.2, 6, [1, 0.85, 0.6, 1], 4);
+    }
   }
 }
 

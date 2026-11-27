@@ -84,7 +84,7 @@ check('Enter restarts (weapon pick again)', (await G(() => window.__game.game.st
 await pg.keyboard.press('Digit1'); await pg.waitForTimeout(200);
 // auto-fire toggle
 await pg.keyboard.press('KeyT'); await pg.waitForTimeout(100);
-check('T toggles full-auto fire', (await G(() => window.__game.settings.autoFire)) === true);
+check('T cycles to auto-aim mode', (await G(() => window.__game.settings.ctrl)) === 'assist');
 
 check('no console/page errors', errs.length === 0, errs.slice(0, 3).join(' | '));
 console.log(results.every(Boolean) ? '\nALL PASSED' : '\nSOME FAILED');

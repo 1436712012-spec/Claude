@@ -1,5 +1,5 @@
 const KEY = 'nightwatch-flak-settings-v1';
-export const DEFAULTS = { autoFire: null, fx: 1, shake: 1, bloom: 1, rays: 1, reduceFlash: false, numbers: true, volume: 0.8, music: 0.5, quality: 'auto' };
+export const DEFAULTS = { ctrl: null, fx: 1, shake: 1, bloom: 1, rays: 1, reduceFlash: false, numbers: true, volume: 0.8, music: 0.5, quality: 'auto' };
 
 export function loadSettings() {
   const s = { ...DEFAULTS };
@@ -35,7 +35,7 @@ export function buildPanel(settings, onChange, onResume) {
     }
     rows.append(row);
   };
-  add('全自动开火 (T)', 'autoFire', 'check');
+  add('瞄准 / 开火 (T)', 'ctrl', 'select', { options: [['manual', '手动瞄准 · 手动开火'], ['assist', '自动瞄准 · 手动开火'], ['auto', '全自动']] });
   add('特效强度', 'fx', 'range', { min: 0.25, max: 1.5 });
   add('屏幕震动', 'shake', 'range', { min: 0, max: 1.5 });
   add('辉光强度', 'bloom', 'range', { min: 0, max: 1.5 });

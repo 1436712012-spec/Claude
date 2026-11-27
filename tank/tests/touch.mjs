@@ -18,7 +18,7 @@ const check = (name, ok, extra = '') => { results.push(ok); console.log((ok ? 'P
 await pg.goto(`http://127.0.0.1:${port}/?noadapt=1&dpr=1&bot=1`);
 await pg.waitForFunction(() => window.__game);
 check('touch device detected', await G(() => window.__game.input.touch.enabled));
-check('auto-fire defaults ON for touch', await G(() => window.__game.settings.autoFire === true));
+check('auto-fire defaults ON for touch', await G(() => window.__game.settings.ctrl === 'auto'));
 check('title state', (await G(() => window.__game.game.state)) === 'title');
 await touch('touchStart', [[420, 195, 1]]); await touch('touchEnd', []);
 await pg.waitForTimeout(400);

@@ -134,13 +134,13 @@ export class Input {
   }
   get left() { return this.axis < -0.2; }
   get right() { return this.axis > 0.2; }
-  get fire() { return this.virtual ? this.virtual.fire : this.auto ? this.auto.fire : this.lmb; }
-  get mg() { return this.virtual ? this.virtual.mg : this.auto ? this.auto.mg : this.rmb || this.held('KeyF'); }
+  get fire() { return this.virtual ? this.virtual.fire : (this.auto && !this.auto.aimOnly) ? this.auto.fire : (this.lmb || !!this.touchFire); }
+  get mg() { return this.virtual ? this.virtual.mg : (this.auto && !this.auto.aimOnly) ? this.auto.mg : (this.rmb || this.held('KeyF') || !!this.touchFire); }
   get jump() { return this.virtual ? this.virtual.jump : this.pressed('Space') || this.pressed('KeyW'); }
   get missile() { return this.virtual ? this.virtual.missile : this.pressed('KeyQ'); }
   get overdrive() { return this.virtual ? this.virtual.overdrive : this.pressed('KeyE'); }
-  get aimX() { return this.virtual ? this.virtual.aimX : this.auto ? this.auto.aimX : this.mx; }
-  get aimY() { return this.virtual ? this.virtual.aimY : this.auto ? this.auto.aimY : this.my; }
+  get aimX() { return this.virtual ? this.virtual.aimX : this.auto ? this.auto.aimX : (this.touch.aim.active ? this.touch.aim.x : this.mx); }
+  get aimY() { return this.virtual ? this.virtual.aimY : this.auto ? this.auto.aimY : (this.touch.aim.active ? this.touch.aim.y - this.touch.aim.off : this.my); }
   endFrame() {
     this.edge.clear(); this.anyPress = false;
     if (this.virtual) { this.virtual.jump = this.virtual.missile = this.virtual.overdrive = false; }
