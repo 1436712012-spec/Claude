@@ -16,6 +16,7 @@
     });
     L.FX.setAmbient(layer);
     L.Audio.ambience(layer);
+    if (L.Music) L.Music.setLayer(layer);
   };
 
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -72,6 +73,7 @@
       };
       L.Audio.duck(true);
       if (!calm) {
+        if (L.Music) L.Music.glitch(true);
         // the dream exhales before it tears: a soft burst of bubbles and light
         L.FX.burst(window.innerWidth / 2, window.innerHeight * 0.45, 'dream', 46, { grav: -70, speed: 1.1, life: 1.6, size: 1.4 });
         L.FX.ring(window.innerWidth / 2, window.innerHeight * 0.45, '#ffe6f6', Math.max(window.innerWidth, window.innerHeight) * 0.6, 1.1, 18);

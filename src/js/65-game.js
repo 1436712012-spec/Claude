@@ -226,6 +226,7 @@
     }
     renderHand(P0.hand);
     renderMid(s);
+    if (L.Music) L.Music.state(P0.sanity, s.depth);
     updateInteractivity();
   }
   function renderHero(hero, bar, p, side) {
@@ -1399,6 +1400,7 @@
   H.fakeplay = async (ev) => {
     const mine = ev.pid === ME;
     A.play('fake');
+    if (L.Music) L.Music.glitch(true);
     const vw = window.innerWidth, vh = window.innerHeight;
     FX.word(vw / 2, vh * 0.42, mine ? '……这张牌从来不存在。' : L.HEROES[cfg.boss].short + '打出了一张不存在的牌。', 'dream');
     log(mine ? '你打出了一张不存在的牌。什么也没有发生。' : '守门人打出了一张不存在的牌。它愣住了。', 's');

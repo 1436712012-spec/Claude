@@ -423,6 +423,7 @@
     p.innerHTML = `<div class="hdr"><h2>设置</h2><button class="back" id="setClose" aria-label="关闭">×</button></div>
       ${row('mute', `<span id="muteLbl">静音</span>`)}
       <div class="set-row"><span>音量</span><div class="seg3" id="volSeg">${[0.3, 0.55, 0.8, 1].map((v) => `<button class="${Math.abs(s.vol - v) < 0.01 ? 'on' : ''}" data-v="${v}">${Math.round(v * 100)}</button>`).join('')}</div></div>
+      <div class="set-row"><span>音乐<small>每一层都有自己的配乐</small></span><div class="seg3" id="musSeg">${[0, 0.35, 0.7, 1].map((v) => `<button class="${Math.abs((s.music == null ? 0.7 : s.music) - v) < 0.01 ? 'on' : ''}" data-v="${v}">${v ? Math.round(v * 100) : '关'}</button>`).join('')}</div></div>
       ${row('crt', 'CRT 扫描线', '暗角、扫描线与轻微闪烁')}
       ${row('barrel', '桶形畸变', '屏幕边缘弯曲（较耗性能）')}
       ${row('fast', '快速动画', '缩短对局中的演出时间')}
@@ -442,6 +443,7 @@
       })
     );
     p.querySelectorAll('#volSeg button').forEach((b) => b.addEventListener('click', () => { s.vol = +b.dataset.v; S.saveSettings(); M.applySettings(); p.querySelectorAll('#volSeg button').forEach((x) => x.classList.toggle('on', x === b)); A.play('click'); }));
+    p.querySelectorAll('#musSeg button').forEach((b) => b.addEventListener('click', () => { s.music = +b.dataset.v; S.saveSettings(); M.applySettings(); p.querySelectorAll('#musSeg button').forEach((x) => x.classList.toggle('on', x === b)); A.play('click'); }));
     $('setClose').onclick = () => ov.classList.remove('on');
     const rp = $('resetProg');
     rp.onclick = () => {

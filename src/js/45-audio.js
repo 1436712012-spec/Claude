@@ -46,12 +46,15 @@
     crush.connect(crushOut);
     crushOut.connect(sfxBus);
     A.ready = true;
+    A._eng = () => ({ ctx, master, verbSend, noise: noiseBuffer });
+    if (L.Music) L.Music.boot();
     if (A._pendingLayer != null) A.ambience(A._pendingLayer);
   };
   A.setVolume = function () {
     if (!master) return;
     const s = settings();
     master.gain.setTargetAtTime(s.mute ? 0 : s.vol, ctx.currentTime, 0.05);
+    if (L.Music) L.Music.volume();
   };
 
   // ---------------------------------------------------------------- building blocks
@@ -343,7 +346,7 @@
     const nodes = [];
     // detuned muzak pad through a tape wobble
     const pad = ctx.createGain();
-    pad.gain.value = 0.05;
+    pad.gain.value = 0; // harmony now comes from L.Music
     const lp = ctx.createBiquadFilter();
     lp.type = 'lowpass';
     lp.frequency.value = 1100;
@@ -417,7 +420,7 @@
       o.frequency.value = midi(n - 12);
       wobG.connect(o.detune);
       const og = ctx.createGain();
-      og.gain.value = 0.028;
+      og.gain.value = 0; // harmony now comes from L.Music
       o.connect(og);
       og.connect(lp);
       o.start();
@@ -434,11 +437,7 @@
         voices.forEach((o, i) => o.frequency.setTargetAtTime(midi(ch[i] - 12), ctx.currentTime, 0.8));
       }
       // music box: a note or two, slightly out of tune, with a long tail
-      if (Math.random() < 0.75) {
-        const n = scale[(Math.random() * scale.length) | 0];
-        tone({ f: midi(n) * (1 + (Math.random() - 0.5) * 0.012), dur: 1.8, v: 0.045, verb: 1.1 });
-        tone({ f: midi(n) * 2.01, dur: 0.6, v: 0.012, verb: 1.1 });
-      }
+      void scale;
       if (Math.random() < 0.5) noise({ f: 3000 + Math.random() * 3000, dur: 0.03, v: 0.015, type: 'highpass' });
     }, 700);
     return { gain: g, nodes, timer };
