@@ -1,0 +1,15 @@
+{
+  "name": "arcana",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Arcana: compile tiny recursive programs into living, animated magic circles.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "build": "node scripts/build.mjs",
+    "dev": "python3 -m http.server 5173"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.0"
+  }
+}
