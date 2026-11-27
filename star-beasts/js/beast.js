@@ -306,14 +306,14 @@ class Body {
     const gl = glowSprite(this.colGlow);
     if (this.charge > 0) { g.globalAlpha = a * this.charge * .55; const r = s * 2.3; g.drawImage(gl, this.mx - r, this.my - r, 2 * r, 2 * r); }
     // nebular flesh along every limb
-    const step = Math.max(6, s * .16), sz = s * .62;
-    g.globalAlpha = a * (this.enemy ? .055 : .065) * (1 + this.flash);
+    const step = Math.max(6, s * .15), sz = s * .78;
+    g.globalAlpha = a * (this.enemy ? .085 : .1) * (1 + this.flash);
     for (const [i, j] of this.edges) {
       const p = N[i], q = N[j], k = Math.max(1, Math.ceil(Math.hypot(q.x - p.x, q.y - p.y) / step));
       for (let m = 0; m <= k; m++) { const x = p.x + (q.x - p.x) * m / k, y = p.y + (q.y - p.y) * m / k; g.drawImage(gl, x - sz / 2, y - sz / 2, sz, sz); }
     }
-    g.globalAlpha = a * .16;
-    for (const n of N) { const r = s * (.22 + .3 * n.mag); g.drawImage(gl, n.x - r, n.y - r, 2 * r, 2 * r); }
+    g.globalAlpha = a * .24;
+    for (const n of N) { const r = s * (.26 + .34 * n.mag); g.drawImage(gl, n.x - r, n.y - r, 2 * r, 2 * r); }
     // star lines
     g.lineCap = 'round'; g.lineJoin = 'round';
     g.beginPath(); for (const [i, j] of this.edges) { g.moveTo(N[i].x, N[i].y); g.lineTo(N[j].x, N[j].y); }

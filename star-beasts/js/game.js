@@ -231,7 +231,7 @@ function onDraftChange() {
     toast('继续延伸：闭合成环会长出护甲，锐角会长出獠牙，星的颜色决定元素', 4600);
   } else if ((S.save.tut & 1) && !(S.save.tut & 2) && d.nodes.length >= 3) {
     S.save.tut |= 2; persist();
-    toast('右侧「星象推演」随每一笔变化。满意了就按「点睛」唤醒它', 4200);
+    toast('「星象推演」会随你的每一笔改变。满意了就按「点睛」唤醒它', 4200);
   }
 }
 
@@ -414,7 +414,7 @@ function toast(msg, ms = 2600) {
 
 /* ---------- awakening ritual ---------- */
 function getPose() {
-  if (W < 760 || W < H) return { x: W / 2, y: Math.max(150, H * .26), s: Math.min(W * .3, H * .16) };
+  if (W < 760 || W < H) return { x: W / 2, y: Math.max(140, H * .22), s: Math.min(W * .28, H * .14) };
   return { x: W * .31, y: H * .53, s: Math.min(W * .19, H * .27) };
 }
 function startAwaken() {
@@ -535,7 +535,7 @@ function renderAwaken(t) {
     void st;
   } else {
     const pose = getPose();
-    drawChartRing(pose.x, pose.y, pose.s * 1.5, t, .85 * k * (1 - back * 2), A.rec.mansion);
+    drawChartRing(pose.x, pose.y, pose.s * 1.32, t, .85 * k * (1 - back * 2), A.rec.mansion);
     b.draw(ctx, t);
   }
 }
@@ -683,7 +683,7 @@ function genEnemy(night, rng, theme, boss) {
       edges.push([i, j]); break;
     }
   }
-  const el = rng() < .6 ? theme : EL_ORDER[Math.floor(rng() * 5)];
+  const el = night <= 2 || rng() < .6 ? theme : EL_ORDER[Math.floor(rng() * 5)];
   const base = { storm: .6, frost: 2.2, light: 3.3, flame: 4.4, ember: 5.6 }[el];
   pts.forEach(p => { p.cls = clamp(Math.round(base + (rng() - .5) * 1.1), 0, 6); p.mag = .3 + rng() * .7; });
   const q = quantPoints(pts);
@@ -693,13 +693,13 @@ function genEnemy(night, rng, theme, boss) {
   rec.boss = boss;
   return rec;
 }
-function genWave(night) {
+function genWave(night, favor) {
   const rng = mulberry32(hashStr(`wave:${S.save.uid}:${night}`));
-  const boss = night % 5 === 0, theme = EL_ORDER[Math.floor(rng() * 5)];
+  const boss = night % 5 === 0, theme = favor || EL_ORDER[Math.floor(rng() * 5)];
   const count = boss ? (night >= 10 ? 3 : 2) : night === 1 ? 1 : night === 2 ? 2 : 3;
   const list = [];
   for (let i = 0; i < count; i++) list.push(genEnemy(night, rng, theme, boss && i === 0));
-  return { night, list, mult: .62 + .085 * night, boss, theme };
+  return { night, list, mult: night === 1 ? .72 : .74 + .15 * (night - 1), boss, theme };
 }
 function counterTip(wave) {
   const cnt = {}; wave.list.forEach(r => { cnt[r.g.element] = (cnt[r.g.element] || 0) + 1; });
@@ -711,7 +711,11 @@ function counterTip(wave) {
 function openPrep() {
   const team = getTeam();
   if (!team.length) { toast('图鉴里还没有星图兽。先在夜空中连星吧'); return false; }
-  if (!S.wave || S.wave.night !== S.save.night) S.wave = genWave(S.save.night);
+  if (!S.wave || S.wave.night !== S.save.night) {
+    // The first two nights send eclipse beasts your lead beast overpowers, so the element ring is learned by winning.
+    const favor = S.save.night <= 2 ? EL_ORDER[(EL_ORDER.indexOf(team[0].g.element) + 1) % 5] : null;
+    S.wave = genWave(S.save.night, favor);
+  }
   const w = S.wave;
   S.overlay = 'prep'; el.prep.hidden = false;
   $('#p-title').textContent = `第${cn(w.night)}夜`;
@@ -736,7 +740,7 @@ function cycleHTML() {
 /* ---------- battle ---------- */
 function makeUnit(rec, side, mult, boss) {
   const g = rec.g, lm = side === 0 ? levelMult(rec.level) : 1, zen = side === 0 && inZenith(rec.mansion);
-  let hp = g.stats.hp * lm * mult * (boss ? 2.2 : 1), atk = g.stats.atk * lm * mult * (boss ? 1.25 : 1);
+  let hp = g.stats.hp * 1.3 * lm * mult * (boss ? 1.9 : 1), atk = g.stats.atk * lm * mult * (boss ? 1.25 : 1);
   const def = g.stats.def * lm * Math.sqrt(mult);
   let spd = g.stats.spd * (side ? 1 + .012 * S.save.night : 1);
   if (zen) { atk *= 1.2; spd *= 1.15; }
@@ -753,7 +757,8 @@ function makeUnit(rec, side, mult, boss) {
 function layoutBattle() {
   const b = S.battle; if (!b) return;
   const portrait = W < H * 1.05;
-  const base = portrait ? Math.min(W * .1, H * .07) : Math.min(W * .06, H * .085);
+  const maxN = Math.max(...[0, 1].map(s => b.units.filter(u => u.side === s).length));
+  const base = portrait ? Math.min(W * (maxN >= 3 ? .12 : .17), H * .09) : Math.min(W * .075, H * (maxN >= 3 ? .1 : .14));
   for (const side of [0, 1]) {
     const us = b.units.filter(u => u.side === side), n = us.length;
     us.forEach((u, i) => {
@@ -762,7 +767,7 @@ function layoutBattle() {
         u.hx = W * (i + 1) / (n + 1); u.hy = side === 0 ? H * .68 : H * .33;
         if (n === 3 && i === 1) u.hy += side === 0 ? H * .05 : -H * .05;
       } else {
-        u.hx = side === 0 ? W * .27 : W * .73; u.hy = n === 1 ? H * .5 : H * (.3 + .4 * i / (n - 1));
+        u.hx = side === 0 ? W * .27 : W * .73; u.hy = n === 1 ? H * .5 : H * (.25 + .48 * i / (n - 1));
         if (n === 3 && i === 1) u.hx += side === 0 ? -W * .06 : W * .06;
       }
     });
@@ -781,7 +786,7 @@ function startBattle() {
     if (u.side === 0) { u.body.place(u.hx - W * .45, u.hy, u.scale, true); u.body.kMul = .3; }
     else { u.body.place(u.hx, u.hy, u.scale, true); u.body.alpha = 0; }
   }
-  clearFx();
+  clearFx(); el.toast.classList.remove('show');
   S.mode = 'battle'; showDrawUI(false); el.hud.classList.add('battle'); el.bhud.hidden = false;
   $('#bh-speed').textContent = '×' + b.speed;
   AU.tone(110, { type: 'sine', dur: 2.2, gain: .12, to: 55 }); AU.noise({ type: 'lowpass', f: 200, to: 1200, dur: 1.4, gain: .14, a: .4 });
@@ -1032,7 +1037,7 @@ function updateBattle(dt) {
       tickStatus(u, sdt); if (!u.alive) continue;
       if (u.anim) { advanceAnim(u, sdt); continue; }
       if (u.freezeT > 0) continue;
-      u.actG += u.spd * 6 * (u.slowT > 0 ? .6 : 1) * sdt;
+      u.actG += u.spd * 4.6 * (u.slowT > 0 ? .6 : 1) * sdt;
       if (u.actG >= 100) { u.actG = 0; act(u); }
     }
     updateProj(sdt);
@@ -1149,6 +1154,8 @@ function setTab(tab) {
   if (tab === 'atlas') openAtlas();
   document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b.dataset.tab === shown));
   showDrawUI(shown === 'draw');
+  if (shown !== 'draw') el.toast.classList.remove('show');
+  else if (!(S.save.tut & 1)) toast('按住一颗星，拖向附近的另一颗星，连成第一条星线', 0);
 }
 function updateHud() {
   el.night.textContent = `第${cn(S.save.night)}夜 · 当空 ${zenText()}`;
@@ -1200,7 +1207,6 @@ $('#t-start').addEventListener('click', () => {
   el.title.classList.add('out'); setTimeout(() => { el.title.hidden = true; }, 800);
   el.hud.hidden = false; S.mode = 'draw'; S.attract = null;
   setTab('draw'); pickGhost(); updateHud();
-  if (!(S.save.tut & 1)) toast('按住一颗星，拖向附近的另一颗星，连成第一条星线', 0);
   const h = (location.hash || '').slice(1);
   if (/^xt[0-9a-z]{8,}$/i.test(h)) setTimeout(() => importCode(h), 600);
 });

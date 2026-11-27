@@ -84,9 +84,9 @@ const FORMS = {
 
 const RARITY = [
   { ch: '凡', min: 0, mult: 1, seal: '#59628a' },
-  { ch: '灵', min: .44, mult: 1.06, seal: '#2b7da6' },
-  { ch: '玄', min: .6, mult: 1.13, seal: '#7a4bc2' },
-  { ch: '天', min: .75, mult: 1.22, seal: '#c63c2c' },
+  { ch: '灵', min: .47, mult: 1.06, seal: '#2b7da6' },
+  { ch: '玄', min: .58, mult: 1.13, seal: '#7a4bc2' },
+  { ch: '天', min: .69, mult: 1.22, seal: '#c63c2c' },
 ];
 
 // The 28 lunar mansions, laid across the sky from left to right.
@@ -429,7 +429,7 @@ function skyTemp(sky, x, y) { return clamp((fbm(sky.tn, x * 1.25 + 3.1, y * 1.25
 function genSky(seed, aspect) {
   aspect = clamp(aspect, .5, 2.4);
   const r = mulberry32(seed >>> 0), tn = makeNoise((seed ^ 0x51ed27) >>> 0);
-  const portrait = aspect < .8, top = portrait ? .13 : .1, bot = portrait ? .74 : .83;
+  const portrait = aspect < .8, top = portrait ? .13 : .12, bot = portrait ? .74 : .84;
   const target = Math.round(aspect * (bot - top) * 150), minD = .05, stars = [];
   const sky = { seed, aspect, stars, tn, top, bot };
   let tries = 0;
