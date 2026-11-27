@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>html,body{margin:0;height:100%;background:#000}canvas{width:100%;height:100%;display:block}</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script type="module">
+import { Renderer } from '../src/render/renderer.js';
+import { cameraBasis } from '../src/world/camera.js';
+const q = new URLSearchParams(location.search);
+const r = new Renderer(document.getElementById('c'));
+r.scale = +(q.get('scale') || 0.5);
+r.quality = q.get('q') || 'high';
+const pos = (q.get('pos') || '0,1.62,3.4').split(',').map(Number);
+const yaw = (+(q.get('yaw') || 0) * Math.PI) / 180;
+const pitch = (+(q.get('pitch') || 0) * Math.PI) / 180;
+const frame = {
+  camPos: pos, camRot: cameraBasis(yaw, pitch).mat, tanHalf: Math.tan((+(q.get('fov') || 70) * Math.PI) / 360),
+  time: 1, seeds: [1, 2, 3], lib: +(q.get('lib') || 0),
+  hover: [0, 0, -1, 0], hide: [0, 0, -1, 0], sel: { center: [0, 0, 0], rot: [1, 0, 0, 0, 1, 0, 0, 0, 1], half: [-1, 0, 0], seed: 0 },
+  mark: [0, 0, -1, 0], markGlow: 0, exposure: 1, warp: 0, warpCenter: [0.5, 0.5], fall: 0, fade: 0, fadeCol: [0, 0, 0], bloom: 1, still: true, debug: +(q.get('debug') || 0),
+};
+let n = 0;
+const N = +(q.get('frames') || 1);
+function loop() {
+  r.render(frame);
+  n++;
+  if (n < N) requestAnimationFrame(loop);
+  else r.gl.finish(), (document.title = 'done');
+}
+document.fonts.ready.then(() => {
+  try { r.refreshGlyphs(); loop(); } catch (e) { document.title = 'error'; console.error(e.message); }
+});
+</script>
+</body>
+</html>
