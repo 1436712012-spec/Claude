@@ -495,7 +495,7 @@ vec3 shade(vec3 ro, vec3 rd, float t, bool allowShadow, out bool isMirror, out v
       emit += vec3(0.25, 0.75, 0.62) * (0.35 + 0.65*pow(1.0 - abs(dot(n, rd)), 2.0)) * 0.9;
     }
     if (uMarkGlow > 0.0 && float(bcx) == uMark.x && float(bcy) == uMark.y && float(bwall) == uMark.z && float(bslot) == uMark.w) {
-      emit += vec3(0.30, 0.95, 0.78) * uMarkGlow * (0.6 + 0.4*sin(uTime*5.0));
+      emit += vec3(0.30, 0.95, 0.78) * uMarkGlow * (1.4 + 0.8*sin(uTime*5.0));
     }
   }
 

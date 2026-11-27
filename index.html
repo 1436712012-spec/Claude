@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Library of Babel</title>
+<meta name="description" content="An explorable, ray-marched Library of Babel where every possible book has exactly one shelf.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=IBM+Plex+Mono:wght@400;500&family=Courier+Prime&family=Noto+Serif+SC:wght@400;600;900&display=swap">
+<link rel="stylesheet" href="src/style.css">
+</head>
+<body class="intro">
+<!--BODY-->
+<canvas id="stage" aria-label="巴别图书馆的实时三维画面"></canvas>
+
+<section id="intro" aria-labelledby="introTitle">
+  <div class="intro-inner">
+    <div class="eyebrow">Jorge Luis Borges · 1941</div>
+    <h1 id="introTitle"><span class="en">The Library of Babel</span><span class="zh">巴别图书馆</span></h1>
+    <p class="epi">宇宙（别人称之为图书馆）由数目不定、或许无限的六角形回廊构成。</p>
+    <p class="intro-body">这里收藏着每一本可能存在的书：所有 410 页、由同一套字母写成的书，每一本恰好一册，各有一个确切的书架。你可以在回廊间行走、抽出任意一本书来读，也可以写下一句话，看它早已被印在哪一本书的哪一页。</p>
+    <div class="intro-actions">
+      <button class="btn primary" id="enterLatin"><span>步入拉丁卷</span><small>29 个符号 · 10<sup>1,918,666</sup> 本书</small></button>
+      <button class="btn" id="enterHan"><span>步入汉字卷</span><small>20,905 个符号 · 竖排右翻</small></button>
+    </div>
+    <p class="intro-foot">实时光线步进渲染 · 建议使用电脑浏览器 · 声音：无</p>
+  </div>
+</section>
+
+<header id="hud">
+  <button class="loc" id="locName" title="查看完整坐标">
+    <span class="hud-lib" id="hudLib"></span>
+    <span class="row"><b>廊</b><span id="hudCorridor"></span></span>
+    <span class="row"><b>室</b><span id="hudGallery"></span></span>
+    <span class="row"><b>层</b><span id="hudLevel"></span></span>
+  </button>
+  <nav class="tools" aria-label="工具">
+    <button class="btn" id="btnSearch">寻书 <kbd>/</kbd></button>
+    <button class="btn ghost" id="btnRandom">随机一册</button>
+    <button class="btn ghost" id="btnLib">去汉字卷</button>
+    <button class="btn ghost" id="btnAbout">原理</button>
+    <button class="btn ghost" id="btnQuality">画质</button>
+  </nav>
+</header>
+
+<div id="tip" hidden></div>
+<div id="hint" aria-live="polite"></div>
+<div id="actions">
+  <button class="btn act" id="actUp" hidden>↑ 上楼</button>
+  <button class="btn act" id="actDown" hidden>↓ 下楼</button>
+  <button class="btn act" id="actLeap" hidden>越过栏杆</button>
+  <button class="btn act primary" id="actGrab" hidden>抓住栏杆</button>
+</div>
+<div id="joy" hidden><div></div></div>
+<div id="toast" hidden role="status"></div>
+
+<div id="panelScrim" hidden></div>
+<aside class="panel" id="panelSearch" hidden aria-label="寻书"></aside>
+<aside class="panel" id="panelAbout" hidden aria-label="原理"></aside>
+
+<section id="reader" hidden aria-label="阅读"></section>
+
+<div id="fatal" hidden><h2>无法打开图书馆</h2><p></p><p class="small">这件作品需要 WebGL2。请换用较新的 Chrome、Edge、Firefox 或 Safari。</p></div>
+<!--/BODY-->
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
