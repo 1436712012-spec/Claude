@@ -19,6 +19,8 @@ npm run build    # dist/index.html — one self-contained 117 KB file
 
 **One architecture, two renderers of it.** The gallery geometry lives in `src/world/geometry.js`. The GLSL constants are generated from it, and the CPU uses the same numbers and the same integer hash for picking, collision and for the book that flies off the shelf. The book you click is exactly the book the GPU drew, with the same spine glyphs that appear on the reader's title.
 
+**Links that lead to a sentence.** After a search in "only this book" mode the page hash holds the sentence itself (hex-encoded, never the address). Whoever opens the link is told someone left them a message, enters the right library, and is carried to the page — the bijection guarantees everyone arrives at the same shelf.
+
 **Two universes.**
 | | Latin volumes | Han volumes |
 |---|---|---|

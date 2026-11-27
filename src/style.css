@@ -95,6 +95,8 @@ kbd {
 #intro h1 .zh { display: block; font: 900 clamp(20px, 3vw, 30px)/1.4 var(--body); letter-spacing: 0.5em; color: var(--lamp); margin-top: 14px; }
 .epi { font: italic 400 clamp(17px, 2vw, 21px)/1.7 var(--display); color: var(--vellum); margin: 0; font-family: var(--body); font-style: normal; border-left: 2px solid var(--lamp-dim); padding-left: 16px; }
 .intro-body { margin: 0; color: var(--vellum-2); max-width: 52ch; }
+.intro-note { margin: 0; padding: 12px 14px; border: 1px solid rgba(124, 196, 174, 0.45); background: rgba(124, 196, 174, 0.08); color: var(--vellum); max-width: 52ch; }
+.share { display: grid; gap: 8px; }
 .intro-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; }
 .intro-actions .btn { display: grid; gap: 6px; text-align: left; padding: 14px 20px; font-size: 16px; }
 .intro-actions .btn small { font: 400 12px/1 var(--mono); opacity: 0.75; }

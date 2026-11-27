@@ -1,0 +1,27 @@
+// Follow a shared link: the intro names the message, entering searches and travels to it.
+import { createRequire } from 'node:module';
+import { createServer } from './serve.mjs';
+import { encodeShare } from '../src/ui/share.js';
+const require = createRequire(import.meta.url);
+const { chromium } = require('playwright');
+const [outDir = '.', page = 'dist/index.html'] = process.argv.slice(2);
+const server = createServer('.');
+await new Promise((r) => server.listen(0, r));
+const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const p = await browser.newPage({ viewport: { width: 1200, height: 720 } });
+const logs = [];
+p.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}`));
+const text = '我在每一间六角形回廊里寻找过你。';
+await p.goto(`http://localhost:${server.address().port}/${page}?scale=0.4#${encodeShare('han', text)}`);
+await p.waitForTimeout(2000);
+await p.screenshot({ path: `${outDir}/s1-intro.png` });
+console.log('note:', await p.textContent('#introNote'));
+await p.click('#enterHan');
+await p.waitForFunction(() => window.__babel?.mode === 'read' && document.querySelector('#readerLoading')?.hidden, null, { timeout: 200000 });
+await p.waitForTimeout(1200);
+await p.screenshot({ path: `${outDir}/s2-found.png` });
+console.log('highlight:', await p.evaluate(() => [...document.querySelectorAll('#reader mark')].map((m) => m.textContent).join('')));
+console.log('hash kept:', await p.evaluate(() => location.hash.slice(0, 12)));
+console.log(logs.join('\n'));
+await browser.close();
+server.close();

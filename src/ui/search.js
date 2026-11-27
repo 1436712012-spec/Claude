@@ -5,6 +5,7 @@ import { digitsToText } from '../babel/alphabet.js';
 import { log10BooksContaining } from '../babel/search.js';
 import { findTextAsync } from '../babel/client.js';
 import { coordHTML, coordGlyphs, pow10HTML } from './format.js';
+import { encodeShare, setShareHash } from './share.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 
@@ -113,6 +114,7 @@ export class SearchPanel {
     btn.textContent = '正在置换 ' + lib.bookLen.toLocaleString('en-US') + ' 个字符…';
     const t0 = performance.now();
     try {
+      this.lastMode = this.mode;
       const res = await findTextAsync(lib, digits, this.mode);
       res.ms = performance.now() - t0;
       res.text = digitsToText(lib, digits);
@@ -180,6 +182,17 @@ export class SearchPanel {
     });
   }
 
+  /** Arrive from a shared link: search in "alone" mode and set off. */
+  async followLink(text) {
+    $('#searchText', this.root).value = text;
+    this.mode = 'alone';
+    this.root.querySelector('input[value=alone]').checked = true;
+    this.update();
+    this.app.openPanel('search');
+    await this.go();
+    if (this.result) setTimeout(() => this.app.travelTo(this.result), 900);
+  }
+
   showResult(res) {
     const lib = this.app.lib;
     const el = $('#result', this.root);
@@ -194,8 +207,24 @@ export class SearchPanel {
         <dt>书</dt><dd>第 ${res.wall + 1} 壁 · 第 ${res.shelf + 1} 架 · 第 ${res.volume + 1} 卷 · 第 ${res.page + 1} 页 · 第 ${Math.floor(res.offset / lib.cols) + 1} ${lib.vertical ? '列' : '行'}</dd>
       </dl>
       <p class="small">每个坐标都是一个 ${h.level.sigLength().toLocaleString('en-US')} 位的 ${lib.K} 进制数，上面的 <code>code</code> 是它用这座图书馆自己的字母写出的开头。这次置换在 ${Math.round(res.ms)} ms 内完成。</p>
+      ${this.lastMode === 'alone' && res.text.length <= 240 ? `<div class="share"><p class="small">这本书是确定的：任何人算出的都是同一个书架。把链接发给别人，他们会被领到这一页。</p><button class="btn ghost wide" id="shareCopy">复制通往这本书的链接</button></div>` : ''}
       <button class="btn primary wide" id="travelGo">前往这本书</button>`;
     $('#travelGo', el).onclick = () => this.app.travelTo(res);
+    const share = $('#shareCopy', el);
+    if (share) {
+      const name = encodeShare(lib.id, res.text);
+      setShareHash(name);
+      share.onclick = async () => {
+        const url = location.href.split('#')[0] + '#' + name;
+        try {
+          await navigator.clipboard.writeText(url);
+          share.textContent = '链接已复制';
+        } catch {
+          share.textContent = '地址栏里的链接已指向这本书';
+        }
+        setTimeout(() => (share.textContent = '复制通往这本书的链接'), 2200);
+      };
+    }
     el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 }

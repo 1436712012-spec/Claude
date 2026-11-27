@@ -12,6 +12,7 @@ import { cameraBasis, rayDir } from './world/camera.js';
 import { Reader } from './ui/reader.js';
 import { SearchPanel } from './ui/search.js';
 import { coordHTML, coordGlyphs, coordFullGlyphs, pow10HTML, fmtInt } from './ui/format.js';
+import { decodeShare } from './ui/share.js';
 
 const $ = (s) => document.querySelector(s);
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
@@ -80,6 +81,14 @@ class App {
     document.fonts?.ready.then(() => this.renderer.refreshGlyphs());
     this.last = performance.now();
     requestAnimationFrame((t) => this.frame(t));
+    this.shared = decodeShare(location.hash);
+    if (this.shared) {
+      const note = $('#introNote');
+      note.hidden = false;
+      note.innerHTML = `有人在这座图书馆里给你留了一句话。它印在${LIBRARIES[this.shared.lib].name}的某一本书里，那本书的位置由这句话唯一确定。`;
+      $(this.shared.lib === 'han' ? '#enterHan' : '#enterLatin').classList.add('primary');
+      $(this.shared.lib === 'han' ? '#enterLatin' : '#enterHan').classList.remove('primary');
+    }
     if (q.get('enter') === '1') this.enter();
   }
 
@@ -186,7 +195,14 @@ class App {
         this.pitch = lerp(from.pitch, -0.05, e);
         this.exposure = lerp(0.75, 1, e);
       },
-      done: () => (this.mode = 'walk'),
+      done: () => {
+        this.mode = 'walk';
+        const sh = this.shared;
+        if (sh && sh.lib === this.lib.id) {
+          this.shared = null;
+          this.search.followLink(sh.text);
+        }
+      },
       mode: 'enter',
     });
     this.hudDirty = true;
