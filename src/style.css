@@ -208,14 +208,15 @@ body.intro #hud, body.intro #hint, body.reading #hud, body.reading #hint, body.r
   z-index: 15;
   overflow-y: auto;
   padding: calc(20px + env(safe-area-inset-top, 0px)) max(22px, env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom, 0px)) 24px;
-  display: grid;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
   gap: 14px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   animation: slidein 0.35s cubic-bezier(.2, .8, .2, 1);
 }
 @keyframes slidein { from { transform: translateX(30px); opacity: 0; } }
+.panel > * { flex-shrink: 0; }
 .panel-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
 .panel h2 { margin: 4px 0 0; font: 900 28px/1.2 var(--body); letter-spacing: 0.2em; }
 .panel h3 { margin: 12px 0 0; font: 600 16px/1.4 var(--body); color: var(--lamp); }
@@ -226,6 +227,7 @@ body.intro #hud, body.intro #hint, body.reading #hud, body.reading #hint, body.r
 .field-label { font: 400 12px/1 var(--display-sc); letter-spacing: 0.12em; color: var(--vellum-3); }
 textarea {
   width: 100%;
+  min-height: 7.2em;
   resize: vertical;
   background: rgba(236, 225, 201, 0.06);
   border: 1px solid var(--line);

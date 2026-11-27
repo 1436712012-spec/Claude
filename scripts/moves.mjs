@@ -1,0 +1,57 @@
+// Exercise the stair climb and the fall, plus a phone-sized layout.
+import { createRequire } from 'node:module';
+import { createServer } from './serve.mjs';
+const require = createRequire(import.meta.url);
+const { chromium, devices } = require('playwright');
+const outDir = process.argv[2] || '.';
+const server = createServer('.');
+await new Promise((r) => server.listen(0, r));
+const port = server.address().port;
+const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const logs = [];
+const p = await browser.newPage({ viewport: { width: 1100, height: 640 } });
+p.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}`));
+p.on('console', (m) => m.type() === 'error' && logs.push(`[error] ${m.text()}`));
+await p.goto(`http://localhost:${port}/index.html?scale=0.4&enter=1`);
+await p.waitForFunction(() => window.__babel && window.__babel.mode === 'walk', null, { timeout: 90000 });
+// stairs: stand in the hallway by the well
+await p.evaluate(() => { const a = window.__babel; a.pos = [6.4, 1.62, 0.2]; a.yaw = Math.PI / 2; });
+await p.waitForTimeout(500);
+const lv0 = await p.evaluate(() => window.__babel.anchor.level.magnitude().exact);
+await p.keyboard.press('e');
+await p.waitForTimeout(2500);
+await p.screenshot({ path: `${outDir}/m1-climb.png` });
+await p.waitForFunction(() => window.__babel.mode === 'walk', null, { timeout: 90000 });
+const lv1 = await p.evaluate(() => { const a = window.__babel; return (a.anchor.level.neg ? -1 : 1) * a.anchor.level.magnitude().exact; });
+console.log('level before/after climb:', lv0, lv1);
+// fall: stand by the railing
+await p.evaluate(() => { const a = window.__babel; a.pos = [0, 1.62, -2.3]; a.yaw = Math.PI / 2; });
+await p.waitForTimeout(300);
+await p.keyboard.press('f');
+await p.waitForFunction(() => window.__babel.mode === 'fall', null, { timeout: 60000 });
+await p.waitForTimeout(3500);
+await p.screenshot({ path: `${outDir}/m2-fall.png` });
+await p.keyboard.press(' ');
+await p.waitForFunction(() => window.__babel.mode === 'walk', null, { timeout: 90000 });
+const lv2 = await p.evaluate(() => { const a = window.__babel; return { level: (a.anchor.level.neg ? -1 : 1) * a.anchor.level.magnitude().exact, pos: a.pos.map((v) => +v.toFixed(2)) }; });
+console.log('after fall and grab:', JSON.stringify(lv2));
+await p.screenshot({ path: `${outDir}/m3-landed.png` });
+await p.close();
+// phone layout
+const ctx = await browser.newContext({ ...devices['iPhone 13'] });
+const m = await ctx.newPage();
+m.on('pageerror', (e) => logs.push(`[pageerror mobile] ${e.message}`));
+await m.goto(`http://localhost:${port}/index.html?scale=0.35`);
+await m.waitForTimeout(2500);
+await m.screenshot({ path: `${outDir}/p1-intro.png` });
+await m.tap('#enterLatin');
+await m.waitForFunction(() => window.__babel.mode === 'walk', null, { timeout: 90000 });
+await m.screenshot({ path: `${outDir}/p2-walk.png` });
+await m.tap('#btnSearch');
+await m.waitForTimeout(600);
+await m.screenshot({ path: `${outDir}/p3-search.png` });
+const ovf = await m.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+console.log('mobile horizontal overflow:', ovf);
+console.log(logs.join('\n'));
+await browser.close();
+server.close();

@@ -19,8 +19,9 @@ const pitch = (+(q.get('pitch') || 0) * Math.PI) / 180;
 const frame = {
   camPos: pos, camRot: cameraBasis(yaw, pitch).mat, tanHalf: Math.tan((+(q.get('fov') || 70) * Math.PI) / 360),
   time: 1, seeds: [1, 2, 3], lib: +(q.get('lib') || 0),
-  hover: [0, 0, -1, 0], hide: [0, 0, -1, 0], sel: { center: [0, 0, 0], rot: [1, 0, 0, 0, 1, 0, 0, 0, 1], half: [-1, 0, 0], seed: 0 },
-  mark: [0, 0, -1, 0], markGlow: 0, exposure: 1, warp: 0, warpCenter: [0.5, 0.5], fall: 0, fade: 0, fadeCol: [0, 0, 0], bloom: 1, still: true, debug: +(q.get('debug') || 0),
+  hide: [0, 0, -1, 0], sel: { center: [0, 0, 0], rot: [1, 0, 0, 0, 1, 0, 0, 0, 1], half: [-1, 0, 0], seed: 0 },
+  mark: (q.get('mark') || '0,0,-1,0').split(',').map(Number), markGlow: +(q.get('glow') || 0),
+  hover: (q.get('hover') || '0,0,-1,0').split(',').map(Number), exposure: 1, warp: 0, warpCenter: [0.5, 0.5], fall: 0, fade: 0, fadeCol: [0, 0, 0], bloom: 1, still: true, debug: +(q.get('debug') || 0),
 };
 let n = 0;
 const N = +(q.get('frames') || 1);

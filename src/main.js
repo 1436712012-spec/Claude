@@ -29,6 +29,7 @@ const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 class App {
   constructor() {
+    document.body.classList.add('intro');
     this.canvas = $('#stage');
     try {
       this.renderer = new Renderer(this.canvas);
@@ -513,7 +514,13 @@ class App {
     this.startAnim({
       mode: 'climb',
       dur,
-      shift: (dx, dy) => { yBase += dy; start.pos[1] += dy; },
+      shift: (dx, dy) => {
+        yBase += dy;
+        start.pos[0] += dx;
+        start.pos[1] += dy;
+        wc[0] += dx;
+        landing[0] += dx;
+      },
       update: (k) => {
         const t = k * dur;
         if (t < T1) {
@@ -830,7 +837,7 @@ class App {
           const hit = { cx: 0, cy: 0, wall, shelfB, shelf: res.shelf, slot };
           const extra = res.random ? {} : { hit: { page: res.page, offset: res.offset, length: res.length } };
           this.openBook(hit, extra);
-        }, 900);
+        }, 1400);
       },
     };
     this.startAnim(anim);
