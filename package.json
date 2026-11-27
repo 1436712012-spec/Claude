@@ -1,0 +1,15 @@
+{
+  "name": "library-of-babel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "An explorable, ray-marched Library of Babel with an exact book-level bijection.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/serve.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.2"
+  }
+}
