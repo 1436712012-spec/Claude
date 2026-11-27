@@ -1,3 +1,14 @@
+GAME STYLE BRIEF — read this first and keep it for every image.
+Game: "LIMINAL" (夹层), a collectible card battler set in the gap between waking and dreaming. The player is an agent of a containment foundation descending through three dream layers: a sterile containment site, the endless yellow backrooms, and a pastel dreamcore childhood. The mood is quiet, nostalgic and uncanny: never gory, never jump-scare; the horror is in emptiness, wrong details and too-familiar places.
+Visual style: polished painterly fantasy-card illustration, like a premium digital collectible card game — rich hand-painted brushwork, strong readable silhouette, a single clear focal subject, cinematic key light plus rim light, soft atmospheric depth, gentle film grain and slight halation. Detailed at the center, softer toward the edges.
+Recurring motifs: faceless humanoids (smooth blank faces, no eyes/nose/mouth), buzzing fluorescent tubes, CRT televisions, VHS haze, empty corridors, pools, malls and kindergartens after closing, floating dust and bubbles, frost.
+Factions and palettes:
+- Containment Site: cold cyan and white, clinical tiles, frost, yellow-black hazard stripes, small red warning lights.
+- Backrooms: mono-yellow wallpaper, damp beige carpet, sickly fluorescent yellow, deep soft shadows.
+- Dreamcore: pastel pink, lavender, sky blue, milky overexposed glow, childhood objects, tiny sparkles; sweet but slightly wrong.
+- Neutral: late-1990s liminal spaces, VHS-tinted warm neon in empty places.
+Hard rules: square 1:1; main subject inside the middle 70% (edges get cropped to an oval or banner); no text, letters, numbers, logos, watermarks, card frames or borders; no blood or gore; consistent style across the whole set.
+
 LIMINAL card art batch — 79 images.
 Instructions for the image model: for EACH entry below, generate ONE square 1:1 image using exactly the prompt given. Produce them in order, one image per reply. After each image, write the entry ID so the file can be named <ID>-1.png. When the user says "continue", go on with the next entry. If the user says "again", make one more variant of the previous entry (name <ID>-2.png).
 
