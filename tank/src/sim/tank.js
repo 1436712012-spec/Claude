@@ -56,15 +56,15 @@ export class Tank {
     // ---- driving ----
     const dir = inp.axis;
     const od = w.combo.odT > 0;
-    let maxV = 200 * (this.charging && this.charge > 0.2 ? 0.7 : 1);
+    let maxV = 340 * (this.charging && this.charge > 0.2 ? 0.7 : 1);
     const sl = T.slopeAt(this.x);
     this.slopeCur = damp(this.slopeCur, sl, 8, dt);
     if (dir) maxV *= (1 - 0.3 * clamp(this.slopeCur * dir, 0, 1)) * Math.min(1, 0.35 + Math.abs(dir));
-    if (Math.abs(dir) > 0.05) this.vx += dir * 950 * dt; else this.vx = approach(this.vx, 0, 820 * dt);
+    if (Math.abs(dir) > 0.05) this.vx += dir * 1700 * dt; else this.vx = approach(this.vx, 0, 1400 * dt);
     this.vx = clamp(this.vx, -maxV, maxV);
     this.x = clamp(this.x + this.vx * dt, 170, T.W - 170);
     this.odo += this.vx * dt * (this.f > 0 ? 1 : -1);
-    this.engine = damp(this.engine, Math.abs(this.vx) / 200, 6, dt);
+    this.engine = damp(this.engine, Math.abs(this.vx) / 340, 6, dt);
 
     const hF = T.heightAt(this.x + 38 * SC * 0.95), hB = T.heightAt(this.x - 38 * SC * 0.95), hM = T.heightAt(this.x);
     const gy = (hF + hB + hM * 2) / 4;

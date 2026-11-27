@@ -13,7 +13,7 @@ export class Terrain {
       let h = 70 + 38 * Math.sin(x * 0.00135 + 1.0) + 24 * Math.sin(x * 0.0043 + 2.0) + 9 * Math.sin(x * 0.0113 + 0.4) + 4 * Math.sin(x * 0.027);
       // flatten around the town and at both ends
       const dt = Math.abs(x - townX);
-      const flat = 1 - clamp((dt - 380) / 420, 0, 1);
+      const flat = 1 - clamp((dt - 560) / 600, 0, 1);
       h = h * (1 - flat) + 46 * flat;
       const edge = Math.min(x, width - x);
       h += clamp(1 - edge / 300, 0, 1) * 40;

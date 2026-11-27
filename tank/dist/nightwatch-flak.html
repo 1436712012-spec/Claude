@@ -1582,7 +1582,7 @@ class Terrain {
       let h = 70 + 38 * Math.sin(x * 0.00135 + 1.0) + 24 * Math.sin(x * 0.0043 + 2.0) + 9 * Math.sin(x * 0.0113 + 0.4) + 4 * Math.sin(x * 0.027);
       // flatten around the town and at both ends
       const dt = Math.abs(x - townX);
-      const flat = 1 - clamp((dt - 380) / 420, 0, 1);
+      const flat = 1 - clamp((dt - 560) / 600, 0, 1);
       h = h * (1 - flat) + 46 * flat;
       const edge = Math.min(x, width - x);
       h += clamp(1 - edge / 300, 0, 1) * 40;
@@ -2045,15 +2045,15 @@ class Tank {
     // ---- driving ----
     const dir = inp.axis;
     const od = w.combo.odT > 0;
-    let maxV = 200 * (this.charging && this.charge > 0.2 ? 0.7 : 1);
+    let maxV = 340 * (this.charging && this.charge > 0.2 ? 0.7 : 1);
     const sl = T.slopeAt(this.x);
     this.slopeCur = damp(this.slopeCur, sl, 8, dt);
     if (dir) maxV *= (1 - 0.3 * clamp(this.slopeCur * dir, 0, 1)) * Math.min(1, 0.35 + Math.abs(dir));
-    if (Math.abs(dir) > 0.05) this.vx += dir * 950 * dt; else this.vx = approach(this.vx, 0, 820 * dt);
+    if (Math.abs(dir) > 0.05) this.vx += dir * 1700 * dt; else this.vx = approach(this.vx, 0, 1400 * dt);
     this.vx = clamp(this.vx, -maxV, maxV);
     this.x = clamp(this.x + this.vx * dt, 170, T.W - 170);
     this.odo += this.vx * dt * (this.f > 0 ? 1 : -1);
-    this.engine = damp(this.engine, Math.abs(this.vx) / 200, 6, dt);
+    this.engine = damp(this.engine, Math.abs(this.vx) / 340, 6, dt);
 
     const hF = T.heightAt(this.x + 38 * SC * 0.95), hB = T.heightAt(this.x - 38 * SC * 0.95), hM = T.heightAt(this.x);
     const gy = (hF + hB + hM * 2) / 4;
@@ -2574,7 +2574,7 @@ class Town {
     this.houses = [];
     const N = 9;
     for (let i = 0; i < N; i++) {
-      const x = cx + (i - (N - 1) / 2) * 96 + rng.range(-10, 10);
+      const x = cx + (i - (N - 1) / 2) * 130 + rng.range(-14, 14);
       const wd = rng.range(58, 80), ht = rng.range(46, 72);
       this.houses.push({
         x, w: wd, h: ht, hp: 100, maxHp: 100, alive: true, wall: rng.pick(WALLS), roofH: rng.range(22, 34), flat: rng.chance(0.25),
@@ -4020,8 +4020,8 @@ return { DEFS, ORDER, Arsenal };
 
 // ---- data/consts.js
 __M[21] = (() => {
-const WORLD_W = 7000;
-const TOWN_X = 3500;
+const WORLD_W = 14000;
+const TOWN_X = 7000;
 const WAVES = 8;
 
 return { WORLD_W, TOWN_X, WAVES };
@@ -4358,10 +4358,10 @@ class Game {
     // camera
     const t = this.tank;
     const lead = clamp((t.aimX - t.x) * 0.22, -150, 150);
-    const tx = t.x + lead + (t.vx * 0.25);
+    const tx = t.x + lead + (t.vx * 0.35);
     const hw = cam.halfW;
-    cam.x = clamp(damp(cam.x, tx, 4.5, dt), hw, this.terrain.W - hw);
-    cam.y = damp(cam.y, t.y * 0.8 + this.terrain.heightAt(t.x) * 0.2 + 125, 3, dt);
+    cam.x = clamp(damp(cam.x, tx, 6, dt), hw, this.terrain.W - hw);
+    cam.y = damp(cam.y, t.y * 0.8 + this.terrain.heightAt(t.x) * 0.2 + 165, 3, dt);
 
     // sky
     let target;
@@ -4385,7 +4385,7 @@ class Game {
   draw(realDt) {
     const fx = this.fx, cam = this.camera, r = this.r;
     const zoom = 1 + fx.zoomPunch * 0.04;
-    cam.halfH = 300 / zoom;
+    cam.halfH = 390 / zoom;
     cam.halfW = cam.halfH * (cam.cssW / cam.cssH);
     const shake = fx.shakeOffset();
     const sky = computeSky(this.skyPhase);

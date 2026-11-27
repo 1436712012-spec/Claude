@@ -262,10 +262,10 @@ export class Game {
     // camera
     const t = this.tank;
     const lead = clamp((t.aimX - t.x) * 0.22, -150, 150);
-    const tx = t.x + lead + (t.vx * 0.25);
+    const tx = t.x + lead + (t.vx * 0.35);
     const hw = cam.halfW;
-    cam.x = clamp(damp(cam.x, tx, 4.5, dt), hw, this.terrain.W - hw);
-    cam.y = damp(cam.y, t.y * 0.8 + this.terrain.heightAt(t.x) * 0.2 + 125, 3, dt);
+    cam.x = clamp(damp(cam.x, tx, 6, dt), hw, this.terrain.W - hw);
+    cam.y = damp(cam.y, t.y * 0.8 + this.terrain.heightAt(t.x) * 0.2 + 165, 3, dt);
 
     // sky
     let target;
@@ -289,7 +289,7 @@ export class Game {
   draw(realDt) {
     const fx = this.fx, cam = this.camera, r = this.r;
     const zoom = 1 + fx.zoomPunch * 0.04;
-    cam.halfH = 300 / zoom;
+    cam.halfH = 390 / zoom;
     cam.halfW = cam.halfH * (cam.cssW / cam.cssH);
     const shake = fx.shakeOffset();
     const sky = computeSky(this.skyPhase);

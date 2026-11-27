@@ -13,7 +13,7 @@ export class Town {
     this.houses = [];
     const N = 9;
     for (let i = 0; i < N; i++) {
-      const x = cx + (i - (N - 1) / 2) * 96 + rng.range(-10, 10);
+      const x = cx + (i - (N - 1) / 2) * 130 + rng.range(-14, 14);
       const wd = rng.range(58, 80), ht = rng.range(46, 72);
       this.houses.push({
         x, w: wd, h: ht, hp: 100, maxHp: 100, alive: true, wall: rng.pick(WALLS), roofH: rng.range(22, 34), flat: rng.chance(0.25),
