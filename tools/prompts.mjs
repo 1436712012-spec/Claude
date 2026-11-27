@@ -183,3 +183,8 @@ document.addEventListener('click', async (e) => {
 fs.mkdirSync(path.join(root, 'dist'), { recursive: true });
 fs.writeFileSync(path.join(root, 'dist/art-prompts.html'), html);
 console.log('prompts:', items.length, 'missing:', L.CARD_LIST.filter((d) => !SUBJECT[d.id]).map((d) => d.id).join(',') || 'none');
+
+// ---- plain-text batch file for a chat image model (public raw link)
+let txt = `LIMINAL card art batch — ${items.length} images.\nInstructions for the image model: for EACH entry below, generate ONE square 1:1 image using exactly the prompt given. Produce them in order, one image per reply. After each image, write the entry ID so the file can be named <ID>-1.png. When the user says "continue", go on with the next entry. If the user says "again", make one more variant of the previous entry (name <ID>-2.png).\n\n`;
+for (const [g, label] of GROUPS) for (const it of items.filter((x) => x.group === g)) txt += `[${it.id}] ${it.prompt}\n\n`;
+fs.writeFileSync(path.join(root, 'docs/ART_PROMPTS.txt'), txt);
